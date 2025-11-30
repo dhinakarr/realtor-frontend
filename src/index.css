@@ -1,0 +1,142 @@
+:root {
+  --primary-color: hsl(270, 70%, 45%);
+  --primary-text: hsl(0, 0%, 100%);
+  --secondary-color: hsl(270, 60%, 25%);
+  --secondary-text: hsl(0, 0%, 100%);
+  --background-gradient: linear-gradient(135deg, hsl(270,30%,98%) 0%, hsl(270,40%,95%) 100%);
+  --card-bg: hsl(0,0%,100%);
+  --card-text: hsl(270,60%,15%);
+  --radius: 0.5rem;
+}
+
+body {
+  background: var(--background-gradient);
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+}
+
+.card-custom {
+  background-color: var(--card-bg);
+  color: var(--card-text);
+  border-radius: var(--radius);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.btn-primary-custom {
+  background-color: var(--primary-color);
+  color: var(--primary-text);
+  border: none;
+}
+
+.btn-primary-custom:hover {
+  background-color: hsl(270, 70%, 55%);
+}
+
+.sidebar {
+  background-color: var(--secondary-color);
+  color: var(--secondary-text);
+  min-height: 100vh;
+  width: 5vw;
+  padding: 0.2rem;
+  overflow: hidden; /* hide overflowing text */
+  white-space: nowrap; /* prevent line breaks */
+  text-overflow: ellipsis; /* show ... for long text */
+}
+
+.sidebar a {
+  display: block;
+  padding: 0.5rem;
+  color: var(--secondary-text);
+  text-decoration: none;
+  border-radius: var(--radius);
+  margin-bottom: 0.3rem;
+}
+
+.sidebar a:hover {
+  background-color: hsl(270,50%,35%);
+  color: var(--primary-text);
+}
+.tile-box:hover {
+  background: #e7f1ff;
+  transform: scale(1.03);
+  transition: 0.2s ease;
+}
+.sidebar-link {
+  display: flex;
+  flex-direction: column; /* stack icon and text vertically */
+  align-items: center; /* center align horizontally */
+  padding: 0.5rem;
+  color: var(--secondary-text);
+  text-decoration: none;
+  border-radius: var(--radius);
+  margin-bottom: 0.5rem;
+}
+
+.sidebar-link:hover {
+  background-color: hsl(270,50%,35%);
+  color: var(--primary-text);
+}
+
+.sidebar-link .icon {
+  font-size: 1.5rem; /* bigger icon */
+  margin-bottom: 0.25rem; /* space between icon and module name */
+}
+
+.sidebar-link .text {
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.module-page-container {
+  margin-left: 0.1rem; /* leave space for sidebar */
+  margin-top: 0.1rem; /* space from top */
+
+}
+.tight-container {
+  margin-top: 5px;
+  margin-left: 5px;
+  margin-right: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.form-page-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 30px;
+  background: #f5f6fa;
+}
+
+.form-card {
+  width: 100%;
+  max-width: 650px;       /* reduces width */
+  background: #fff;
+  padding: 30px 35px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid #eee;
+}
+
+.form-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+.form-group label {
+  font-weight: 500;
+}
+
+input,
+select,
+textarea {
+  border-radius: 6px !important;
+  padding: 10px !important;
+}
+
+.error-message {
+  color: red;
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
