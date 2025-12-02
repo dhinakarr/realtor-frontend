@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import API from "../../api/api";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 import useModule from "../../hooks/useModule";
+import "./ProjectPage.css";
 
 export default function ProjectPage() {
   const [projects, setProjects] = useState([]);
@@ -17,6 +18,9 @@ export default function ProjectPage() {
   const BASE_URL = API.defaults.baseURL; 
 
   const storedUser = JSON.parse(localStorage.getItem("user"));
+  
+  const [deleteProjectId, setDeleteProjectId] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const canCreate = feature.canCreate;
   const canEdit   = feature.canUpdate;
@@ -28,28 +32,60 @@ export default function ProjectPage() {
   }, []);
 
   const loadProjects = async () => {
-    try {
+    try { 
       const res = await API.get("/api/projects");
+	  //console.log("@ProjectPage.loadProjects res: "+JSON.stringify(res));
       if (res.data?.success) {
         setProjects(res.data.data || []);
       }
+	  //console.log("@ProjectPage.loadProjects projects: "+JSON.stringify(projects));
     } catch (err) {
       console.error("Error fetching projects", err);
     } finally {
       setLoading(false);
     }
+	
   };
 
   const handleNewProject = () => navigate("/projects/create");
 
   const handleEdit = (id) => navigate(`/projects/edit/${id}`);
-  const handleDelete = (id) => {
-    if (!window.confirm("Are you sure to delete this project?")) return;
-    console.log("Delete ->", id);
-  };
+  const handleView = (id) => navigate(`/projects/details/${id}`);
+  const handleDelete = (id, e) => {
+	  e.stopPropagation();
+	  setDeleteProjectId(id);
+	};
+  
+  const cancelProject = async (projectId) => {
+	  setIsDeleting(true);
+
+	  try {
+		const res = await API.delete(`/api/projects/${projectId}`);
+		if (res.data.success) {
+		  // fade-out animation flag
+		  setProjects(prev =>
+			prev.map(p =>
+			  p.projectId === projectId ? { ...p, _fade: true } : p
+			)
+		  );
+
+		  // remove after animation ends (300ms)
+		  setTimeout(() => {
+			setProjects(prev => prev.filter(p => p.projectId !== projectId));
+		  }, 300);
+
+		  toast.success("Project deleted successfully!");
+		}
+	  } catch (err) {
+		console.error(err);
+	  }
+
+	  setIsDeleting(false);
+	  setDeleteProjectId(null);
+	};
 
   return (
-    <div className="container">
+    <div className="container-fluid  custom-container">
 
       {/* Header */}
       <div className="d-flex justify-content-between align-items-center mb-3">
@@ -78,12 +114,17 @@ export default function ProjectPage() {
         {projects.map((project) => {
           const img =
             project.files && project.files.length > 0
-              ? project.files[0].publicUrl
+              ? `${BASE_URL}/api/projects/file/${project.files[0].projectFileId}`
               : null;
-//console.log("ProjectsPage project: "+project.files[0].publicUrl);
+//console.log("ProjectsPage project: "+img);
           return (
-            <div key={project.projectId} className="col-md-4 mb-4">
-              <div className="card shadow-sm h-100 position-relative">
+            <div
+				  key={project.projectId}
+				  className={`col-md-4 mb-4 project-card-wrapper ${project._fade ? "fade-out" : ""}`}
+				>
+              <div className="card shadow-sm h-100 position-relative cursor-pointer hover:shadow-lg"
+                onClick={() => handleView(project.projectId)}>
+			  
                 {/* Edit Icon (top-right) */}
                 {canEdit && (
                   <FaEdit
@@ -128,29 +169,62 @@ export default function ProjectPage() {
                 </div>
 
                 {/* Card Footer */}
-                <div className="card-footer d-flex justify-content-between align-items-center bg-white">
-                  <Link
-                    to={`/admin/projects/${project.projectId}`}
-                    className="btn btn-sm btn-outline-primary"
-                  >
-                    View
-                  </Link>
-
-                  {/* Delete Icon */}
-                  {canDelete && (
-                    <FaTrash
-                      className="text-danger"
-                      style={{ cursor: "pointer" }}
-                      onClick={() => handleDelete(project.projectId)}
-                    />
-                  )}
-                </div>
+                <div className="card-footer bg-white position-relative" style={{ minHeight: "30px" }}>
+				  {canDelete && (
+					<FaTrash
+					  className="text-danger position-absolute"
+					  style={{
+						right: "10px",
+						bottom: "8px",
+						cursor: "pointer",
+						fontSize: "16px"
+					  }}
+					  onClick={(e) => handleDelete(project.projectId, e)}
+					/>
+				  )}
+				</div>
 
               </div>
             </div>
           );
         })}
       </div>
+	  
+	  {/* DELETE PROJECT CONFIRM MODAL */}
+		{deleteProjectId && (
+		  <div
+			className="modal fade show"
+			style={{ display: "block", background: "rgba(0,0,0,0.4)" }}
+		  >
+			<div className="modal-dialog modal-dialog-centered">
+			  <div className="modal-content">
+
+				<div className="modal-header">
+				  <h5 className="modal-title">Delete Project</h5>
+				  <button className="btn-close" onClick={() => setDeleteProjectId(null)} />
+				</div>
+
+				<div className="modal-body">
+				  Are you sure you want to <strong>delete this project?</strong><br/>
+				  This will mark the project as <strong>INACTIVE</strong>.
+				</div>
+
+				<div className="modal-footer">
+				  <button className="btn btn-secondary" onClick={() => setDeleteProjectId(null)}>
+					Cancel
+				  </button>
+
+				  <button className="btn btn-danger" disabled={isDeleting}
+					onClick={() => cancelProject(deleteProjectId)}>
+					{isDeleting ? "Deleting..." : "Yes, Delete"}
+				  </button>
+				</div>
+
+			  </div>
+			</div>
+		  </div>
+		)}
+	  
     </div>
   );
 }

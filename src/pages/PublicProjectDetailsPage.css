@@ -1,0 +1,82 @@
+/* Grid for plots */
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 10px;
+}
+
+/* Plot squares */
+.plot-square {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.7rem;
+  padding: 4px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.plot-square:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+.plot-number {
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
+.plot-data {
+  font-size: 0.65rem;
+  text-align: center;
+}
+
+/* Overlay backdrop */
+.overlay-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.45);
+  z-index: 9998;
+}
+
+/* Sliding overlay panel */
+.plot-overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 40%;
+  max-width: 450px;
+  height: 100%;
+  background: #fff;
+  z-index: 9999;
+  padding: 20px;
+  overflow-y: auto;
+  box-shadow: -4px 0 20px rgba(0,0,0,0.3);
+  transform: translateX(100%);
+  transition: transform 0.3s ease-out;
+}
+
+/* Slide-in effect */
+.plot-overlay.slide-in {
+  transform: translateX(0);
+}
+
+/* Overlay content */
+.plot-overlay-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Close button */
+.close-overlay {
+  align-self: flex-end;
+  margin-bottom: 10px;
+}

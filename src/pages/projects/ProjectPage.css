@@ -1,0 +1,13 @@
+.project-card-wrapper.fade-out {
+  animation: fadeProject 0.3s ease-in forwards;
+}
+
+@keyframes fadeProject {
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(0.9); }
+}
+
+.custom-container {
+  padding-left: 5px !important;
+  padding-right: 5px !important;
+}

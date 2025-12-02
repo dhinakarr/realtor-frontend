@@ -58,7 +58,7 @@ export default function ProjectFormPage() {
       const res = await API.get(url);
       const form = res.data?.data?.form;
       const record = res.data?.data?.data;
-console.log("ProjectFormPage.loadFormMeta res: "+res);
+//console.log("ProjectFormPage.loadFormMeta res: "+res);
       if (!form) return;
 
       const mapped = form.fields.map((f) => ({
@@ -92,9 +92,9 @@ console.log("ProjectFormPage.loadFormMeta res: "+res);
   // DELETE FILE HANDLER
   // ------------------------------------------------------------
   const handleDeleteFile = async (fileId) => {
-	  console.log("@handleDeleteFile fileId: "+fileId);
+	  //console.log("@handleDeleteFile fileId: "+fileId);
     try {
-      const res = await API.delete(`/api/projects/file/delete/${fileId}?projectId=${id}`, {
+      const res = await API.delete(`/api/projects/file/delete/${fileId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -297,8 +297,8 @@ console.log("ProjectFormPage.loadFormMeta res: "+res);
                     formValues.existingFiles?.length > 0 && (
                       <div className="mb-2 d-flex flex-wrap">
                         {formValues.existingFiles.map((f) => {
-                          const imgUrl = f.publicUrl;
-//console.log("imgUrl: "+imgUrl);
+                          const imgUrl = `${BASE_URL}/api/projects/file/${f.projectFileId}`
+console.log("imgUrl: "+imgUrl);
                           return (
                             <div
                               key={f.projectFileId}

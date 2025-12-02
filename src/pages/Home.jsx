@@ -1,26 +1,77 @@
-import React from 'react';
+import React, { useEffect, useState } from "react";
+import API from "../api/api";
+import { useNavigate } from "react-router-dom";
+//import "./HomePage.css";
 
-export default function Home() {
-  const projects = [
-    { id: 1, name: 'Project A', image: '/assets/placeholder.png' },
-    { id: 2, name: 'Project B', image: '/assets/placeholder.png' },
-    { id: 3, name: 'Project C', image: '/assets/placeholder.png' }
-  ];
+export default function HomePage() {
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const BASE_URL = API.defaults.baseURL;
+
+  useEffect(() => {
+    loadProjects();
+  }, []);
+
+  const loadProjects = async () => {
+    try {
+      const res = await API.get("/public/projects");
+      if (res.data?.success) setProjects(res.data.data);
+    } catch (err) {
+      console.error("Error fetching public projects", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const openProject = (id) => navigate(`/public/projects/details/${id}`);
 
   return (
-    <div className="container my-4">
-      <h3>Our Projects</h3>
+    <div className="container-fluid px-2">
+      {loading && <p>Loading...</p>}
+
+      {!loading && projects.length === 0 && (
+        <p className="text-muted">No projects available</p>
+      )}
+
       <div className="row">
-        {projects.map(p => (
-          <div key={p.id} className="col-md-4 mb-3">
-            <div className="card shadow-sm">
-              <img src={p.image} className="card-img-top" alt={p.name} />
-              <div className="card-body">
-                <h5 className="card-title">{p.name}</h5>
+        {projects.map((project) => {
+          const img =
+            project.files?.length > 0
+              ? `${BASE_URL}/api/projects/file/${project.files[0].projectFileId}`
+              : null;
+
+          return (
+            <div key={project.projectId} className="col-md-4 mb-4">
+              <div
+                className="card shadow-sm h-100 position-relative cursor-pointer"
+                onClick={() => openProject(project.projectId)}
+              >
+                {img && (
+                  <img
+                    src={img}
+                    alt={project.projectName}
+                    className="card-img-top"
+                    style={{ height: "180px", objectFit: "cover" }}
+                  />
+                )}
+
+                <div className="card-body">
+                  <h5 className="fw-bold mb-1">{project.projectName}</h5>
+
+                  <small className="text-muted">
+                    {project.locationDetails}
+                  </small>
+
+                  <div className="mt-2 text-secondary">
+                    Plots: {project.noOfPlots}
+                  </div>
+                </div>
+
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

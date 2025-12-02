@@ -1,0 +1,134 @@
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 12px;
+  margin-top: 20px;
+  padding: 8px;
+}
+.plot-square {
+  position: relative;
+  aspect-ratio: 1 / 1;    /* FIXED SQUARE */
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  overflow: visible;
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  font-size: 0.7rem;
+  min-height: 115px;
+}
+
+.plot-square:hover {
+  transform: scale(1.06);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+  border-color: #0d6efd;
+}
+
+.plot-content-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 4px;
+  box-sizing: border-box;
+}
+
+.plot-number {
+  font-size: 0.65rem;
+  color: #222;
+  margin-bottom: 2px;	
+}
+
+.plot-data {
+  font-size: 0.65rem;
+  text-align: left;
+}
+
+/* Icons */
+.plot-edit-icon {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  color: #555;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.plot-edit-icon:hover {
+  color: #555;
+  background: rgba(13, 110, 253, 0.15);
+  transform: scale(1.1);
+}
+
+.bottom-icons {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  display: flex;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  z-index: 30;
+}
+
+.plot-icon {
+  padding: 4px;
+  border-radius: 4px;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: all 0.2s;
+}
+
+.plot-icon.delete { color: red; }
+.plot-icon.delete:hover {
+  color: red;
+  transform: scale(1.15);
+}
+
+.plot-icon.finance { color: green; }
+.plot-icon.finance:hover {
+  color: green;
+  transform: scale(1.15);
+}
+
+.fade-anim {
+  animation: fadeOutIn 1s ease-in-out;
+}
+
+@keyframes fadeOutIn {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.94); }
+}
+.project-images-gallery {
+  display: flex;
+  overflow-x: auto;
+  gap: 10px;
+  padding: 10px 0;
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+}
+
+.project-images-gallery::-webkit-scrollbar {
+  height: 6px;
+}
+
+.project-images-gallery::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
+}
+
+.project-gallery-img {
+  height: 120px;
+  border-radius: 6px;
+  object-fit: cover;
+  flex: 0 0 auto; /* ensures images do not shrink */
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.project-gallery-img:hover {
+  transform: scale(1.05);
+}

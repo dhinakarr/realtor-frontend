@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import Home from './pages/Home';
+import PublicProjectDetailsPage from "./pages/PublicProjectDetailsPage";
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import ModulePage from './pages/ModulePage';
@@ -27,6 +28,7 @@ import PermissionCreatePage from './pages/admin/PermissionCreatePage';
 
 import ProjectsPage from './pages/projects/ProjectsPage';
 import ProjectFormPage from "./pages/projects/ProjectFormPage";
+import ProjectDetailsPage from "./pages/projects/ProjectDetailsPage";
 
 import { Tooltip, Popover } from 'bootstrap';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
@@ -49,6 +51,7 @@ function App() {
         <div className="flex-grow-1 p-3">
           <Routes>
             <Route path="/" element={<Home />} />
+			<Route path="/public/projects/details/:id" element={<PublicProjectDetailsPage />} />
             <Route path="/login" element={<Login setUser={setUser} />} />
             <Route path="/dashboard" element={user ? <Dashboard /> : <Login setUser={setUser} />} />
 			<Route path="/module/:moduleName" element={user ? <ModulePage user={user} /> : <Login setUser={setUser} />} />
@@ -84,6 +87,7 @@ function App() {
 			<Route path="/projects/list" element={<ProjectsPage />} />
 			<Route path="/projects/create" element={<ProjectFormPage />} />
 			<Route path="/projects/edit/:id" element={<ProjectFormPage />} />
+			<Route path="/projects/details/:id" element={<ProjectDetailsPage />} />
 			
 			{/* PermissionList pages */}
 			<Route path="/admin/permissions" element={<PermissionListPage />} />
