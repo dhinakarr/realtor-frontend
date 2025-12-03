@@ -78,6 +78,7 @@ export default function UserCreatePage() {
     metaList.forEach((m) => {
       if (m.key.trim()) metaObj[m.key] = m.value;
     });
+	console.log("@UserCreatePage.handleSubmit metaObj: "+JSON.stringify(metaObj));
     if (Object.keys(metaObj).length > 0) {
       formData.append("meta", JSON.stringify(metaObj));
     }
@@ -87,7 +88,7 @@ export default function UserCreatePage() {
     if (imageFile) {
       formData.append("profileImage", imageFile);
     }
-
+console.log("@UserCreatePage.handleSubmit formData: "+JSON.stringify(formData));
     API.post("/api/users", formData, {
       headers: {
         Authorization: `Bearer ${token}`,

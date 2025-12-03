@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from "react";
 import API from "../../api/api";
 import PageHeader from "../../components/PageHeader";
+import useModule from "../../hooks/useModule";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Link } from "react-router-dom";
+import { FaPlus, FaEye, FaEdit, FaTrash } from "react-icons/fa";
+import { mapApiToRoute } from "../../utils/mapApiToRoute";
 
 export default function PermissionCreatePage() {
   const [roles, setRoles] = useState([]);
@@ -10,6 +14,7 @@ export default function PermissionCreatePage() {
   const [selectedRoleId, setSelectedRoleId] = useState("");
   const [selectedModuleId, setSelectedModuleId] = useState("");
   const [features, setFeatures] = useState([]);
+  const module = useModule("/api/modules");
 
   const [permissions, setPermissions] = useState({});
 
@@ -95,6 +100,9 @@ export default function PermissionCreatePage() {
 
   return (
     <div className="container mt-3">
+	  {module && (
+        <PageHeader module={module} mapApiToRoute={mapApiToRoute} />
+      )}
       <PageHeader title="Create ACL Permissions" />
 
       {/* ROLE DROPDOWN */}

@@ -1,58 +1,62 @@
 // components/Sidebar.jsx
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { FaUserShield, FaCogs, FaTh, FaUsers, FaKey, FaFolderOpen } from 'react-icons/fa';
+import { Link, useLocation } from 'react-router-dom';
+import { FaTachometerAlt, FaUserShield, FaFolderOpen, FaDollarSign, FaUsers } from 'react-icons/fa';
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
+import Tooltip from 'react-bootstrap/Tooltip';
 
 const moduleIcons = {
-  Admin: <FaUserShield />,
-  Features: <FaCogs />,
-  Modules: <FaTh />,
-  Roles: <FaKey />,
-  Users: <FaUsers />,
-  Projects: <FaFolderOpen />, 
+	Dashboard: <FaTachometerAlt />,
+	Admin: <FaUserShield />,
+	Projects: <FaFolderOpen />,
+	Finance: <FaDollarSign />,
+	Customers: <FaUsers />
 };
 
 const moduleRouteMap = {
-  Admin: "/module/Admin",
+  Dashboard: '/dashboard',
+	Admin: '/module/admin',
+	Projects: '/projects/list',
+	Finance: '/finance/list',
+	Customers: '/customers/list'
 };
 
 export default function Sidebar() {
+  const location = useLocation();
   const user = JSON.parse(localStorage.getItem('user'));
   const permissions = user?.permission || []; // fixed access
   //console.log("Sidebar Data Received: "+JSON.stringify(user));
   //console.log("Sidebar permissions: "+JSON.stringify(permissions));
+  
+  //const isActive = (route) => location.pathname.startsWith(route);
+  //console.log("Sidebar isActive: "+isActive);
   return (
-    <div style={{ width: '70px', backgroundColor: 'hsl(270, 70%, 40%)', color: 'white', minHeight: '100vh', padding: '1rem' }}>
-      {permissions.length > 0 ? (
+    <div style={{ width: '70px', backgroundColor: 'hsl(270, 70%, 40%)', color: 'white', minHeight: '100vh', padding: '0.5rem' }}>
+      {permissions.length > 0 ? (	
         permissions.map((module) => (
-          <div key={module.moduleId} className="mb-3">
-		  
-		  <Link
-              to={
-                moduleRouteMap[module.moduleName] || // keep Admin unchanged
-                `/${module.moduleName.toLowerCase()}/list` // dynamic route for new modules
-              }
-              className="sidebar-link d-flex flex-column align-items-center"
-            >
-              <span className="icon">{moduleIcons[module.moduleName] || '📁'}</span>
-              <span className="text">{module.moduleName}</span>
-            </Link>
-		  
-		 {/*
-            <Link
-			  to={`/module/${module.moduleName}`}
-			  className="sidebar-link d-flex flex-column align-items-center"
-			>
-              <span className="icon">{moduleIcons[module.moduleName] || '📁'}</span>
-              <span className="text">{module.moduleName}</span>
-            </Link>
-		*/}
-			
+			//const route = moduleRouteMap[module.moduleName] || `/${module.moduleName.toLowerCase()}/list`;
+          <div key={module.moduleId} className="mb-3 text-center">
+			  <OverlayTrigger
+				placement="right"
+				overlay={<Tooltip id={`tooltip-${module.moduleName}`}>{module.moduleName}</Tooltip>}
+				>
+			  
+				  <Link
+					  to={
+						moduleRouteMap[module.moduleName] || // keep Admin unchanged
+						`/${module.moduleName.toLowerCase()}/list` // dynamic route for new modules
+					  }
+					  className={`sidebar-link d-flex flex-column align-items-center text-white text-decoration-none p-2 rounded`}
+					>
+					  <span className="icon">{moduleIcons[module.moduleName] || '📁'}</span>
+						  {/*<span className="text mt-1 small" style={{fontSize: '0.6rem'}}>{module.moduleName}</span> */}
+					</Link>
+			  </OverlayTrigger>	
           </div>
         ))
       ) : (
         <p>No modules available</p>
       )}
     </div>
-  );
+  );  
 }

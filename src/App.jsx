@@ -30,6 +30,9 @@ import ProjectsPage from './pages/projects/ProjectsPage';
 import ProjectFormPage from "./pages/projects/ProjectFormPage";
 import ProjectDetailsPage from "./pages/projects/ProjectDetailsPage";
 
+import CustomerListPage from "./pages/customers/CustomerListPage";
+
+
 import { Tooltip, Popover } from 'bootstrap';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
@@ -92,6 +95,11 @@ function App() {
 			{/* PermissionList pages */}
 			<Route path="/admin/permissions" element={<PermissionListPage />} />
 			<Route path="/admin/permissions/create" element={<PermissionCreatePage />} />
+			
+			
+			<Route path="/customers/list" element={<CustomerListPage />} />
+			
+			
 			<Route path="*" element={<div style={{color:'red'}}>NO MATCH</div>} />
 			
 			
