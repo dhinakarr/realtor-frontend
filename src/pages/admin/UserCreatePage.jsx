@@ -66,29 +66,32 @@ export default function UserCreatePage() {
     }
 
     const formData = new FormData();
-	const dto = {...record, meta: {} };	
+	
+	// Add meta (optional)
+    const metaObj = {};
+    metaList.forEach((m) => {
+      if (m.key.trim()) metaObj[m.key] = m.value;
+    });
+	//const dto = {...record, meta: {} };	
 
     // Add normal fields
     Object.keys(record).forEach((key) => {
       if (key !== "meta") formData.append(key, record[key]);
     });
 
-    // Add meta (optional)
-    const metaObj = {};
-    metaList.forEach((m) => {
-      if (m.key.trim()) metaObj[m.key] = m.value;
-    });
+    
 	console.log("@UserCreatePage.handleSubmit metaObj: "+JSON.stringify(metaObj));
-    if (Object.keys(metaObj).length > 0) {
-      formData.append("meta", JSON.stringify(metaObj));
-    }
+    //if (Object.keys(metaObj).length > 0) {
+      //formData.append("meta", JSON.stringify(metaObj));
+    //}
+	const dto = {...record, meta: metaObj };	
 	formData.append("dto", new Blob([JSON.stringify(dto)], { type: "application/json" }));
 
     // Add image (optional)
     if (imageFile) {
       formData.append("profileImage", imageFile);
     }
-console.log("@UserCreatePage.handleSubmit formData: "+JSON.stringify(formData));
+
     API.post("/api/users", formData, {
       headers: {
         Authorization: `Bearer ${token}`,

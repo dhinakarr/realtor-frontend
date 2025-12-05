@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { FaPlus, FaEdit, FaTrash, FaUserPlus } from "react-icons/fa";
+import { FaPlus, FaEdit, FaTrash, FaUserPlus, FaEye } from "react-icons/fa";
 import API from "../../api/api";
 import { mapApiToRoute } from "../../utils/mapApiToRoute";
 import CustomerCreateOverlay from './CustomerCreateOverlay';
+import CustomerViewOverlay from './CustomerViewOverlay';
+import CustomerEditOverlay from './CustomerEditOverlay';
 
 export default function CustomerListPage() {
   const [customers, setCustomers] = useState([]);
@@ -10,6 +12,9 @@ export default function CustomerListPage() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [showCreate, setShowCreate] = useState(false);
+  const [viewId, setViewId] = useState(null);
+  const [showEdit, setShowEdit] = useState(false);
+  const [selectedCustomerId, setSelectedCustomerId] = useState(null);
   
   const fetchCustomers = () => {
 	  API.get("/api/customers")
@@ -38,6 +43,11 @@ export default function CustomerListPage() {
   const filtered = customers.filter((c) =>
     c.customerName?.toLowerCase().includes(searchText.toLowerCase())
   );
+  
+  const handleEdit = (id) => {
+	  setSelectedCustomerId(id);
+	  setShowEdit(true);
+	};
 
   // Pagination logic
   const totalPages = Math.ceil(filtered.length / pageSize);
@@ -45,8 +55,8 @@ export default function CustomerListPage() {
   const paginated = filtered.slice(startIndex, startIndex + pageSize);
 
   return (
-    <div className="container mt-3">
-      <div><h1>Customer Portal</h1></div>
+    <div className="container-fluid mt-1">
+      <div><h2>Customer Portal</h2></div>
       {/* Top bar: search - title - create */}
       <div className="d-flex justify-content-between align-items-center mb-2 flex-nowrap">
 
@@ -95,8 +105,16 @@ export default function CustomerListPage() {
                   <td>{c.email}</td>
                   <td>{c.mobile}</td>
                   <td align="center">
-                    <FaEdit className="me-2" />
-                    <FaTrash className="me-2" />
+					<FaEye 
+						className="me-2 action-icon" 
+						onClick={() => setViewId(c.customerId)} 
+						style={{ cursor: "pointer" }}
+					  />
+                    <FaEdit onClick={() => handleEdit(c.customerId)} 
+						className="text-primary cursor-pointer" 
+						style={{ cursor: "pointer" }}
+					 />
+                    <FaTrash className="me-2 action-icon" style={{ cursor: "pointer" }} />
                   </td>
                 </tr>
               ))
@@ -109,6 +127,22 @@ export default function CustomerListPage() {
             )}
           </tbody>
         </table>
+		
+		{/* Overlay must be here — OUTSIDE the table */}
+		<CustomerViewOverlay
+		  customerId={viewId}
+		  onClose={() => setViewId(null)}
+		/>
+		{/* Overlay must be here — OUTSIDE the table */}
+		{showEdit && (
+		  <CustomerEditOverlay
+			show={showEdit}
+			customerId={selectedCustomerId}
+			onClose={() => setShowEdit(false)}
+			onUpdated={fetchCustomers}
+		  />
+		)}
+		
       </div>
 
       {/* Pagination bar */}
@@ -168,6 +202,7 @@ export default function CustomerListPage() {
 			}}
 		  />
 		)}
+		
 
     </div>
   );

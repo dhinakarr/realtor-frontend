@@ -1,0 +1,235 @@
+/* Background Overlay */
+.overlay-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 900;
+  opacity: 1;
+}
+
+/* Sliding Panel */
+.edit-panel {
+  position: fixed;
+  top: 0;
+  right: -450px;
+  width: 550px;
+  height: 100%;
+  background: #fff;
+  box-shadow: -2px 0 8px rgba(0,0,0,0.3);
+  z-index: 1000;
+  transition: right 0.15s ease-in-out;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.edit-panel.open {
+  right: 0;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #ddd;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.form-container {
+  margin-top: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+.form-group input,
+.form-group textarea {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.radio-group {
+  display: flex;
+  gap: 12px;
+}
+
+.preview-img {
+  width: 100px;
+  margin-top: 10px;
+  border-radius: 4px;
+}
+
+.save-btn {
+  width: 100%;
+  padding: 12px;
+  background: #0066ff;
+  border: none;
+  color: #fff;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.form-container {
+  margin-top: 5px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;   /* Two columns */
+  gap: 5px;
+}
+
+/* Textarea and file fields should span across both columns */
+.form-group.full-width {
+  grid-column: span 2;
+}
+
+/* Inputs */
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+/* Grid layout: 2 columns */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* Full width fields */
+.full-width {
+  grid-column: span 2;
+}
+
+/* Card sections */
+.form-section {
+  background: #f7f7f7;
+  padding: 9px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #e0e0e0;
+}
+
+.section-title {
+  font-size: 10px;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #444;
+}
+
+/* Floating label container */
+.float-group {
+  position: relative;
+  margin-bottom: 8px;
+}
+
+.float-group input,
+.float-group textarea,
+.float-group select {
+  width: 100%;
+  padding: 12px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 14px;
+}
+
+.float-group textarea {
+  min-height: 90px;
+}
+
+/* Floating label */
+.float-group label {
+  position: absolute;
+  left: 12px;
+  top: 13px;
+  background: #f7f7f7;
+  padding: 0 4px;
+  color: #888;
+  font-size: 14px;
+  pointer-events: none;
+  transition: all 0.2s ease;
+}
+
+.float-group input:focus + label,
+.float-group textarea:focus + label,
+.float-group input:not(:placeholder-shown) + label,
+.float-group textarea:not(:placeholder-shown) + label {
+  top: -8px;
+  font-size: 12px;
+  color: #333;
+}
+
+/* Validation message */
+.validation-error {
+  color: #d30000;
+  font-size: 12px;
+  margin-top: 3px;
+}
+.image-preview-box {
+  position: relative;
+  display: inline-block;
+}
+
+.preview-img {
+  width: 140px;     /* adjust as you prefer */
+  height: auto;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.image-delete-icon {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #ff4d4d;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 20px;
+  padding: 0;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  transition: 0.2s ease-in-out;
+}
+
+.image-delete-icon:hover {
+  background: #d93636;
+  transform: scale(1.1);
+}
+.confirm-overlay {
+  position: fixed;
+  top: 200px;
+  left: 400px;
+  width: 20%;
+  height: 20%;
+  background: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 5000; /* <-- increase this */
+}
+.confirm-box {
+  position: relative;
+  z-index: 1000000;
+}
