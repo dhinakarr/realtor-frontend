@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { FaPlus, FaEdit, FaTrash, FaUserPlus, FaEye } from "react-icons/fa";
+import { FaPlus, FaEdit, FaTrash, FaUserPlus, FaEye, FaUpload, FaFileUpload, FaStickyNote, FaRegStickyNote } from "react-icons/fa";
 import API from "../../api/api";
 import { mapApiToRoute } from "../../utils/mapApiToRoute";
 import CustomerCreateOverlay from './CustomerCreateOverlay';
 import CustomerViewOverlay from './CustomerViewOverlay';
 import CustomerEditOverlay from './CustomerEditOverlay';
+import UploadDocumentsOverlay from './UploadDocumentsOverlay';
+import useDebounce from "../../hooks/useDebounce";
+import "./CustomerListPage.css";
 
 export default function CustomerListPage() {
   const [customers, setCustomers] = useState([]);
@@ -15,6 +18,43 @@ export default function CustomerListPage() {
   const [viewId, setViewId] = useState(null);
   const [showEdit, setShowEdit] = useState(false);
   const [selectedCustomerId, setSelectedCustomerId] = useState(null);
+  const [docCustomerId, setDocCustomerId] = useState(null);
+  const [showDocs, setShowDocs] = useState(false);
+  const [showUploadOverlay, setShowUploadOverlay] = useState(false);
+  
+  const openDocuments = (id) => {
+	  setDocCustomerId(id);
+	  setShowDocs(true);
+	};
+
+	const openNotes = (id) => {
+	  console.log("Notes not implemented yet", id);
+	};
+  
+  useEffect(() => {
+	  if (searchText.trim() === "") {
+		// Load all customers
+		fetchCustomers();
+		return;
+	  }
+
+	  const delayDebounce = setTimeout(() => {
+		API.get("/api/customers/search", {
+		  params: { searchText }
+		})
+		  .then((res) => {
+			  const data = res.data?.data; 
+			setCustomers(Array.isArray(data) ? data : []);
+			setPage(1);
+		  })
+		  .catch((err) => {
+			console.error(err);
+			setCustomers([]);
+		  });
+	  }, 400);   // debounce 400ms like Google search
+	  return () => clearTimeout(delayDebounce);
+	}, [searchText]);
+  
   
   const fetchCustomers = () => {
 	  API.get("/api/customers")
@@ -40,9 +80,11 @@ export default function CustomerListPage() {
   }, []);
 
   // Filter customers based on search
-  const filtered = customers.filter((c) =>
-    c.customerName?.toLowerCase().includes(searchText.toLowerCase())
-  );
+  const filtered = Array.isArray(customers)
+	  ? customers.filter((c) =>
+		  c.customerName?.toLowerCase().includes(searchText.toLowerCase())
+		)
+	  : [];
   
   const handleEdit = (id) => {
 	  setSelectedCustomerId(id);
@@ -61,7 +103,7 @@ export default function CustomerListPage() {
       <div className="d-flex justify-content-between align-items-center mb-2 flex-nowrap">
 
         {/* Left: Search */}
-        <div style={{ width: "250px" }}>
+        <div style={{ width: "200px" }}>
           <input
             type="text"
             className="form-control"	
@@ -104,17 +146,37 @@ export default function CustomerListPage() {
                   <td>{c.customerName}</td>
                   <td>{c.email}</td>
                   <td>{c.mobile}</td>
-                  <td align="center">
+                  <td className="action-col">
+				   <div className="action-icons">
 					<FaEye 
-						className="me-2 action-icon" 
+						className="action-icon view" 
 						onClick={() => setViewId(c.customerId)} 
 						style={{ cursor: "pointer" }}
 					  />
                     <FaEdit onClick={() => handleEdit(c.customerId)} 
-						className="text-primary cursor-pointer" 
+						className="action-icon edit" 
 						style={{ cursor: "pointer" }}
 					 />
-                    <FaTrash className="me-2 action-icon" style={{ cursor: "pointer" }} />
+                    <FaUpload
+					  size={18}
+					  className="action-icon upload"
+					  style={{ cursor: "pointer" }}
+					  onClick={() => {
+						setSelectedCustomerId(c.customerId);
+						setShowUploadOverlay(true);
+					  }}
+					/>
+
+					<FaRegStickyNote
+					  size={18}
+					  className="action-icon note"
+					  style={{ cursor: "pointer" }}
+					  onClick={() => {
+						setSelectedCustomerId(c.customerId);
+						setShowNotesOverlay(true);
+					  }}
+					/>
+					</div>
                   </td>
                 </tr>
               ))
@@ -142,6 +204,19 @@ export default function CustomerListPage() {
 			onUpdated={fetchCustomers}
 		  />
 		)}
+		
+		{showDocs && (
+		  <CustomerDocumentsOverlay
+			customerId={docCustomerId}
+			onClose={() => setShowDocs(false)}
+		  />
+		)}
+		
+		<UploadDocumentsOverlay
+		  show={showUploadOverlay}
+		  customerId={selectedCustomerId}
+		  onClose={() => setShowUploadOverlay(false)}
+		/>
 		
       </div>
 

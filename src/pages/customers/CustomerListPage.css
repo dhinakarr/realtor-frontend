@@ -1,0 +1,16 @@
+.action-icons {
+  display: flex;
+  align-items: center;   /* Perfect vertical alignment */
+  gap: 8px;              /* Space between icons */
+}
+
+.action-icon {
+  cursor: pointer;
+  font-size: 18px;       /* Normalize icon size */
+  line-height: 1;        /* Prevent baseline shifting */
+}
+
+.action-icon.view  { color: black; }
+.action-icon.edit  { color: #007bff; }
+.action-icon.upload { color: #007bff; }
+.action-icon.note  { color: #f4c20d; }    /* gold */

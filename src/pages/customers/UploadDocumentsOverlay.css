@@ -1,0 +1,132 @@
+.overlay-container {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 500px;
+  background: #fff;
+  box-shadow: -4px 0 10px rgba(0, 0, 0, 0.15);
+  transform: translateX(100%); /* hidden */
+  transition: transform 0.35s ease-in-out;
+  z-index: 9999;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.overlay-container.show {
+  transform: translateX(0); /* slide in */
+}
+
+.overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(2px);
+  z-index: 9998;
+}
+.doc-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.doc-item {
+  width: 80px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.doc-icon {
+  font-size: 32px;
+}
+
+.doc-number {
+  font-size: 12px;
+  margin-top: 5px;
+  color: #555;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.doc-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.doc-card {
+  position: relative;
+  width: 120px;
+  padding: 10px;
+  background: #f7f7f7;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  text-align: center;
+}
+
+.doc-icon {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+}
+
+.doc-name {
+  margin-top: 6px;
+  font-size: 13px;
+  word-break: break-word;
+}
+
+/* Top-right X delete button */
+.doc-delete-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  border: none;
+  background: #ff4d4d;
+  color: white;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 18px;
+  padding: 0;
+}
+
+.doc-delete-btn:hover {
+  background: #d90000;
+}
+.delete-icon {
+	position: absolute;
+  top: 0px;
+  right: 2px;
+  background: rgba(0,0,0,0.2);
+  color: white;
+  border: none;
+  border-radius: 70%;
+  width: 22px;
+  height: 22px;
+  font-size: 10px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: right;
+}
+.confirmation-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 9999;   /* Higher than your edit overlay */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.confirmation-modal {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  width: 320px;
+  z-index: 10000;  /* Keep this above everything */
+}

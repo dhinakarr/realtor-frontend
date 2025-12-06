@@ -1,0 +1,26 @@
+.overlay-container {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 420px;
+  background: #fff;
+  box-shadow: -4px 0 10px rgba(0, 0, 0, 0.15);
+  transform: translateX(100%); /* hidden */
+  transition: transform 0.35s ease-in-out;
+  z-index: 9999;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.overlay-container.show {
+  transform: translateX(0); /* slide in */
+}
+
+.overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(2px);
+  z-index: 9998;
+}
