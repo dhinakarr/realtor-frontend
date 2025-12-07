@@ -62,9 +62,9 @@ export default function Navbar({ user, setUser }) {
     >
       <div className="d-flex align-items-center">
         <img
-          src="/logo192.png"
+          src="/logo.png"
           alt="Logo"
-          style={{ width: "40px", marginRight: "10px" }}
+          style={{ width: "60px", marginRight: "20px" }}
         />
         <h4 className="m-0 text-white">Diamond Realtors</h4>
       </div>

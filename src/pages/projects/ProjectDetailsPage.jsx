@@ -64,7 +64,7 @@ export default function ProjectDetailsPage() {
   };
 
   const cancelPlot = (plotId) => {
-    if (!window.confirm("Are you sure you want to cancel this plot?")) return;
+    //if (!window.confirm("Are you sure you want to cancel this plot?")) return;
     
     setIsDeleting(true);
     API.delete(`/api/plots/${plotId}`)

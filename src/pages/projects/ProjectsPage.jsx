@@ -13,7 +13,7 @@ export default function ProjectPage() {
   const featureUrl = "/api/projects";
   const module = useModule(featureUrl);
   
-  const feature = module.features.find(f => f.url);
+  const feature = module.features.find(f => f.url  === featureUrl);
   //console.log("ProjectsPage feature.canCreate: "+JSON.stringify(feature.canCreate));
   const BASE_URL = API.defaults.baseURL; 
 
@@ -130,7 +130,11 @@ export default function ProjectPage() {
                   <FaEdit
                     className="position-absolute"
                     style={{ top: "10px", right: "10px", cursor: "pointer" }}
-                    onClick={() => handleEdit(project.projectId)}
+                    onClick={(e) => {
+						e.stopPropagation();
+						handleEdit(project.projectId);
+					  }
+					}
                   />
                 )}
 
@@ -179,7 +183,11 @@ export default function ProjectPage() {
 						cursor: "pointer",
 						fontSize: "16px"
 					  }}
-					  onClick={(e) => handleDelete(project.projectId, e)}
+					  onClick={(e) => {
+							e.stopPropagation();
+							handleDelete(project.projectId, e);
+					    }
+					  }
 					/>
 				  )}
 				</div>
@@ -215,7 +223,9 @@ export default function ProjectPage() {
 				  </button>
 
 				  <button className="btn btn-danger" disabled={isDeleting}
-					onClick={() => cancelProject(deleteProjectId)}>
+					onClick={() => 
+						cancelProject(deleteProjectId)
+					}>
 					{isDeleting ? "Deleting..." : "Yes, Delete"}
 				  </button>
 				</div>
