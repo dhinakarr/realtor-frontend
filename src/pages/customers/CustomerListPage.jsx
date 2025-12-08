@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FaPlus, FaEdit, FaTrash, FaUserPlus, FaEye, FaUpload, FaFileUpload, FaStickyNote, FaRegStickyNote } from "react-icons/fa";
+import { FaPlus, FaEdit, FaTrash, FaUserPlus, FaEye, FaUpload, FaFileUpload, FaStickyNote, FaRegStickyNote, FaComment } from "react-icons/fa";
 import API from "../../api/api";
 import { mapApiToRoute } from "../../utils/mapApiToRoute";
 import CustomerCreateOverlay from './CustomerCreateOverlay';
@@ -80,11 +80,11 @@ export default function CustomerListPage() {
   }, []);
 
   // Filter customers based on search
-  const filtered = Array.isArray(customers)
-	  ? customers.filter((c) =>
-		  c.customerName?.toLowerCase().includes(searchText.toLowerCase())
-		)
-	  : [];
+  const filtered = customers; //Array.isArray(customers)
+	  //? customers.filter((c) =>
+		//  c.customerName?.toLowerCase().includes(searchText.toLowerCase())
+		//)
+	  //: [];
   
   const handleEdit = (id) => {
 	  setSelectedCustomerId(id);
@@ -150,15 +150,17 @@ export default function CustomerListPage() {
 				   <div className="action-icons">
 					<FaEye 
 						className="action-icon view" 
+						size={15}
 						onClick={() => setViewId(c.customerId)} 
 						style={{ cursor: "pointer" }}
 					  />
                     <FaEdit onClick={() => handleEdit(c.customerId)} 
+						size={15}
 						className="action-icon edit" 
 						style={{ cursor: "pointer" }}
 					 />
                     <FaUpload
-					  size={18}
+					  size={15}
 					  className="action-icon upload"
 					  style={{ cursor: "pointer" }}
 					  onClick={() => {
@@ -167,8 +169,8 @@ export default function CustomerListPage() {
 					  }}
 					/>
 
-					<FaRegStickyNote
-					  size={18}
+					<FaComment
+					  size={15}
 					  className="action-icon note"
 					  style={{ cursor: "pointer" }}
 					  onClick={() => {

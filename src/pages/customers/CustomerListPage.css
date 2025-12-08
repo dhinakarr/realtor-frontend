@@ -10,7 +10,7 @@
   line-height: 1;        /* Prevent baseline shifting */
 }
 
-.action-icon.view  { color: black; }
+.action-icon.view  { color: #007bff; }
 .action-icon.edit  { color: #007bff; }
 .action-icon.upload { color: #007bff; }
-.action-icon.note  { color: #f4c20d; }    /* gold */
+.action-icon.note  { color: #007bff; }    /* gold */
