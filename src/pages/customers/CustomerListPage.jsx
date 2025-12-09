@@ -6,6 +6,7 @@ import CustomerCreateOverlay from './CustomerCreateOverlay';
 import CustomerViewOverlay from './CustomerViewOverlay';
 import CustomerEditOverlay from './CustomerEditOverlay';
 import UploadDocumentsOverlay from './UploadDocumentsOverlay';
+import CommentsOverlay from './CommentsOverlay';
 import useDebounce from "../../hooks/useDebounce";
 import "./CustomerListPage.css";
 
@@ -21,6 +22,7 @@ export default function CustomerListPage() {
   const [docCustomerId, setDocCustomerId] = useState(null);
   const [showDocs, setShowDocs] = useState(false);
   const [showUploadOverlay, setShowUploadOverlay] = useState(false);
+  const [showNotesOverlay, setShowNotesOverlay] = useState(false);
   
   const openDocuments = (id) => {
 	  setDocCustomerId(id);
@@ -178,6 +180,9 @@ export default function CustomerListPage() {
 						setShowNotesOverlay(true);
 					  }}
 					/>
+					
+
+					
 					</div>
                   </td>
                 </tr>
@@ -218,6 +223,12 @@ export default function CustomerListPage() {
 		  show={showUploadOverlay}
 		  customerId={selectedCustomerId}
 		  onClose={() => setShowUploadOverlay(false)}
+		/>
+		
+		<CommentsOverlay
+		  show={showNotesOverlay}
+		  customerId={selectedCustomerId}
+		  onClose={() => setShowNotesOverlay(false)}
 		/>
 		
       </div>

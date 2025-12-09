@@ -145,6 +145,7 @@ export default function UsersListPage() {
             <th>Role Name</th>
             <th>Email</th>
             <th>Manager name</th>
+			<th>Mobile</th>
             <th>Status</th>
             <th style={{ width: "140px" }}>Actions</th>
           </tr>
@@ -163,6 +164,7 @@ export default function UsersListPage() {
                 <td>{u.roleName}</td>
                 <td>{u.email}</td>
                 <td>{u.managerName}</td>
+				<td>{u.mobile}</td>
                 <td>
                   <span className={`badge ${u.status === "ACTIVE" ? "bg-success" : "bg-secondary"}`}>
                     {u.status}
