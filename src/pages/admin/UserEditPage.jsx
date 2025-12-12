@@ -218,6 +218,8 @@ export default function UserEditPage() {
             {...commonProps}
             type={f.fieldType === "number" ? "text" : f.fieldType}
             inputMode={f.fieldType === "number" ? "numeric" : undefined}
+			readOnly={f.apiField === "email"}   // ⬅ MAKE EMAIL READONLY
+			style={f.apiField === "email" ? { backgroundColor: "#eee" } : {}}
           />
         )}
 

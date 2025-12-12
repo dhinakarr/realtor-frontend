@@ -146,6 +146,7 @@ export default function ProjectPage() {
                     className="card-img-top"
                     style={{
                       height: "180px",
+					  cursor: "pointer",
                       objectFit: "cover",
                       borderTopLeftRadius: "0.25rem",
                       borderTopRightRadius: "0.25rem",

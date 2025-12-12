@@ -58,49 +58,40 @@ export default function UserCreatePage() {
   // FORM SUBMIT
   // --------------------------------------------
   const handleSubmit = (e) => {
-    e.preventDefault();
+	  e.preventDefault();
 
-    if (!e.target.checkValidity()) {
-      e.target.reportValidity();
-      return;
-    }
+	  if (!e.target.checkValidity()) {
+		e.target.reportValidity();
+		return;
+	  }
 
-    const formData = new FormData();
-	
-	// Add meta (optional)
-    const metaObj = {};
-    metaList.forEach((m) => {
-      if (m.key.trim()) metaObj[m.key] = m.value;
-    });
-	//const dto = {...record, meta: {} };	
+	  const formData = new FormData();
 
-    // Add normal fields
-    Object.keys(record).forEach((key) => {
-      if (key !== "meta") formData.append(key, record[key]);
-    });
+	  const metaObj = {};
+	  metaList.forEach((m) => {
+		if (m.key.trim()) metaObj[m.key] = m.value;
+	  });
 
-    
-	console.log("@UserCreatePage.handleSubmit metaObj: "+JSON.stringify(metaObj));
-    //if (Object.keys(metaObj).length > 0) {
-      //formData.append("meta", JSON.stringify(metaObj));
-    //}
-	const dto = {...record, meta: metaObj };	
-	formData.append("dto", new Blob([JSON.stringify(dto)], { type: "application/json" }));
+	  const dto = { ...record, meta: metaObj };
 
-    // Add image (optional)
-    if (imageFile) {
-      formData.append("profileImage", imageFile);
-    }
+	  formData.append(
+		"dto",
+		new Blob([JSON.stringify(dto)], { type: "application/json" })
+	  );
 
-    API.post("/api/users", formData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "multipart/form-data",
-      },
-    })
-      .then(() => navigate("/admin/users"))
-      .catch((err) => console.error(err));
-  };
+	  if (imageFile) {
+		formData.append("profileImage", imageFile);
+	  }
+
+	  API.post("/api/users", formData, {
+		headers: {
+		  Authorization: `Bearer ${token}`,
+		},
+	  })
+		.then(() => navigate("/admin/users"))
+		.catch((err) => console.error(err));
+	};
+
 
   if (loading) return <div className="p-4">Loading...</div>;
 

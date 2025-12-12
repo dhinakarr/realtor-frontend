@@ -66,7 +66,7 @@ export default function Navbar({ user, setUser }) {
           alt="Logo"
           style={{ width: "60px", marginRight: "20px" }}
         />
-        <h4 className="m-0 text-white">Diamond Realtors</h4>
+        <h4 className="m-0 text-white">Diamond Realty</h4>
       </div>
 
       <div className="d-flex align-items-center">

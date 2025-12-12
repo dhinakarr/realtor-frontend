@@ -30,10 +30,13 @@ import ProjectsPage from './pages/projects/ProjectsPage';
 import ProjectFormPage from "./pages/projects/ProjectFormPage";
 import ProjectDetailsPage from "./pages/projects/ProjectDetailsPage";
 
+import CommissionRulesPage from "./pages/sales/CommissionRulesPage";
+
 import CustomerListPage from "./pages/customers/CustomerListPage";
 
-
+		
 import { Tooltip, Popover } from 'bootstrap';
+import { Toaster } from "react-hot-toast";
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 function App() {
@@ -48,11 +51,14 @@ function App() {
 
   return (
     <Router>
+		<Toaster position="top-right" />
       <Navbar user={user}  setUser={setUser} />
       <div className="d-flex">
         {user && <Sidebar />}
         <div className="flex-grow-1 p-3">
           <Routes>
+			
+		  
             <Route path="/" element={<Home />} />
 			<Route path="/public/projects/details/:id" element={<PublicProjectDetailsPage />} />
             <Route path="/login" element={<Login setUser={setUser} />} />
@@ -91,6 +97,10 @@ function App() {
 			<Route path="/projects/create" element={<ProjectFormPage />} />
 			<Route path="/projects/edit/:id" element={<ProjectFormPage />} />
 			<Route path="/projects/details/:id" element={<ProjectDetailsPage />} />
+			
+			{/* Sales pages will be given here*/}
+			<Route path="/projects/:id/commission-rules" element={<CommissionRulesPage />} />
+			
 			
 			{/* PermissionList pages */}
 			<Route path="/admin/permissions" element={<PermissionListPage />} />

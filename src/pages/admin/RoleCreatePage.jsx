@@ -29,7 +29,11 @@ export default function RoleCreatePage() {
       // Initialize record
       const initialObj = {};
       formInfo.fields.forEach((f) => {
-        initialObj[f.apiField] = "";
+        if (f.fieldType === "checkbox") {
+			initialObj[f.apiField] = false;
+		  } else {
+			initialObj[f.apiField] = "";
+		  }
       });
       setRecord(initialObj);
 
@@ -154,6 +158,23 @@ export default function RoleCreatePage() {
         </div>
       );
     }
+	
+	if (f.fieldType === "checkbox") {
+	  return (
+		<div className="form-check mb-3" key={f.apiField}>
+		  <input
+			type="checkbox"
+			className="form-check-input"
+			id={f.apiField}
+			checked={record[f.apiField] === true}
+			onChange={(e) => updateField(f.apiField, e.target.checked)}
+		  />
+		  <label className="form-check-label" htmlFor={f.apiField}>
+			{f.displayLabel}
+		  </label>
+		</div>
+	  );
+	}
 
     // DEFAULT INPUT
     return (

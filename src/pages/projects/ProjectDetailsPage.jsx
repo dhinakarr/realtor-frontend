@@ -6,6 +6,7 @@ import "./ProjectDetailsPage.css";
 import useModule from "../../hooks/useModule";
 import PlotEditPanel from "../../components/PlotEditPanel";
 import PlotViewPanel from "../../components/PlotViewPanel";
+import SaleInitiationPanel from "../../components/SaleInitiationPanel";
 
 export default function ProjectDetailsPage() {
   const { id } = useParams();
@@ -15,6 +16,9 @@ export default function ProjectDetailsPage() {
   const [viewPlotId, setViewPlotId] = useState(null);
   const [deletePlotId, setDeletePlotId] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [activeTab, setActiveTab] = useState("overview");
+  const [salePlotId, setSalePlotId] = useState(null);
+  const [saleProjectId, setSaleProjectId] = useState(null);
 
   const BASE_URL = API.defaults.baseURL;
   
@@ -94,6 +98,14 @@ export default function ProjectDetailsPage() {
       })
       .catch(console.error);
   };
+  
+  const handleSaleInitiation = (plotId, projectId) => {
+	  setSalePlotId(plotId);
+	  setSaleProjectId(projectId);
+	};
+  const refreshProjectDetails = () => {
+    loadProject();   // This reloads full project details safely
+  };
 
   return (
     <div className="container-flex">
@@ -104,11 +116,21 @@ export default function ProjectDetailsPage() {
           <button className="btn btn-primary" onClick={() => navigate("/projects/list")} style={{ marginRight: "10px" }}>
             Back
           </button>
+		  <button
+			  className="btn btn-primary"
+			  style={{ marginRight: "10px" }}
+			  onClick={() => navigate(`/projects/${id}/commission-rules`)}
+			>
+			  Commission Rules
+			</button>
           <button className="btn btn-primary" onClick={() => navigate("/projects/create")}>
             +New Project
           </button>
         </div>
       </div>
+	  
+	  
+
 
       {/* PROJECT INFO */}
       <div className="project-card" style={{ marginBottom: "20px", padding: "15px", border: "1px solid #ddd", borderRadius: "8px", backgroundColor: "#f9f9f9" }}>
@@ -168,6 +190,7 @@ export default function ProjectDetailsPage() {
 							  }}
 							/>
 						  )}
+						  {canDelete && (
 							<FaTrash
 							  className="plot-icon delete"
 							  size={20}
@@ -176,6 +199,8 @@ export default function ProjectDetailsPage() {
 								setDeletePlotId(plot.plotId);
 							  }}
 							/>
+							)}
+							
 						  </div>
 						)}
 
@@ -201,6 +226,17 @@ export default function ProjectDetailsPage() {
 				  
 				</div>
 
+		{salePlotId && (
+		  <SaleInitiationPanel
+			plotId={salePlotId}
+			projectId={saleProjectId}
+			onClose={() => {
+				setSalePlotId(null);
+				setSaleProjectId(null);
+			}}
+			onSuccess={refreshProjectDetails}
+		  />
+		)}
 
       {/* Panels & Modals */}
       {editPlotId && (
@@ -215,6 +251,7 @@ export default function ProjectDetailsPage() {
         <PlotViewPanel
           plotId={viewPlotId}
           onClose={() => setViewPlotId(null)}
+		  onBook={handleSaleInitiation}
         />
       )}
 
