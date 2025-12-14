@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from 'react-toastify';
 import { FaPlus, FaEdit, FaTrash, FaMoneyBill } from "react-icons/fa";
 import API from "../../api/api";
 import "./ProjectDetailsPage.css";
@@ -7,6 +8,7 @@ import useModule from "../../hooks/useModule";
 import PlotEditPanel from "../../components/PlotEditPanel";
 import PlotViewPanel from "../../components/PlotViewPanel";
 import SaleInitiationPanel from "../../components/SaleInitiationPanel";
+import PaymentModal from "../../components/PaymentModal";
 
 export default function ProjectDetailsPage() {
   const { id } = useParams();
@@ -19,6 +21,8 @@ export default function ProjectDetailsPage() {
   const [activeTab, setActiveTab] = useState("overview");
   const [salePlotId, setSalePlotId] = useState(null);
   const [saleProjectId, setSaleProjectId] = useState(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [selectedSale, setSelectedSale] = useState(null);
 
   const BASE_URL = API.defaults.baseURL;
   
@@ -106,28 +110,52 @@ export default function ProjectDetailsPage() {
   const refreshProjectDetails = () => {
     loadProject();   // This reloads full project details safely
   };
+  
+  const handlePaymentSubmit = async (payload) => {
+	  try {
+		await API.post("/api/payments", payload);
+		toast.success("Payment saved successfully");
+		setShowPaymentModal(false);
+		// optionally refresh payments list
+	  } catch (err) {
+		toast.error("Failed to save payment");
+	  }
+	};
 
   return (
-    <div className="container-flex">
+    <div className="project-details-container">
       {/* HEADER */}
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px" }}>
-        <h1>Project Details</h1>
-        <div>
-          <button className="btn btn-primary" onClick={() => navigate("/projects/list")} style={{ marginRight: "10px" }}>
-            Back
-          </button>
-		  <button
+ 
+		<div className="project-header">
+		  <h1 style={{ margin: 0 }}>Project Details</h1>
+
+		  <div className="project-header-actions">
+			<button
+			  type="button"
 			  className="btn btn-primary"
-			  style={{ marginRight: "10px" }}
+			  onClick={() => navigate("/projects/list")}
+			>
+			  Back
+			</button>
+
+			<button
+			  type="button"
+			  className="btn btn-primary"
 			  onClick={() => navigate(`/projects/${id}/commission-rules`)}
 			>
 			  Commission Rules
 			</button>
-          <button className="btn btn-primary" onClick={() => navigate("/projects/create")}>
-            +New Project
-          </button>
-        </div>
-      </div>
+
+			<button
+			  type="button"
+			  className="btn btn-primary"
+			  onClick={() => navigate("/projects/create")}
+			>
+			  + New Project
+			</button>
+		  </div>
+		</div>
+
 	  
 	  
 
@@ -186,7 +214,8 @@ export default function ProjectDetailsPage() {
 							  size={24}
 							  onClick={(e) => {
 								e.stopPropagation();
-								alert(`Finance action for Plot ${plot.plotNumber}`);
+								setSelectedSale(plot.plotId);
+								setShowPaymentModal(true);
 							  }}
 							/>
 						  )}
@@ -237,6 +266,13 @@ export default function ProjectDetailsPage() {
 			onSuccess={refreshProjectDetails}
 		  />
 		)}
+		
+		<PaymentModal
+		  open={showPaymentModal}
+		  plotId={selectedSale}
+		  onClose={() => setShowPaymentModal(false)}
+		  onSubmit={handlePaymentSubmit}
+		/>
 
       {/* Panels & Modals */}
       {editPlotId && (

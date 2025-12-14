@@ -11,3 +11,35 @@
   padding-left: 5px !important;
   padding-right: 5px !important;
 }
+/* ===============================
+   PROJECTS PAGE HEADER FIX
+================================ */
+/* =====================================
+   FORCE PROJECTS HEADER LAYOUT
+===================================== */
+.projects-header-fix {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  width: 100% !important;
+  flex-wrap: nowrap !important;
+}
+
+.projects-header-fix > * {
+  flex: 0 0 auto !important;
+}
+
+.projects-btn-fix {
+  width: auto !important;
+  min-width: unset !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  white-space: nowrap !important;
+}
+
+/* Kill global button stretching */
+.projects-header-fix button {
+  max-width: fit-content !important;
+}
+

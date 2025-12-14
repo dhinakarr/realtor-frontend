@@ -80,6 +80,8 @@
   background: white;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   transition: all 0.2s;
+  cursor: pointer;
+  z-index: 5;
 }
 
 .plot-icon.delete { color: red; }
@@ -131,4 +133,52 @@
 
 .project-gallery-img:hover {
   transform: scale(1.05);
+}
+
+/* ===============================
+   PROJECT HEADER (HARD FIX)
+================================ */
+
+.project-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.project-title {
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* ===============================
+   PROJECT DETAILS CONTAINER
+================================ */
+.project-details-container {
+  display: block;
+  width: 100%;
+}
+
+/* ===============================
+   HEADER FIX (BULLETPROOF)
+================================ */
+.project-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.project-header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* Kill global button rules */
+.project-header-actions button {
+  width: auto !important;
+  display: inline-flex !important;
+  white-space: nowrap;
 }

@@ -29,12 +29,8 @@ export default function RoleCreatePage() {
       // Initialize record
       const initialObj = {};
       formInfo.fields.forEach((f) => {
-        if (f.fieldType === "checkbox") {
-			initialObj[f.apiField] = false;
-		  } else {
-			initialObj[f.apiField] = "";
-		  }
-      });
+		  initialObj[f.apiField] = ""; // radio carries STRING
+		});
       setRecord(initialObj);
 
       setLoading(false);
@@ -175,6 +171,42 @@ export default function RoleCreatePage() {
 		</div>
 	  );
 	}
+	
+	// RADIO
+	if (f.fieldType === "radio") {
+	  return (
+		<div className="mb-3" key={f.apiField}>
+		  <label className="form-label d-block">{f.displayLabel}</label>
+
+		  {f.lookupData?.map((opt) => (
+			<div className="form-check form-check-inline" key={opt.key}>
+			  <input
+				className="form-check-input"
+				type="radio"
+				name={f.apiField}              // IMPORTANT
+				id={`${f.apiField}_${opt.key}`}
+				value={opt.key}
+				checked={record[f.apiField] === opt.key}
+				onChange={(e) => updateField(f.apiField, e.target.value)}
+			  />
+			  <label
+				className="form-check-label"
+				htmlFor={`${f.apiField}_${opt.key}`}
+			  >
+				{opt.label}
+			  </label>
+			</div>
+		  ))}
+
+		  {f.extraSettings?.hint && (
+			<small className="text-muted d-block">
+			  {f.extraSettings.hint}
+			</small>
+		  )}
+		</div>
+	  );
+	}
+
 
     // DEFAULT INPUT
     return (

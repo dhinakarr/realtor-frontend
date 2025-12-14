@@ -120,6 +120,36 @@ export default function DynamicFormRenderer({ form, record, updateField }) {
             </div>
           );
         }
+		
+		// RADIO
+		if (f.fieldType === "radio") {
+		  return (
+			<div className="mb-3" key={f.apiField}>
+			  <label className="form-label d-block">{f.displayLabel}</label>
+
+			  {f.lookupData?.map((opt) => (
+				<div className="form-check form-check-inline" key={opt.key}>
+				  <input
+					className="form-check-input"
+					type="radio"
+					name={f.apiField} // groups radio buttons
+					id={`${f.apiField}_${opt.key}`}
+					value={opt.key}
+					checked={value === opt.key}
+					onChange={(e) => updateField(f.apiField, e.target.value)}
+				  />
+				  <label
+					className="form-check-label"
+					htmlFor={`${f.apiField}_${opt.key}`}
+				  >
+					{opt.label}
+				  </label>
+				</div>
+			  ))}
+			</div>
+		  );
+		}
+
 
         // DEFAULT TEXT
         return (

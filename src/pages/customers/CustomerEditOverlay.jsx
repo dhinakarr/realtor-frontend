@@ -128,7 +128,7 @@ export default function CustomerEditOverlay({ show, customerId, onClose, onUpdat
 		} else {
 		  alert("Profile image deleted successfully");
 		}
-
+		onClose();
 	  } catch (err) {
 		console.error("Image delete failed:", err);
 		if (window?.toast) {
