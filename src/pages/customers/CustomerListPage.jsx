@@ -102,7 +102,11 @@ export default function CustomerListPage() {
     <div className="container-fluid mt-1">
       <div><h2>Customer Portal</h2></div>
       {/* Top bar: search - title - create */}
-      <div className="d-flex justify-content-between align-items-center mb-2 flex-nowrap">
+      <div className="mb-3 align-items-center"
+  style={{
+    display: "grid",
+    gridTemplateColumns: "200px 1fr auto",
+  }}>
 
         {/* Left: Search */}
         <div style={{ width: "200px" }}>
@@ -119,12 +123,13 @@ export default function CustomerListPage() {
         </div>
 
         {/* Center title */}
-        <div className="flex-grow-1 text-center">
+        <div className="flex-grow-1 text-center pe-5">
 		  <h3 className="m-0">Customer List</h3>
 		</div>
 
         {/* Right: Create button */}
-        <button className="btn btn-primary d-flex align-items-center" onClick={() => setShowCreate(true)}>
+        <button className="btn btn-primary d-flex align-items-center"
+			 onClick={() => setShowCreate(true)}>
           <FaUserPlus className="me-2" /> Customer
         </button>
       </div>

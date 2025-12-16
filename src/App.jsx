@@ -31,12 +31,12 @@ import ProjectFormPage from "./pages/projects/ProjectFormPage";
 import ProjectDetailsPage from "./pages/projects/ProjectDetailsPage";
 
 import CommissionRulesPage from "./pages/sales/CommissionRulesPage";
-
+import FinanceDashboard from "./pages/finance/FinanceDashboard";
 import CustomerListPage from "./pages/customers/CustomerListPage";
 
-		
+import { ToastProvider } from "./components/common/ToastProvider";
 import { Tooltip, Popover } from 'bootstrap';
-import { Toaster } from "react-hot-toast";
+
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 function App() {
@@ -51,7 +51,7 @@ function App() {
 
   return (
     <Router>
-		<Toaster position="top-right" />
+	  <ToastProvider>
       <Navbar user={user}  setUser={setUser} />
       <div className="d-flex">
         {user && <Sidebar />}
@@ -109,6 +109,8 @@ function App() {
 			
 			<Route path="/customers/list" element={<CustomerListPage />} />
 			
+			<Route path="/finance/list" element={<FinanceDashboard /> } />
+			
 			
 			<Route path="*" element={<div style={{color:'red'}}>NO MATCH</div>} />
 			
@@ -117,6 +119,7 @@ function App() {
           </Routes>
         </div>
       </div>
+	  </ToastProvider>
     </Router>
   );
 }

@@ -19,6 +19,7 @@ export default function PaymentModal({ open, onClose, plotId, onSubmit }) {
   };
 
   const handleSubmit = () => {
+	  //console.log("@PaymentModal plotId: "+plotId);
     onSubmit({
       plotId,
       ...form,
