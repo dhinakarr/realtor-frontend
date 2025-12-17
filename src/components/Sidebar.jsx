@@ -30,10 +30,14 @@ export default function Sidebar() {
   
   //const isActive = (route) => location.pathname.startsWith(route);
   //console.log("Sidebar isActive: "+isActive);
+  
+  if (!permissions.length) {
+    return null;
+  }
+  
   return (
     <div style={{ width: '70px', backgroundColor: 'hsl(270, 70%, 40%)', color: 'white', minHeight: '100vh', padding: '0.5rem' }}>
-      {permissions.length > 0 ? (	
-        permissions.map((module) => (
+      {permissions.map((module) => (
 			//const route = moduleRouteMap[module.moduleName] || `/${module.moduleName.toLowerCase()}/list`;
           <div key={module.moduleId} className="mb-3 text-center">
 			  <OverlayTrigger
@@ -53,10 +57,7 @@ export default function Sidebar() {
 					</Link>
 			  </OverlayTrigger>	
           </div>
-        ))
-      ) : (
-        <p>No modules available</p>
-      )}
+        ))}
     </div>
   );  
 }

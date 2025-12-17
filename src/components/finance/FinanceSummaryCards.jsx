@@ -47,7 +47,7 @@ const FinanceSummaryCards = ({ data, onFilter }) => {
 					title="Paid This Month"
 					value={data.commissionPaidThisMonth}
 					variant="info"
-					onClick={() => onFilter?.({ status: "DUE" })}
+					
 				/>
 			</Col>
 

@@ -24,9 +24,15 @@ console.log("location.pathname:", pathname);
       <div className="d-flex flex-wrap gap-2 ms-auto">
         {visibleFeatures.map((f) => {
 			const targetRoute = mapApiToRoute(f.url);
-			const isActive = pathname === targetRoute || pathname.startsWith(targetRoute + '/');
+			const isActive =
+				pathname === targetRoute ||
+				(
+				  pathname.startsWith(targetRoute + "/") &&
+				  targetRoute !== "/admin/users"
+				);
 			const buttonClass = isActive ? "btn btn-primary" : "btn btn-outline-primary";
 			//console.log("PageHeader targetRoute: "+targetRoute);
+			//console.log(f.featureName, f.url, mapApiToRoute(f.url));
 			return (
 			  <button
 				key={f.featureId}

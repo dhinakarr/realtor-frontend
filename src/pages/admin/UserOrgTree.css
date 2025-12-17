@@ -1,0 +1,39 @@
+.org-tree ul {
+  padding-left: 20px;
+  list-style: none;
+  position: relative;
+}
+
+.org-tree ul::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 8px;
+  border-left: 1px solid #ccc;
+  height: 100%;
+}
+
+.org-tree li {
+  margin: 10px 0;
+  position: relative;
+}
+
+.org-tree li::before {
+  content: "";
+  position: absolute;
+  top: 15px;
+  left: -12px;
+  width: 12px;
+  border-top: 1px solid #ccc;
+}
+
+.tree-node {
+  display: inline-flex;
+  align-items: center;
+  background: #f8f9fa;
+  padding: 6px 12px;
+  border-radius: 6px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  font-weight: 500;
+}
+

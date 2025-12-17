@@ -114,8 +114,9 @@ export default function ProjectDetailsPage() {
   const handlePaymentSubmit = async (payload) => {
 	  try {
 		await API.post("/api/payments", payload);
-		toast.success("Payment saved successfully");
+		
 		setShowPaymentModal(false);
+		toast.success("Payment saved successfully");
 		// optionally refresh payments list
 	  } catch (err) {
 		toast.error("Failed to save payment");

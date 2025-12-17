@@ -57,7 +57,7 @@ export default function Navbar({ user, setUser }) {
 
   return (
     <nav
-      className="d-flex justify-content-between align-items-center px-4 py-2"
+      className="d-flex align-items-center px-4 py-2	"
       style={{ backgroundColor: "hsl(270, 70%, 40%)" }}
     >
       <div className="d-flex align-items-center">
@@ -69,7 +69,25 @@ export default function Navbar({ user, setUser }) {
         <h4 className="m-0 text-white">Diamond Realty</h4>
       </div>
 
-      <div className="d-flex align-items-center">
+      <div className="mx-auto d-flex align-items-center gap-4 ms-auto me-4">
+	     {user && (
+			<>
+			  <Link
+				to="/dashboard"
+				className="text-white text-decoration-none fw-semibold"
+			  >
+				Dashboard
+			  </Link>
+
+			  <Link
+				to="/"
+				className="text-white text-decoration-none fw-semibold"
+			  >
+				Home
+			  </Link>
+			</>
+		  )}
+	    <div className="ms-auto d-flex align-items-center">
         {user ? (
           <div className="dropdown">
             {/* NOTE: removed data-bs-toggle attribute to avoid auto-init conflict */}
@@ -125,6 +143,7 @@ export default function Navbar({ user, setUser }) {
             Login
           </Link>
         )}
+		</div>
       </div>
     </nav>
   );

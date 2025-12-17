@@ -139,28 +139,81 @@ const FinanceDashboard = () => {
 		}
 	};
 	
-		const handlePaymentSubmit = async (payload) => {
-			//console.log("handlePaymentSubmit payload: "+payload);
-		  try {
-			  const jsonData = {
-				  paymentType: "PAID",
-				  saleId: drawer.row.saleId,
-				  amount: Number(drawer.row.commissionPayable), // already rounded
-				  paidTo: drawer.row.agentId,                    // ✅ CRITICAL
-				  paymentMode: formValues.paymentMode,
-				  transactionRef: formValues.transactionRef,
-				  remarks: formValues.remarks
-				};
-			  
-			  console.log("handlePaymentSubmit paidTo: "+jsonData);
-			//await API.post("/api/payments", jsonData);
-			showToast("Payment saved successfully");
-			setShowPaymentModal(false);	
-			// optionally refresh payments list
-		  } catch (err) {
-			showToast("Failed to save payment");
-		  }
+	const submitReceivablePayment = async (payload) => {
+		
+	  const json = buildPaymentPayload(payload, "RECEIVABLE");
+	  await API.post("/api/payments", json);
+	  setShowPaymentModal(false);
+	  showToast("Payment saved successfully");
+	  loadSummary();
+	  loadCashFlow();
+	};
+	
+	const submitCommissionPayment = async (row, form) => {
+	  const json = buildPaymentPayload(
+		{
+		  amount: row.commissionPayable,
+		  paidTo: row.agentId,
+		  saleId: row.saleId,
+		  plotId: row.plotId,
+		  ...form
+		},
+		"COMMISSION"
+	  );
+	  await API.post("/api/payments", json);
+	};
+	
+	const buildPaymentPayload = (data, type) => {
+	  if (type === "RECEIVABLE") {
+		return {
+		  paymentType: "RECEIVED",
+		  plotId: data.plotId,
+		  amount: data.amount,
+		  paymentMode: data.paymentMode,
+		  transactionRef: data.transactionRef,
+		  remarks: data.remarks
 		};
+	  }
+
+	  if (type === "COMMISSION") {
+		return {
+		  paymentType: "PAID",
+		  saleId: data.saleId,
+		  paidTo: data.paidTo,
+		  amount: data.amount,
+		  paymentMode: data.paymentMode,
+		  transactionRef: data.transactionRef,
+		  remarks: data.remarks
+		};
+	  }
+
+	  throw new Error("Invalid payment type");
+	};
+	
+	const handlePaymentSubmit = async (payload) => {
+		//console.log("handlePaymentSubmit payload: "+payload);
+	  try {
+		  const jsonData = {
+			  paymentType: "PAID",
+			  saleId: drawer.row.saleId,
+			  amount: Number(drawer.row.commissionPayable), // already rounded
+			  paidTo: drawer.row.agentId,                    // ✅ CRITICAL
+			  paymentMode: formValues.paymentMode,
+			  transactionRef: formValues.transactionRef,
+			  remarks: formValues.remarks
+			};
+		  
+		  console.log("handlePaymentSubmit paidTo: "+jsonData);
+		//await API.post("/api/payments", jsonData);
+		showToast("Payment saved successfully");
+		setShowPaymentModal(false);	
+		loadSummary();
+		loadCashFlow();
+		// optionally refresh payments list
+	  } catch (err) {
+		showToast("Failed to save payment");
+	  }
+	};
 
 	return (
 		<div className="p-4">
@@ -203,7 +256,7 @@ const FinanceDashboard = () => {
 			{viewType === "CASHFLOW" && (
 				<>
 					<FinanceFilters
-						onChange={(f) => {
+						onApply={(f) => {
 							setFilters(f);
 							loadCashFlow(f);
 						}}
@@ -234,7 +287,7 @@ const FinanceDashboard = () => {
 			  open={showPaymentModal}
 			  plotId={selectedPlotId}
 			  onClose={() => setShowPaymentModal(false)}
-			  onSubmit={handlePaymentSubmit}
+			  onSubmit={submitReceivablePayment}
 			/>
 			
 		</div>

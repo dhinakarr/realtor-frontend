@@ -29,7 +29,7 @@ export default function UsersListPage() {
 //console.log("UserListPage feature: "+JSON.stringify(feature));
 
   const loadData = () => {
-    API.get(`/api/users/pages?page=${page}&size=${size}`)
+    API.get(`/api/users/pages?page=${page-1}&size=${size}`)
       .then((res) => {
         const result = res.data.data || {};
         setList(result.data || []);
@@ -39,7 +39,11 @@ export default function UsersListPage() {
   };
 
   useEffect(() => {
-    loadData();
+    if (search) {
+    searchUsers(search);	
+	  } else {
+		loadData();
+	  }
   }, [page]);
 /*
   const filtered = list.filter((u) =>
@@ -67,7 +71,7 @@ export default function UsersListPage() {
 	const handleSearchChange = (e) => {
 	  const value = e.target.value;
 	  setSearch(value);
-
+	  setPage(1);	
 	  if (searchTimeout) {
 		clearTimeout(searchTimeout);
 	  }
@@ -90,8 +94,8 @@ export default function UsersListPage() {
 		.then((res) => {
 		  const result = res.data.data || {};
 		  setList(result || []);
-		  setTotalPages(result.totalPages || 1);
-		  setPage(1); // reset to first page
+		  //setTotalPages(result.totalPages || 1);
+		  //setPage(1); // reset to first page
 		})
 		.catch((err) => {
 		  console.error("Search error:", err);

@@ -25,6 +25,7 @@ import FeatureViewPage from './pages/admin/FeatureViewPage';
 import FeatureEditPage from './pages/admin/FeatureEditPage';
 import PermissionListPage from './pages/admin/PermissionListPage';
 import PermissionCreatePage from './pages/admin/PermissionCreatePage';
+import UserOrgTree from './pages/admin/UserOrgTree';
 
 import ProjectsPage from './pages/projects/ProjectsPage';
 import ProjectFormPage from "./pages/projects/ProjectFormPage";
@@ -72,6 +73,8 @@ function App() {
 			<Route path="/admin/users" element={<UsersListPage />} />
 			<Route path="/admin/users/view/:id" element={<UserViewPage />} />
 			<Route path="/admin/users/edit/:id" element={<UserEditPage />} />
+			<Route path="/admin/users/tree" element={<UserOrgTree />} />
+
 			
 			{/* Role pages */}
 			<Route path="/admin/roles/create" element={<RoleCreatePage />} />	

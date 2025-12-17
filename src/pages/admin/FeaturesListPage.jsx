@@ -29,7 +29,7 @@ export default function FeaturesListPage() {
 //console.log("FeaturesListPage feature: "+JSON.stringify(feature));
 
   const loadData = () => {
-    API.get(`/api/features/pages?page=${page}&size=${size}`)
+    API.get(`/api/features/pages?page=${page-1}&size=${size}`)
       .then((res) => {
         const result = res.data.data || {};
         setList(result.data || []);
@@ -39,7 +39,11 @@ export default function FeaturesListPage() {
   };
 
   useEffect(() => {
-    loadData();
+    if (search) {
+    searchUsers(search);	
+	  } else {
+		loadData();
+	  }
   }, [page]);
 
   const handleDeleteClick = (featureId) => {
