@@ -30,13 +30,13 @@ const CommissionPayableTable = ({ data, loading, onAction }) => {
 						<td>{row.agentName}</td>
 
 						<td className="text-end">
-							₹ {(row.commissionEligible ?? 0).toLocaleString()}
+							 {(row.commissionEligible ?? 0).toLocaleString()}
 						</td>
 						<td className="text-end">
-							₹ {(row.commissionPaid ?? 0).toLocaleString()}
+							 {(row.commissionPaid ?? 0).toLocaleString()}
 						</td>
 						<td className="text-end fw-bold text-danger">
-							₹ {(row.commissionPayable ?? 0).toLocaleString()}
+							 {(row.commissionPayable ?? 0).toLocaleString()}
 						</td>
 
 						<td className="text-center">

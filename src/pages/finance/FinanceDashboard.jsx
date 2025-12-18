@@ -4,6 +4,7 @@ import FinanceFilters from "../../components/finance/FinanceFilters";
 import CashFlowTable from "../../components/finance/CashFlowTable";
 import PaymentDrawer from "../../components/finance/PaymentDrawer";
 import PaymentModal from "../../components/PaymentModal";
+import CommentsOverlay from '../../pages/customers/CommentsOverlay';
 import ReceivableDetailsTable from "../../components/finance/ReceivableDetailsTable";
 import CommissionPayableTable from "../../components/finance/CommissionPayableTable";
 import { getFinanceSummary, getCashFlow } from "../../api/financeApi";
@@ -25,6 +26,8 @@ const FinanceDashboard = () => {
 	const BASE_URL = API.defaults.baseURL;	
 	const [showPaymentModal, setShowPaymentModal] = useState(false);
 	const [selectedPlotId, setSelectedPlotId] = useState(null);
+	const [showCommentsOverlay, setShowCommentsOverlay] = useState(false);
+	const [selectedCustomerId, setSelectedCustomerId] = useState(null);
 
 	useEffect(() => {
 		loadSummary();
@@ -131,11 +134,15 @@ const FinanceDashboard = () => {
 		}
 
 		if (action === "COMMENTS") {
+			/*
 			setDrawer({
 				open: true,
 				row,
 				action: "COMMENTS"
 			});
+			*/
+			setSelectedCustomerId(row.customerId);
+			setShowCommentsOverlay(true);
 		}
 	};
 	
@@ -289,7 +296,11 @@ const FinanceDashboard = () => {
 			  onClose={() => setShowPaymentModal(false)}
 			  onSubmit={submitReceivablePayment}
 			/>
-			
+			<CommentsOverlay
+			  show={showCommentsOverlay}
+			  customerId={selectedCustomerId}
+			  onClose={() => setShowCommentsOverlay(false)}
+			/>
 		</div>
 	);
 };

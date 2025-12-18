@@ -55,10 +55,10 @@ const ReceivableDetailsTable = ({ data, loading, onAction }) => {
 						<td>{row.plotNumber}</td>
 						<td>{row.customerName}</td>
 						<td>{row.agentName}</td>
-						<td>₹ {row.saleAmount.toLocaleString()}</td>
-						<td>₹ {row.totalReceived.toLocaleString()}</td>
+						<td> {row.saleAmount.toLocaleString()}</td>
+						<td> {row.totalReceived.toLocaleString()}</td>
 						<td className="fw-bold text-danger">
-							₹ {row.outstandingAmount.toLocaleString()}
+							 {row.outstandingAmount.toLocaleString()}
 						</td>
 						<td className="text-center">
 							<ActionIcons

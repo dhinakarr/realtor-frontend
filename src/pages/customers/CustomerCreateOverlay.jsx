@@ -4,6 +4,7 @@ import API from "../../api/api";
 export default function CustomerCreateOverlay({ show, onClose, onCreated }) {
   const [fields, setFields] = useState([]);
   const [formData, setFormData] = useState({});
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     if (show) {
@@ -15,11 +16,79 @@ export default function CustomerCreateOverlay({ show, onClose, onCreated }) {
     }
   }, [show]);
 
-  const handleChange = (field, value) => {
-    setFormData({ ...formData, [field]: value });
-  };
+  const validateField = (field, value) => {
+	  const rules = field.extraSettings || {};
+	  const fieldErrors = [];
+
+	  // Required
+	  if (field.required && (value === undefined || value === null || value === "")) {
+		fieldErrors.push(`${field.displayLabel} is required`);
+	  }
+
+	  // Min length
+	  if (rules.minLength && value && value.length < rules.minLength) {
+		fieldErrors.push(
+		  `${field.displayLabel} must be at least ${rules.minLength} characters`
+		);
+	  }
+
+	  // Max length
+	  if (rules.maxLength && value && value.length > rules.maxLength) {
+		fieldErrors.push(
+		  `${field.displayLabel} must be at most ${rules.maxLength} characters`
+		);
+	  }
+
+	  // Pattern (Regex)
+	  if (rules.pattern && value) {
+		const regex = new RegExp(rules.pattern);
+		if (!regex.test(value)) {
+		  fieldErrors.push(
+			rules.patternMessage || `${field.displayLabel} is invalid`
+		  );
+		}
+	  }
+
+	  return fieldErrors;
+	};
+	
+	const validateForm = () => {
+	  const newErrors = {};
+
+	  fields.forEach((field) => {
+		if (field.hidden) return;
+
+		const value = formData[field.apiField];
+		const fieldErrors = validateField(field, value);
+
+		if (fieldErrors.length > 0) {
+		  newErrors[field.apiField] = fieldErrors[0]; // show first error
+		}
+	  });
+
+	  setErrors(newErrors);
+	  return Object.keys(newErrors).length === 0;
+	};
+	
+	const handleChange = (fieldName, value, fieldConfig) => {
+	  setFormData((prev) => ({ ...prev, [fieldName]: value }));
+
+	  // live validation
+	  if (fieldConfig) {
+		const fieldErrors = validateField(fieldConfig, value);
+		setErrors((prev) => ({
+		  ...prev,
+		  [fieldName]: fieldErrors[0],
+		}));
+	  }
+	};
+
+
 
   const handleSubmit = () => {
+	  if (!validateForm()) {
+		return; // ❌ stop submission
+	  }
 	  const fd = new FormData();
 
 	  /// Separate file and rest of the data
@@ -48,7 +117,7 @@ export default function CustomerCreateOverlay({ show, onClose, onCreated }) {
       {/* SLIDING PANEL */}
       <div className={`overlay-slide ${show ? "show" : ""}`}>
         <div className="d-flex justify-content-between align-items-center p-3 border-bottom">
-          <h4>Create Customer</h4>
+          <h5>Create Customer</h5>
           <button className="btn-close" onClick={onClose}></button>
         </div>
 
@@ -75,9 +144,12 @@ export default function CustomerCreateOverlay({ show, onClose, onCreated }) {
 							  type="radio"
 							  name={f.apiField}
 							  value={opt.key}
-							  onChange={(e) => handleChange(f.apiField, e.target.value)}
+							  onChange={(e) => handleChange(f.apiField, e.target.value, f)}
 							/>
 							<label className="form-check-label ms-1">{opt.label}</label>
+							{errors[f.apiField] && (
+							  <div className="text-danger small">{errors[f.apiField]}</div>
+							)}
 						  </div>
 						))}
 					  </div>
@@ -87,29 +159,35 @@ export default function CustomerCreateOverlay({ show, onClose, onCreated }) {
                   {["text", "email", "number", "date"].includes(f.fieldType) && (
                     <input
                       type={f.fieldType}
-                      className="form-control"
+                      className={`form-control ${errors[f.apiField] ? "is-invalid" : ""}`}
                       placeholder={f.extraSettings?.placeholder || ""}
-                      onChange={(e) => handleChange(f.apiField, e.target.value)}
+					  value={formData[f.apiField] || ""}
+                      onChange={(e) => handleChange(f.apiField, e.target.value, f)}
                     />
                   )}
+
 
                   {/* TEXTAREA */}
                   {f.fieldType === "textarea" && (
                     <textarea
-                      className="form-control"
+                      className={`form-control ${errors[f.apiField] ? "is-invalid" : ""}`}
                       rows="3"
                       placeholder={f.extraSettings?.placeholder || ""}
-                      onChange={(e) => handleChange(f.apiField, e.target.value)}
+					  value={formData[f.apiField] || ""}
+                      onChange={(e) => handleChange(f.apiField, e.target.value, f)}
                     />
                   )}
-
+					{errors[f.apiField] && (
+					  <div className="invalid-feedback">{errors[f.apiField]}</div>
+					)}
                   {/* FILE UPLOAD */}
                   {f.fieldType === "file" && (
                     <input
                       type="file"
-                      className="form-control"
-                      onChange={(e) => handleChange(f.apiField, e.target.files[0])}
+                      className={`form-control ${errors[f.apiField] ? "is-invalid" : ""}`}
+                      onChange={(e) => handleChange(f.apiField, e.target.files[0], f)}
                     />
+
                   )}
                 </div>
               )

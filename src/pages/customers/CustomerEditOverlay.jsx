@@ -22,28 +22,31 @@ export default function CustomerEditOverlay({ show, customerId, onClose, onUpdat
   
   const validateField = (field, value) => {
 	  const err = [];
+	  const extra = field.extraSettings || {};
+	  const stringValue = value?.toString().trim() || "";
 
-	  if (field.required && (!value || value.toString().trim() === "")) {
-		err.push("This field is required");
+	  if (field.required && !stringValue) {
+		err.push(`${field.displayLabel} is required`);
 	  }
 
-	  if (field.extraSettings?.minLength && value?.length < field.extraSettings.minLength) {
-		err.push(`Minimum ${field.extraSettings.minLength} characters required`);
+	  if (extra.minLength && stringValue.length < extra.minLength) {
+		err.push(`Minimum ${extra.minLength} characters required`);
 	  }
 
-	  if (field.extraSettings?.maxLength && value?.length > field.extraSettings.maxLength) {
-		err.push(`Maximum ${field.extraSettings.maxLength} characters allowed`);
+	  if (extra.maxLength && stringValue.length > extra.maxLength) {
+		err.push(`Maximum ${extra.maxLength} characters allowed`);
 	  }
 
-	  if (field.extraSettings?.pattern) {
-		const regex = new RegExp(field.extraSettings.pattern);
-		if (!regex.test(value)) {
-		  err.push(field.extraSettings.patternMessage || "Invalid format");
+	  if (extra.pattern && stringValue) {
+		const regex = new RegExp(extra.pattern);
+		if (!regex.test(stringValue)) {
+		  err.push(extra.patternMessage || "Invalid format");
 		}
 	  }
 
 	  return err;
 	};
+
 
   const loadCustomerForm = async () => {
     setLoading(true);
@@ -63,9 +66,13 @@ export default function CustomerEditOverlay({ show, customerId, onClose, onUpdat
     setLoading(false);
   };
 
-  const updateFieldValue = (name, value) => {
-    setFormValues(prev => ({ ...prev, [name]: value }));
-	setErrors(prev => ({ ...prev, [name]: validateField(name, value) }));
+  const updateFieldValue = (field, value) => {
+    setFormValues(prev => ({ ...prev, [field.apiField]: value }));
+	const fieldErrors = validateField(field, value);
+	setErrors(prev => ({
+		...prev,
+		[field.apiField]: fieldErrors[0] // store first error
+	  }));
   };
 
   const handleFileChange = e => {
@@ -81,9 +88,32 @@ export default function CustomerEditOverlay({ show, customerId, onClose, onUpdat
     });
     return changed;
   };
+  
+  const validateForm = () => {
+	  const newErrors = {};
+
+	  fields.forEach(field => {
+		if (field.hidden) return;
+
+		const value = formValues[field.apiField];
+		const fieldErrors = validateField(field, value);
+
+		if (fieldErrors.length > 0) {
+		  newErrors[field.apiField] = fieldErrors[0];
+		}
+	  });
+
+	  setErrors(newErrors);
+	  return Object.keys(newErrors).length === 0;
+	};
+
 
   const handleSubmit = async e => {
     e.preventDefault();
+	if (!validateForm()) {
+
+		return; // ❌ STOP submission
+	  }
 	const changed = getChangedFields();
     const formData = new FormData();
 	
@@ -100,7 +130,7 @@ export default function CustomerEditOverlay({ show, customerId, onClose, onUpdat
 		console.log("image section called");
 		formData.append("profileImage", profileFile);
 	}
-	
+	/*
     try {
       await API.patch(`/api/customers/${customerId}`, formData, {
         headers: { "Content-Type": "multipart/form-data" }
@@ -110,7 +140,7 @@ export default function CustomerEditOverlay({ show, customerId, onClose, onUpdat
       onClose();
     } catch (err) {
       console.error("Update failed:", err);
-    }
+    } */
   };
   
   const handleDeleteImage = async () => {
@@ -182,17 +212,21 @@ export default function CustomerEditOverlay({ show, customerId, onClose, onUpdat
                     {type === "text" || type === "email" || type === "number" ? (
                       <input
                         type={type}
+						
                         value={formValues[name] || ""}
                         placeholder={extra.placeholder}
-                        onChange={e => updateFieldValue(name, e.target.value)}
+						className={`form-control ${errors[name] ? "is-invalid" : ""}`}
+                        onChange={e => updateFieldValue(field, e.target.value)}
                       />
                     ) : null}
-
+					{errors[name] && (
+					  <div className="error-text">{errors[name]}</div>
+					)}
                     {type === "textarea" && (
                       <textarea
                         value={formValues[name] || ""}
                         placeholder={extra.placeholder}
-                        onChange={e => updateFieldValue(name, e.target.value)}
+                        onChange={e => updateFieldValue(field, e.target.value)}
                       />
                     )}
 
@@ -200,7 +234,7 @@ export default function CustomerEditOverlay({ show, customerId, onClose, onUpdat
                       <input
                         type="date"
                         value={formValues[name] || ""}
-                        onChange={e => updateFieldValue(name, e.target.value)}
+                        onChange={e => updateFieldValue(field, e.target.value)}
                       />
                     )}
 
@@ -212,7 +246,7 @@ export default function CustomerEditOverlay({ show, customerId, onClose, onUpdat
                               type="radio"
                               name={name}
                               checked={formValues[name] === opt.key}
-                              onChange={() => updateFieldValue(name, opt.key)}
+                              onChange={() => updateFieldValue(field, opt.key)}
                             />
                             {opt.label}
                           </label>
@@ -243,14 +277,7 @@ export default function CustomerEditOverlay({ show, customerId, onClose, onUpdat
 						)}
 					  </div>
 					)}
-					
-					
-					
-					
                   </div>
-				  
-				  
-				  
                 );
               })}
 
