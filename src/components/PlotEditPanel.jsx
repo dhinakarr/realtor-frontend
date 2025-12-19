@@ -9,6 +9,8 @@ export default function PlotEditPanel({ plotId, onClose, onSaved }) {
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(false);
+  
+  
 
   // load form + data
   useEffect(() => {
@@ -70,8 +72,9 @@ export default function PlotEditPanel({ plotId, onClose, onSaved }) {
     if (!formSpec || !formSpec.fields) return errs;
     formSpec.fields.forEach((f) => {
       if (f.hidden) return;
+	  const v = values[f.apiField];
       if (f.required) {
-        const v = values[f.apiField];
+        
         // treat empty string or null/undefined as error
         if (
           v === null ||
@@ -81,6 +84,18 @@ export default function PlotEditPanel({ plotId, onClose, onSaved }) {
           errs[f.apiField] = `${f.displayLabel} is required`;
         }
       }
+	  const maxLength = f.extraSettings?.maxLength
+		  ? Number(f.extraSettings.maxLength)
+		  : null;
+
+		if (
+		  maxLength &&
+		  typeof v === "string" &&
+		  v.length > maxLength
+		) {
+		  errs[f.apiField] = `${f.displayLabel} must not exceed ${maxLength} characters`;
+		}
+	  
     });
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -137,6 +152,10 @@ export default function PlotEditPanel({ plotId, onClose, onSaved }) {
     const val = values[key];
     const placeholder =
       (f.extraSettings && f.extraSettings.placeholder) || "";
+	  
+	const maxLength = f.extraSettings?.maxLength
+		? Number(f.extraSettings.maxLength)
+		: undefined;
 
     if (f.fieldType === "checkbox") {
       return (
@@ -170,6 +189,7 @@ export default function PlotEditPanel({ plotId, onClose, onSaved }) {
             className="form-control"
             placeholder={placeholder}
             value={val === null || typeof val === "undefined" ? "" : val}
+			maxLength={maxLength}
             onChange={handleChange(key, f.fieldType)}
           />
           {errors[key] && <div className="text-danger small">{errors[key]}</div>}
@@ -190,6 +210,7 @@ export default function PlotEditPanel({ plotId, onClose, onSaved }) {
           className="form-control"
           placeholder={placeholder}
           value={val === null || typeof val === "undefined" ? "" : val}
+		  maxLength={maxLength}
           onChange={handleChange(key, f.fieldType)}
         />
         {errors[key] && <div className="text-danger small">{errors[key]}</div>}

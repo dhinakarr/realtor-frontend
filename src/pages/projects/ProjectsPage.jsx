@@ -173,6 +173,9 @@ export default function ProjectPage() {
                   <div className="mt-2 text-secondary">
                     Survey Number: <small>{project.surveyNumber}</small>
                   </div>
+				  <div className="mt-2 text-secondary">
+                    Guideline Value: <small>{project.guidanceValue}</small>
+                  </div>
                 </div>
 
                 {/* Card Footer */}

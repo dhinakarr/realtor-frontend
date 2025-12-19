@@ -175,6 +175,7 @@ export default function ProjectDetailsPage() {
         <p><strong>Survey Number:</strong> {project.surveyNumber}</p>
         <p><strong>Start Date:</strong> {project.startDate} | <strong>End Date:</strong> {project.endDate}</p>
         <p><strong>Price/Sqft:</strong> ₹{project.pricePerSqft}</p>
+		<p><strong>Guideline Value:</strong> ₹{project.guidanceValue}</p>
       </div>
 
       {/* PLOT GRID */}
@@ -190,9 +191,9 @@ export default function ProjectDetailsPage() {
 						<div className="plot-number">Plot {plot.plotNumber}</div>
 
 						<div className="plot-data">
-						  <div>Area: {plot.width && plot.breath ? `${plot.width}×${plot.breath}` : ""} sft</div>
+						  <div>Area: {plot.area} sft</div>
 						  <div>Facing: {plot.facing || ""}</div>
-						  <div>Road: {plot.roadWidth ? `${plot.roadWidth} ft` : ""}</div>
+						  <div>Survey: {plot.surveyNum}</div>
 						</div>
 
 						{/* Edit Icon */}
