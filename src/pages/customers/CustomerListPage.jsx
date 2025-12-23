@@ -42,13 +42,15 @@ export default function CustomerListPage() {
 
 	  const delayDebounce = setTimeout(() => {
 		API.get("/api/customers/search", {
-		  params: { searchText }
-		})
-		  .then((res) => {
-			  const data = res.data?.data; 
-			setCustomers(Array.isArray(data) ? data : []);
-			setPage(1);
-		  })
+			  params: { searchText }
+			})
+			.then((res) => {
+				
+			  const pageResult = res.data;
+
+			  setCustomers(Array.isArray(pageResult?.data) ? pageResult.data : []);
+			  setPage(1);
+			})
 		  .catch((err) => {
 			console.error(err);
 			setCustomers([]);
@@ -81,22 +83,23 @@ export default function CustomerListPage() {
 	fetchCustomers();
   }, []);
 
-  // Filter customers based on search
-  const filtered = customers; //Array.isArray(customers)
-	  //? customers.filter((c) =>
-		//  c.customerName?.toLowerCase().includes(searchText.toLowerCase())
-		//)
-	  //: [];
-  
   const handleEdit = (id) => {
 	  setSelectedCustomerId(id);
 	  setShowEdit(true);
 	};
 
+	const isSearching = searchText.trim().length > 0;
   // Pagination logic
-  const totalPages = Math.ceil(filtered.length / pageSize);
+  //const totalPages = Math.ceil(filtered.length / pageSize);
+  const totalPages = isSearching ? 1 : Math.ceil(customers.length / pageSize);
   const startIndex = (page - 1) * pageSize;
-  const paginated = filtered.slice(startIndex, startIndex + pageSize);
+  //const paginated = filtered.slice(startIndex, startIndex + pageSize);
+  const paginated = isSearching
+					  ? customers              // 🔥 show all search results
+					  : customers.slice(
+						  (page - 1) * pageSize,
+						  page * pageSize
+						);
 
   return (
     <div className="container-fluid mt-1">
@@ -262,9 +265,9 @@ export default function CustomerListPage() {
 
         {/* Page navigation buttons */}
         <div>
-          <button
+          <button 
             className="btn btn-outline-primary me-2"
-            disabled={page === 1}
+            disabled={page === 1 || isSearching}
             onClick={() => setPage(page - 1)}
           >
             Previous
@@ -276,7 +279,7 @@ export default function CustomerListPage() {
 
           <button
             className="btn btn-outline-primary"
-            disabled={page === totalPages}
+            disabled={page === totalPages || isSearching}
             onClick={() => setPage(page + 1)}
           >
             Next

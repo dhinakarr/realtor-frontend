@@ -182,3 +182,11 @@
   display: inline-flex !important;
   white-space: nowrap;
 }
+.table-transparent {
+  background-color: transparent !important;
+}
+
+.table-transparent td,
+.table-transparent th {
+  background-color: transparent !important;
+}

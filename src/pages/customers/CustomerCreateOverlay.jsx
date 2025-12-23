@@ -146,7 +146,7 @@ export default function CustomerCreateOverlay({ show, onClose, onCreated }) {
 							  value={opt.key}
 							  onChange={(e) => handleChange(f.apiField, e.target.value, f)}
 							/>
-							<label className="form-check-label ms-1">{opt.label}</label>
+							<label className="form-check-label ms-1">{opt.key}</label>
 							{errors[f.apiField] && (
 							  <div className="text-danger small">{errors[f.apiField]}</div>
 							)}

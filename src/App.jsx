@@ -34,7 +34,7 @@ import ProjectDetailsPage from "./pages/projects/ProjectDetailsPage";
 import CommissionRulesPage from "./pages/sales/CommissionRulesPage";
 import FinanceDashboard from "./pages/finance/FinanceDashboard";
 import CustomerListPage from "./pages/customers/CustomerListPage";
-
+import SiteVisitList from "./pages/site-visit/SiteVisitList";
 import { ToastProvider } from "./components/common/ToastProvider";
 import { Tooltip, Popover } from 'bootstrap';
 
@@ -113,6 +113,7 @@ function App() {
 			<Route path="/customers/list" element={<CustomerListPage />} />
 			
 			<Route path="/finance/list" element={<FinanceDashboard /> } />
+			<Route path="/site-visits/list" element={<SiteVisitList /> } />
 			
 			
 			<Route path="*" element={<div style={{color:'red'}}>NO MATCH</div>} />

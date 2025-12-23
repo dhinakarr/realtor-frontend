@@ -1,24 +1,51 @@
 import React from "react";
 
-export default function DynamicFormRenderer({ form, record, updateField }) {
+export default function DynamicFormRenderer({
+  form,
+  record,
+  updateField,
+  errors = {},
+  layout = { columns: 1 },
+}) {
   if (!form || !form.fields) return null;
 
-  return (
-    <>
-      {form.fields.map((f) => {
-        const value = record[f.apiField];
+  const columnClass =
+    layout.columns === 2 ? "col-12 col-md-6 mb-3" : "col-12 mb-3";
 
-        // TEXT INPUT
+  const renderError = (field) =>
+    errors[field] && (
+      <div className="text-danger small mt-1">
+        {errors[field]}
+      </div>
+    );
+
+  const renderLabel = (f) => (
+    <label className="form-label">
+      {f.displayLabel}
+      {f.required && <span className="text-danger ms-1">*</span>}
+    </label>
+  );
+
+  return (
+    <div className="row">
+      {form.fields.map((f) => {
+        const value = record[f.apiField] ?? "";
+        const isMulti = f.extraSettings?.multiple === true;
+
+        // TEXT
         if (["text", "string"].includes(f.fieldType)) {
           return (
-            <div className="mb-3" key={f.apiField}>
-              <label className="form-label">{f.displayLabel}</label>
+            <div className={columnClass} key={f.apiField}>
+              {renderLabel(f)}
               <input
                 type="text"
                 className="form-control"
-                value={value || ""}
-                onChange={(e) => updateField(f.apiField, e.target.value)}
+                value={value}
+                onChange={(e) =>
+                  updateField(f.apiField, e.target.value)
+                }
               />
+              {renderError(f.apiField)}
             </div>
           );
         }
@@ -26,14 +53,72 @@ export default function DynamicFormRenderer({ form, record, updateField }) {
         // NUMBER
         if (f.fieldType === "number") {
           return (
-            <div className="mb-3" key={f.apiField}>
-              <label className="form-label">{f.displayLabel}</label>
+            <div className={columnClass} key={f.apiField}>
+              {renderLabel(f)}
               <input
                 type="number"
                 className="form-control"
-                value={value || ""}
-                onChange={(e) => updateField(f.apiField, e.target.value)}
+                value={value}
+                onChange={(e) =>
+                  updateField(f.apiField, e.target.value)
+                }
               />
+              {renderError(f.apiField)}
+            </div>
+          );
+        }
+
+        // DATE
+        if (f.fieldType === "date") {
+          return (
+            <div className={columnClass} key={f.apiField}>
+              {renderLabel(f)}
+              <input
+                type="date"
+                className="form-control"
+                value={value}
+                onChange={(e) =>
+                  updateField(f.apiField, e.target.value)
+                }
+              />
+              {renderError(f.apiField)}
+            </div>
+          );
+        }
+
+        // SELECT / MULTISELECT
+        if (f.fieldType === "select") {
+          return (
+            <div className={columnClass} key={f.apiField}>
+              {renderLabel(f)}
+              <select
+                className="form-select"
+                multiple={isMulti}
+                value={isMulti ? value || [] : value}
+                onChange={(e) =>
+                  updateField(
+                    f.apiField,
+                    isMulti
+                      ? Array.from(
+                          e.target.selectedOptions,
+                          (o) => o.value
+                        )
+                      : e.target.value
+                  )
+                }
+              >
+                {!isMulti && (
+                  <option value="">
+                    Select {f.displayLabel}
+                  </option>
+                )}
+                {f.lookupData?.map((opt) => (
+                  <option key={opt.key} value={opt.key}>
+                    {opt.value}
+                  </option>
+                ))}
+              </select>
+              {renderError(f.apiField)}
             </div>
           );
         }
@@ -41,129 +126,23 @@ export default function DynamicFormRenderer({ form, record, updateField }) {
         // TEXTAREA
         if (f.fieldType === "textarea") {
           return (
-            <div className="mb-3" key={f.apiField}>
-              <label className="form-label">{f.displayLabel}</label>
+            <div className="col-12 mb-3" key={f.apiField}>
+              {renderLabel(f)}
               <textarea
                 className="form-control"
                 rows={3}
-                value={value || ""}
-                onChange={(e) => updateField(f.apiField, e.target.value)}
-              ></textarea>
-            </div>
-          );
-        }
-
-        // DATE FIELD
-        if (f.fieldType === "date") {
-          return (
-            <div className="mb-3" key={f.apiField}>
-              <label className="form-label">{f.displayLabel}</label>
-              <input
-                type="date"
-                className="form-control"
-                value={value || ""}
-                onChange={(e) => updateField(f.apiField, e.target.value)}
+                value={value}
+                onChange={(e) =>
+                  updateField(f.apiField, e.target.value)
+                }
               />
+              {renderError(f.apiField)}
             </div>
           );
         }
 
-        // SELECT DROPDOWN
-        if (f.fieldType === "select") {
-          return (
-            <div className="mb-3" key={f.apiField}>
-              <label className="form-label">{f.displayLabel}</label>
-              <select
-                className="form-select"
-                value={value || ""}
-                onChange={(e) => updateField(f.apiField, e.target.value)}
-              >
-                <option value="">Select {f.displayLabel}</option>
-                {f.lookupData?.map((opt) => (
-                  <option key={opt.key} value={opt.key}>
-                    {opt.value}
-                  </option>
-                ))}
-              </select>
-            </div>
-          );
-        }
-
-        // CHECKBOX
-        if (f.fieldType === "checkbox") {
-          return (
-            <div className="form-check mb-3" key={f.apiField}>
-              <input
-                type="checkbox"
-                className="form-check-input"
-                id={f.apiField}
-                checked={value === true}
-                onChange={(e) => updateField(f.apiField, e.target.checked)}
-              />
-              <label className="form-check-label" htmlFor={f.apiField}>
-                {f.displayLabel}
-              </label>
-            </div>
-          );
-        }
-
-        // FILE UPLOAD
-        if (f.fieldType === "file") {
-          return (
-            <div className="mb-3" key={f.apiField}>
-              <label className="form-label">{f.displayLabel}</label>
-              <input
-                type="file"
-                className="form-control"
-                onChange={(e) => updateField(f.apiField, e.target.files[0])}
-              />
-            </div>
-          );
-        }
-		
-		// RADIO
-		if (f.fieldType === "radio") {
-		  return (
-			<div className="mb-3" key={f.apiField}>
-			  <label className="form-label d-block">{f.displayLabel}</label>
-
-			  {f.lookupData?.map((opt) => (
-				<div className="form-check form-check-inline" key={opt.key}>
-				  <input
-					className="form-check-input"
-					type="radio"
-					name={f.apiField} // groups radio buttons
-					id={`${f.apiField}_${opt.key}`}
-					value={opt.key}
-					checked={value === opt.key}
-					onChange={(e) => updateField(f.apiField, e.target.value)}
-				  />
-				  <label
-					className="form-check-label"
-					htmlFor={`${f.apiField}_${opt.key}`}
-				  >
-					{opt.label}
-				  </label>
-				</div>
-			  ))}
-			</div>
-		  );
-		}
-
-
-        // DEFAULT TEXT
-        return (
-          <div className="mb-3" key={f.apiField}>
-            <label className="form-label">{f.displayLabel}</label>
-            <input
-              type="text"
-              className="form-control"
-              value={value || ""}
-              onChange={(e) => updateField(f.apiField, e.target.value)}
-            />
-          </div>
-        );
+        return null;
       })}
-    </>
+    </div>
   );
 }

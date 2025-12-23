@@ -1,16 +1,18 @@
 // components/Sidebar.jsx
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FaTachometerAlt, FaUserShield, FaFolderOpen, FaDollarSign, FaUsers } from 'react-icons/fa';
+import { FaTachometerAlt, FaUserShield, FaFolderOpen, FaDollarSign, FaUsers, FaMapMarkedAlt,    // for Site Visit
+  FaProjectDiagram, FaMapMarkerAlt, FaRoute } from 'react-icons/fa';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
 
 const moduleIcons = {
 	Dashboard: <FaTachometerAlt />,
 	Admin: <FaUserShield />,
-	Projects: <FaFolderOpen />,
+	Projects: <FaProjectDiagram />,
 	Finance: <FaDollarSign />,
-	Customers: <FaUsers />
+	Customers: <FaUsers />,
+	"Site-Visits": <FaMapMarkerAlt />
 };
 
 const moduleRouteMap = {
@@ -18,7 +20,8 @@ const moduleRouteMap = {
 	Admin: '/module/admin',
 	Projects: '/projects/list',
 	Finance: '/finance/list',
-	Customers: '/customers/list'
+	Customers: '/customers/list',
+	sitevisits: '/site-visits/list'
 };
 
 export default function Sidebar() {
@@ -27,7 +30,6 @@ export default function Sidebar() {
   const permissions = user?.permission || []; // fixed access
   //console.log("Sidebar Data Received: "+JSON.stringify(user));
   //console.log("Sidebar permissions: "+JSON.stringify(permissions));
-  
   //const isActive = (route) => location.pathname.startsWith(route);
   //console.log("Sidebar isActive: "+isActive);
   
@@ -35,9 +37,12 @@ export default function Sidebar() {
     return null;
   }
   
+  const normalizeModuleName = (name) => name.replace(/-/g, '');
+  
   return (
     <div style={{ width: '70px', backgroundColor: 'hsl(270, 70%, 40%)', color: 'white', minHeight: '100vh', padding: '0.5rem' }}>
       {permissions.map((module) => (
+		  
 			//const route = moduleRouteMap[module.moduleName] || `/${module.moduleName.toLowerCase()}/list`;
           <div key={module.moduleId} className="mb-3 text-center">
 			  <OverlayTrigger

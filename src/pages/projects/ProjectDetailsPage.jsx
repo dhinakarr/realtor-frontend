@@ -156,11 +156,6 @@ export default function ProjectDetailsPage() {
 			</button>
 		  </div>
 		</div>
-
-	  
-	  
-
-
       {/* PROJECT INFO */}
       <div className="project-card" style={{ marginBottom: "20px", padding: "15px", border: "1px solid #ddd", borderRadius: "8px", backgroundColor: "#f9f9f9" }}>
         {project.files?.length > 0 && (
@@ -170,12 +165,27 @@ export default function ProjectDetailsPage() {
             style={{ width: "100%", borderRadius: "8px", marginBottom: "15px", height:"450px" }}
           />
         )}
-        <h2 style={{ margin: "0 0 10px" }}>{project.projectName}</h2>
-        <p><strong>Location:</strong> {project.locationDetails}</p>
-        <p><strong>Survey Number:</strong> {project.surveyNumber}</p>
-        <p><strong>Start Date:</strong> {project.startDate} | <strong>End Date:</strong> {project.endDate}</p>
-        <p><strong>Price/Sqft:</strong> ₹{project.pricePerSqft}</p>
-		<p><strong>Guideline Value:</strong> ₹{project.guidanceValue}</p>
+        <h4 style={{ margin: "0 0 10px" }}>{project.projectName}</h4>
+		<table className="table table-transparent">
+		  <tbody>
+			<tr>
+			  <td style={{ width: "40%" }}>
+				<p><small>Location:</small> {project.locationDetails}</p>
+				<p><small>Survey Number:</small> {project.surveyNumber}</p>
+				<p><small>Start Date:</small> {project.startDate}</p>
+				<p><small>End Date:</small> {project.endDate}</p>
+				<p><small>Price / Sqft:</small> ₹{project.pricePerSqft}</p>
+			  </td>
+			  <td style={{ width: "40%" }}>
+				<p><small>Registration Charges:</small> ₹{project.regCharges}</p>
+				<p><small>Documentation Charges:</small> ₹{project.docCharges}</p>
+				<p><small>Other Charges:</small> ₹{project.otherCharges}</p>
+				<p><small>Guideline Value:</small> ₹{project.guidanceValue}</p>
+			  </td>
+			</tr>
+		  </tbody>
+		</table>
+
       </div>
 
       {/* PLOT GRID */}
@@ -194,6 +204,7 @@ export default function ProjectDetailsPage() {
 						  <div>Area: {plot.area} sft</div>
 						  <div>Facing: {plot.facing || ""}</div>
 						  <div>Survey: {plot.surveyNum}</div>
+						  <div>Total: {plot.totalPrice}</div>
 						</div>
 
 						{/* Edit Icon */}

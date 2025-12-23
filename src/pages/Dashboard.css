@@ -1,0 +1,13 @@
+.dashboard-card {
+  min-height: 70px;
+  border-radius: 10px;
+}
+
+.table th {
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.table td {
+  white-space: nowrap;
+}

@@ -248,7 +248,7 @@ export default function CustomerEditOverlay({ show, customerId, onClose, onUpdat
                               checked={formValues[name] === opt.key}
                               onChange={() => updateFieldValue(field, opt.key)}
                             />
-                            {opt.label}
+                            {opt.key}
                           </label>
                         ))}
                       </div>
