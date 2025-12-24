@@ -1,190 +1,310 @@
 import React, { useEffect, useState } from "react";
-import { Container, Row, Col, Card, Table, Spinner, Badge } from "react-bootstrap";
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from "recharts";
-import API from "../api/api";
-import dayjs from "dayjs";
-import "./Dashboard.css";
+import { Card, Row, Col, Spinner } from "react-bootstrap";
+import { Bar, Line, Doughnut } from "react-chartjs-2";
+import API from "../api/API";
 
-export default function Dashboard() {
+/* Chart.js registration */
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  ArcElement,
+  LineElement,
+  PointElement,
+  Tooltip,
+  Legend,
+} from "chart.js";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  ArcElement,
+  LineElement,
+  PointElement,
+  Tooltip,
+  Legend
+);
+
+export default function DashboardSummary() {
   const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    API.get("/api/dashboard")
-      .then(res => setData(res.data))
-      .finally(() => setLoading(false));
+    API.get("/api/dashboard/summary").then(res => setData(res.data));
   }, []);
 
-  if (loading) {
-    return (
-      <div className="text-center mt-5">
-        <Spinner animation="border" />
-      </div>
-    );
-  }
+  if (!data) return <Spinner animation="border" />;	
+  
+   
 
-  const { cards = [], charts = [], tables = [], meta } = data;
+  /* ================= KPIs ================= */
 
-  /* ---------------- helpers ---------------- */
+  const totalCommission = sum(data.commissions, "totalCommission");
 
-  const formatDate = (value) =>
-    value ? dayjs(value).format("DD/MM/YYYY") : "-";
+  
+  const totalPlots = data.inventory.reduce((a, p) => a + p.totalPlots, 0);
+  const availablePlots = data.inventory.reduce((a, p) => a + p.available, 0);
+  const bookedPlots = data.inventory.reduce((a, p) => a + p.booked, 0);
+  const soldPlots = data.inventory.reduce((a, p) => a + p.sold, 0);
 
-  const formatNumber = (value) =>
-    typeof value === "number" ? value.toLocaleString() : value ?? "-";
+  const totalSales = sum(data.finance, "totalSales");
+  const totalReceived = sum(data.finance, "totalReceived");
+  const totalOutstanding = sum(data.finance, "totalOutstanding");
 
-  const getCardBg = (key) => {
-    if (key.includes("SALE")) return "primary-subtle";
-    if (key.includes("OUTSTANDING")) return "danger-subtle";
-    if (key.includes("RECEIVED") || key.includes("PAID")) return "success-subtle";
-    if (key.includes("COMMISSION")) return "warning-subtle";
-    return "light";
+  const totalVisits = sum(data.siteVisits, "totalVisits");
+  const totalConversions = sum(data.siteVisits, "conversions");
+  const conversionRate = totalVisits
+						? ((totalConversions / totalVisits) * 100).toFixed(1)
+							: 0;
+
+/* ================= VISIBILITY FLAGS ================= */
+  const hasInventory = data.inventory?.length > 0;
+  const hasFinance = data.finance?.length > 0 && Number(totalSales.replace(/,/g, "")) > 0;
+  const hasAgents = data.agents?.length > 0;
+  const hasCommissions = data.commissions?.length > 0 &&
+								Number(totalCommission.replace(/,/g, "")) > 0;
+  const hasVisits = data.siteVisits?.length > 0;
+
+/* ================= Cards ================= */
+	const StatCard = ({ title, value, bg }) => (
+	  <Col md={2} lg={2} className="mb-2">
+		<Card
+		  className="border-0 shadow-sm"
+		  style={{
+			background: bg,
+			color: "#fff",
+			cursor: "pointer",
+		  }}
+		>
+		  <Card.Body className="py-3 px-3">
+			<div className="small opacity-75">{title}</div>
+			<div className="fw-bold fs-5">{value}</div>
+		  </Card.Body>
+		</Card>
+	  </Col>
+	);
+
+
+
+  /* ================= Charts ================= */
+
+  const inventoryChart = {
+    labels: data.inventory.map(p => p.projectName),
+    datasets: [
+      {
+        label: "Available",
+        data: data.inventory.map(p => p.available),
+        backgroundColor: "#4dabf7",
+      },
+      {
+        label: "Booked",
+        data: data.inventory.map(p => p.booked),
+        backgroundColor: "#ffa94d",
+      },
+      {
+        label: "Sold",
+        data: data.inventory.map(p => p.sold),
+        backgroundColor: "#ff6b6b",
+      },
+    ],
+  };
+  
+  const ChartBox = ({ children }) => (
+	  <div style={{ height: "250px" }}>
+		{children}
+	  </div>
+	);
+
+  const financeChart = {
+	  labels: data.finance.map(f => f.projectName),
+	  datasets: [
+		{
+		  label: "Sales",
+		  data: data.finance.map(f => f.totalSales),
+		  backgroundColor: "#4dabf7",
+		},
+		{
+		  label: "Received",
+		  data: data.finance.map(f => f.totalReceived),
+		  backgroundColor: "#ffa94d",
+		},
+		{
+		  label: "Outstanding",
+		  data: data.finance.map(f => f.totalOutstanding),
+		  backgroundColor: "#ff6b6b",
+		},
+	  ],
+	};
+
+
+  const agentChart = {
+    labels: data.agents.map(a => a.agentName),
+    datasets: [
+      {
+        label: "Sales Value",
+        data: data.agents.map(a => a.salesValue),
+        backgroundColor: "#9775fa",
+      },
+    ],
   };
 
-  const shouldRenderTable = (tableKey) => {
-    if (tableKey === "INVENTORY_TABLE") return meta?.showInventory;
-    if (tableKey === "RECEIVABLE_TABLE") return meta?.showReceivableTable;
-    if (tableKey === "COMMISSION_PAYABLE_TABLE") return meta?.showCommissionTable;
-    return true;
+  const commissionChart = {
+    labels: data.commissions.map(c => c.agentName),
+    datasets: [
+      {
+        data: data.commissions.map(c => c.totalCommission),
+        backgroundColor: ["#5c7cfa", "#ffa94d", "#9775fa", "#ff6b6b"],
+      },
+    ],
   };
-
-  /* ---------------- render ---------------- */
 
   return (
-    <Container fluid className="px-3 py-2">
+    <>
+		<p><h3>Dashboard </h3> </p>
+      {/* ================= KPI CARDS ================= */}
+      <Row className="mb-4">
+		  {hasInventory && (
+			<StatCard title="Total Plots" value={totalPlots} bg="#4dabf7" />
+		  )}
+		  {/* <StatCard title="Total Plots" value={totalPlots} bg="#4dabf7" />
+			   <StatCard title="Available" value={availablePlots} bg="#51cf66" />
+		  <StatCard title="Booked" value={bookedPlots} bg="#ffa94d" />
+		  <StatCard title="Sold" value={soldPlots} bg="#ff6b6b" />*/}
+			  {/*
+		  <StatCard title="Sales Value" value={`₹${totalSales}`} bg="#339af0" /> 
+		  <StatCard title="Received" value={`₹${totalReceived}`} bg="#20c997" />
+		  <StatCard title="Outstanding" value={`₹${totalOutstanding}`} bg="#845ef7" />
+			  */}
+		  
+		  {hasFinance && (
+			<>
+			  <StatCard title="Sales Value" value={`₹${totalSales.toLocaleString()}`} bg="#339af0" />
+			  <StatCard title="Received" value={`₹${totalReceived}`} bg="#20c997" />
+			  <StatCard title="Outstanding" value={`₹${totalOutstanding}`} bg="#845ef7" />
+			</>
+		  )}
+		  {/*
+		  <StatCard title="Site Visits" value={totalVisits} bg="#5c7cfa" />
+		  <StatCard title="Conversion %" value={`${conversionRate}%`} bg="#15aabf" />
+		  */}
+		  {hasVisits && (
+			<>
+			  <StatCard title="Site Visits" value={totalVisits} bg="#5c7cfa" />
+			  <StatCard title="Conversion %" value={`${conversionRate}%`} bg="#15aabf" />
+			</>
+		  )}
+		</Row>
 
-      {/* ================= CARDS ================= */}
-      <Row className="g-2 mb-4">
-        {cards.map(card => (
-          <Col
-            key={card.key}
-            xs={12}
-            sm={6}
-            md={4}
-            lg={2}     // 6 cards per row
-          >
-            <Card
-              className={`border-0 shadow-sm bg-${getCardBg(card.key)}`}
-              style={{ borderRadius: "12px" }}
-            >
-              <Card.Body className="p-2 text-center">
-                <div className="text-muted small fw-semibold">
-                  {card.label}
-                </div>
-                <div className="fs-6 fw-bold mt-1">
-                  ₹ {formatNumber(card.value)}
-                </div>
-              </Card.Body>
-            </Card>
-          </Col>
-        ))}
+
+      {/* ================= ROW 1 ================= */}
+      <Row className="g-4">
+	  {/*
+        <Col md={6}>
+          <DashboardCard title="Inventory Status">
+		    <ChartBox>
+				<Bar data={inventoryChart} />
+			</ChartBox>
+          </DashboardCard>
+		</Col>
+	  */}
+		{hasInventory && (
+		  <Col md={6}>
+			<DashboardCard title="Inventory Status">
+			  <ChartBox>
+				<Bar data={inventoryChart} />
+			  </ChartBox>
+			</DashboardCard>
+		  </Col>
+		)}
+		
+		{hasFinance && (
+		  <Col md={6}>
+			<DashboardCard title="Finance Overview">
+			  <ChartBox>
+				<Bar data={financeChart} options={{ maintainAspectRatio: false }} />
+			  </ChartBox>
+			</DashboardCard>
+		  </Col>
+		)}
+		
+		{/*
+			<Col md={6}>
+			  <DashboardCard title="Finance Overview">
+				<ChartBox>
+					<Bar data={financeChart} options={{ maintainAspectRatio: false }} />
+				</ChartBox>
+			  </DashboardCard>
+			</Col>
+		 </Row>
+		*/}	
+      
+
+      {/* ================= ROW 2 ================= */}
+      
+	  {/* <Row>
+        <Col md={6}>
+          <DashboardCard title="Agent Performance">
+		    <ChartBox>
+				<Bar data={agentChart} />
+			</ChartBox>
+          </DashboardCard>
+        </Col>
+        <Col md={3}>
+          <DashboardCard title="Commission Distribution">
+		    <ChartBox>
+				<Doughnut data={commissionChart} />
+			</ChartBox>
+          </DashboardCard>
+        </Col>
+	  */}
+	  
+	  {hasAgents && (
+		<Col md={6}>
+		  <DashboardCard title="Agent Performance">
+			<ChartBox>
+			  <Bar data={agentChart} />
+			</ChartBox>
+		  </DashboardCard>
+		</Col>
+	  )}
+
+	  {hasCommissions && (
+		<Col md={3}>
+		  <DashboardCard title="Commission Distribution">
+			<ChartBox>
+			  <Doughnut data={commissionChart} />
+			</ChartBox>
+		  </DashboardCard>
+		</Col>
+	  )}
+	  
       </Row>
-
-      {/* ================= CHARTS ================= */}
-      <Row className="justify-content-center mb-5">
-        {charts.map(chart => (
-          <Col
-            key={chart.key}
-            xs={12}
-            md={10}
-            lg={6}   // reduced width + centered
-            className="mb-4"
-          >
-            <Card className="shadow-sm border-0" style={{ borderRadius: "12px" }}>
-              <Card.Body style={{ height: "320px" }}>
-                <Card.Title className="mb-3 text-center">
-                  {chart.key.replaceAll("_", " ")}
-                </Card.Title>
-
-                <ResponsiveContainer width="100%" height="85%">
-                  {chart.type === "LINE" ? (
-                    <LineChart data={chart.data}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="label" />
-                      <YAxis />
-                      <Tooltip formatter={formatNumber} />
-                      <Line
-                        type="monotone"
-                        dataKey="value"
-                        stroke="#4e73df"
-                        strokeWidth={2}
-                      />
-                    </LineChart>
-                  ) : (
-                    <BarChart data={chart.data}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="label" />
-                      <YAxis />
-                      <Tooltip formatter={formatNumber} />
-                      <Bar
-                        dataKey="value"
-                        fill="#1cc88a"
-                        radius={[4, 4, 0, 0]}
-                      />
-                    </BarChart>
-                  )}
-                </ResponsiveContainer>
-              </Card.Body>
-            </Card>
-          </Col>
-        ))}
-      </Row>
-
-      {/* ================= TABLES ================= */}
-      <Row>
-        {tables
-          .filter(table => shouldRenderTable(table.key))
-          .map(table => (
-            <Col key={table.key} xs={12} className="mb-4">
-              <Card className="shadow-sm border-0" style={{ borderRadius: "12px" }}>
-                <Card.Body className="p-3">
-                  <Card.Title className="mb-3">
-                    {table.key.replaceAll("_", " ")}
-                  </Card.Title>
-
-                  <div className="table-responsive">
-                    <Table
-                      hover
-                      size="sm"
-                      className="align-middle mb-0"
-                      style={{ fontSize: "0.85rem" }}
-                    >
-                      <thead className="table-light small">
-                        <tr>
-                          {table.columns.map(col => (
-                            <th key={col}>
-                              {col.replaceAll("_", " ").toUpperCase()}
-                            </th>
-                          ))}
-                        </tr>
-                      </thead>
-
-                      <tbody>
-                        {table.rows.map((row, rowIdx) => (
-                          <tr key={rowIdx}>
-                            {table.columns.map(col => {
-                              let value = row[col];
-                              if (
-                                col.toLowerCase().includes("date") ||
-                                col.toLowerCase().includes("confirmed_at")
-                              ) {
-                                value = formatDate(value);
-                              } else {
-                                value = formatNumber(value);
-                              }
-                              return <td key={col}>{value}</td>;
-                            })}
-                          </tr>
-                        ))}
-                      </tbody>
-                    </Table>
-                  </div>
-                </Card.Body>
-              </Card>
-            </Col>
-          ))}
-      </Row>
-
-    </Container>
+    </>
   );
 }
+
+/* ================= UI COMPONENTS ================= */
+
+const DashboardCard = ({ title, children }) => (
+  <Card className="mb-4 shadow-sm border-0">
+    <Card.Body>
+      <Card.Title className="fw-semibold mb-3">{title}</Card.Title>
+      {children}
+    </Card.Body>
+  </Card>
+);
+
+const Kpi = ({ title, value }) => (
+  <Col md={3}>
+    <Card className="shadow-sm border-0 text-center">
+      <Card.Body>
+        <div className="text-muted small">{title}</div>
+        <h4 className="fw-bold mt-1">{value}</h4>
+      </Card.Body>
+    </Card>
+  </Col>
+);
+
+const sum = (arr, key) =>
+  arr.reduce((a, b) => a + (b[key] || 0), 0).toLocaleString();
