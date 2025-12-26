@@ -3,9 +3,12 @@ import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import Home from './pages/Home';
+import Profile from "./pages/Profile";
+import EditProfile from "./pages/EditProfile";
 import PublicProjectDetailsPage from "./pages/PublicProjectDetailsPage";
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import InventoryDetails from './pages/InventoryDetails';
 import ModulePage from './pages/ModulePage';
 import UserCreatePage from './pages/admin/UserCreatePage';
 import UsersListPage from './pages/admin/UsersListPage';
@@ -61,9 +64,15 @@ function App() {
 			
 		  
             <Route path="/" element={<Home />} />
+			<Route path="/profile/:userId" element={<Profile />} />
+			<Route path="/profile/edit/:userId" element={<EditProfile />} />
+			
 			<Route path="/public/projects/details/:id" element={<PublicProjectDetailsPage />} />
             <Route path="/login" element={<Login setUser={setUser} />} />
             <Route path="/dashboard" element={user ? <Dashboard /> : <Login setUser={setUser} />} />
+			<Route path="/dashboard/inventory" element={<InventoryDetails />} />
+			
+			
 			<Route path="/module/:moduleName" element={user ? <ModulePage user={user} /> : <Login setUser={setUser} />} />
 			
 			

@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import API from "../../api/api";
+import { useToast } from "../../components/common/ToastProvider";
 
 export default function CustomerCreateOverlay({ show, onClose, onCreated }) {
   const [fields, setFields] = useState([]);
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
+  const { showToast } = useToast();
 
   useEffect(() => {
     if (show) {
@@ -104,9 +106,27 @@ export default function CustomerCreateOverlay({ show, onClose, onCreated }) {
 
 	  API.post("/api/customers", fd)
 		.then(() => {
+			showToast("New Customer Created");
 		  onCreated(); // refresh list and close overlay
 		})
-		.catch((err) => console.error(err));
+		.catch((err) => {
+			let message =
+				  err.response?.data?.message ||
+				  err.message ||
+				  "Something went wrong. Please try again.";
+
+				showToast(message, "error");
+/*
+			  if (err.response) {
+				// Backend returned an error response (4xx, 5xx)
+				message = err.response.data?.message || message;
+			  } else if (err.request) {
+				// Request made but no response
+				message = "Server is not responding";
+			  }
+*/
+			  //showToast(message, "danger");
+		});
 	};
 
   return (

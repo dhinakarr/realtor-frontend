@@ -116,9 +116,9 @@ export default function Navbar({ user, setUser }) {
               aria-labelledby="dropdownMenuButton"
             >
               <li>
-                <Link className="dropdown-item" to="/profile">
-                  User Profile
-                </Link>
+                <Link className="dropdown-item" to={`/profile/${user?.token?.userId}`}>
+				  User Profile
+				</Link>
               </li>
               <li>
                 <Link className="dropdown-item" to="/change-password">

@@ -130,7 +130,7 @@ export default function CustomerEditOverlay({ show, customerId, onClose, onUpdat
 		console.log("image section called");
 		formData.append("profileImage", profileFile);
 	}
-	/*
+
     try {
       await API.patch(`/api/customers/${customerId}`, formData, {
         headers: { "Content-Type": "multipart/form-data" }
@@ -140,7 +140,7 @@ export default function CustomerEditOverlay({ show, customerId, onClose, onUpdat
       onClose();
     } catch (err) {
       console.error("Update failed:", err);
-    } */
+    } 
   };
   
   const handleDeleteImage = async () => {

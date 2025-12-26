@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Card, Row, Col, Spinner } from "react-bootstrap";
 import { Bar, Line, Doughnut } from "react-chartjs-2";
 import API from "../api/API";
+import { useNavigate } from "react-router-dom";
 
 /* Chart.js registration */
 import {
@@ -10,7 +11,7 @@ import {
   LinearScale,
   BarElement,
   ArcElement,
-  LineElement,
+  LineElement,		
   PointElement,
   Tooltip,
   Legend,
@@ -29,20 +30,33 @@ ChartJS.register(
 
 export default function DashboardSummary() {
   const [data, setData] = useState(null);
+  const navigate = useNavigate();
+  
 
   useEffect(() => {
-    API.get("/api/dashboard/summary").then(res => setData(res.data));
-  }, []);
+	  API.get("/api/dashboard/summary")
+		.then(res => setData(res.data))
+		.catch(() => setData({
+		  inventory: [],
+			finance: [],
+			agents: [],
+			commissions: [],
+			siteVisits: [],
+			summaryKpis: {},
+			actionKpis: {}
+		}));
+	}, []);
+
 
   if (!data) return <Spinner animation="border" />;	
-  
+  const summary = data.summaryKpis ?? {};
    
 
   /* ================= KPIs ================= */
 
   const totalCommission = sum(data.commissions, "totalCommission");
 
-  
+  /*
   const totalPlots = data.inventory.reduce((a, p) => a + p.totalPlots, 0);
   const availablePlots = data.inventory.reduce((a, p) => a + p.available, 0);
   const bookedPlots = data.inventory.reduce((a, p) => a + p.booked, 0);
@@ -57,35 +71,58 @@ export default function DashboardSummary() {
   const conversionRate = totalVisits
 						? ((totalConversions / totalVisits) * 100).toFixed(1)
 							: 0;
+*/
+
+	const {
+	  totalPlots = 0,
+	  availablePlots = 0,
+	  bookedPlots = 0,
+	  soldPlots = 0,
+	  totalSales = 0,
+	  totalReceived = 0,
+	  totalOutstanding = 0,
+	  totalSiteVisits = 0,
+	  avgConversionRatio = 0,
+	  totalCommissionPayable = 0,
+	} = summary;
 
 /* ================= VISIBILITY FLAGS ================= */
   const hasInventory = data.inventory?.length > 0;
-  const hasFinance = data.finance?.length > 0 && Number(totalSales.replace(/,/g, "")) > 0;
+  const hasFinance = data.finance?.length > 0 && totalSales > 0;
   const hasAgents = data.agents?.length > 0;
-  const hasCommissions = data.commissions?.length > 0 &&
-								Number(totalCommission.replace(/,/g, "")) > 0;
+  const hasCommissions = data.commissions?.length > 0 && totalCommission > 0;
   const hasVisits = data.siteVisits?.length > 0;
+ /* 
+  const inventoryChart = data.inventory?.length
+						  ? {
+							  labels: data.inventory.map(p => p.projectName),
+							  datasets: [...]
+							}
+						  : null;
+  const hasFinance = totalSales > 0;	
+  const hasCommissions = totalCommissionPayable > 0;
+  const hasVisits = totalSiteVisits > 0;
+  const hasAgents = data.agents?.length > 0;*/
 
 /* ================= Cards ================= */
-	const StatCard = ({ title, value, bg }) => (
-	  <Col md={2} lg={2} className="mb-2">
+	const StatCard = ({ title, value, bg, onClick }) => (
+	  <Col className="d-flex">
 		<Card
-		  className="border-0 shadow-sm"
+		  className="border-0 shadow-sm flex-fill"
 		  style={{
 			background: bg,
 			color: "#fff",
-			cursor: "pointer",
+			cursor: onClick ? "pointer" : "default",
 		  }}
+		  onClick={onClick}
 		>
-		  <Card.Body className="py-3 px-3">
-			<div className="small opacity-75">{title}</div>
+		  <Card.Body className="py-3 px-3 text-center">
+			<div className="fw-bold opacity-75">{title}</div>
 			<div className="fw-bold fs-5">{value}</div>
 		  </Card.Body>
 		</Card>
 	  </Col>
 	);
-
-
 
   /* ================= Charts ================= */
 
@@ -110,8 +147,8 @@ export default function DashboardSummary() {
     ],
   };
   
-  const ChartBox = ({ children }) => (
-	  <div style={{ height: "250px" }}>
+  const ChartBox = ({ children, height = 250 }) => (
+	  <div style={{ height }}>
 		{children}
 	  </div>
 	);
@@ -154,44 +191,40 @@ export default function DashboardSummary() {
     datasets: [
       {
         data: data.commissions.map(c => c.totalCommission),
-        backgroundColor: ["#5c7cfa", "#ffa94d", "#9775fa", "#ff6b6b"],
+        backgroundColor: ["#5c7cfa", "#ffa94d", "#9775fa", "#ff6b6b", 
+		"#20c997", "#4dabf7", "#339af0", "#845ef7", "#51cf66"],
       },
     ],
   };
 
   return (
     <>
-		<p><h3>Dashboard </h3> </p>
+		<h3 className="mb-3">Dashboard</h3>
       {/* ================= KPI CARDS ================= */}
-      <Row className="mb-4">
+      <Row className="mb-4 g-4">
 		  {hasInventory && (
-			<StatCard title="Total Plots" value={totalPlots} bg="#4dabf7" />
+		  <>
+			<StatCard title="Total Plots" value={totalPlots} 
+				bg="#4dabf7" onClick={() => navigate("/dashboard/inventory")} />
+			<StatCard title="Available" value={availablePlots} bg="#51cf66" />
+			<StatCard title="Booked" value={bookedPlots} bg="#ffa94d" />
+		  </>	
 		  )}
 		  {/* <StatCard title="Total Plots" value={totalPlots} bg="#4dabf7" />
 			   <StatCard title="Available" value={availablePlots} bg="#51cf66" />
 		  <StatCard title="Booked" value={bookedPlots} bg="#ffa94d" />
 		  <StatCard title="Sold" value={soldPlots} bg="#ff6b6b" />*/}
-			  {/*
-		  <StatCard title="Sales Value" value={`₹${totalSales}`} bg="#339af0" /> 
-		  <StatCard title="Received" value={`₹${totalReceived}`} bg="#20c997" />
-		  <StatCard title="Outstanding" value={`₹${totalOutstanding}`} bg="#845ef7" />
-			  */}
-		  
 		  {hasFinance && (
 			<>
 			  <StatCard title="Sales Value" value={`₹${totalSales.toLocaleString()}`} bg="#339af0" />
-			  <StatCard title="Received" value={`₹${totalReceived}`} bg="#20c997" />
-			  <StatCard title="Outstanding" value={`₹${totalOutstanding}`} bg="#845ef7" />
+			  <StatCard title="Received" value={`₹${totalReceived.toLocaleString()}`} bg="#20c997" />
+			  <StatCard title="Outstanding" value={`₹${totalOutstanding.toLocaleString()}`} bg="#845ef7" />
 			</>
 		  )}
-		  {/*
-		  <StatCard title="Site Visits" value={totalVisits} bg="#5c7cfa" />
-		  <StatCard title="Conversion %" value={`${conversionRate}%`} bg="#15aabf" />
-		  */}
 		  {hasVisits && (
 			<>
-			  <StatCard title="Site Visits" value={totalVisits} bg="#5c7cfa" />
-			  <StatCard title="Conversion %" value={`${conversionRate}%`} bg="#15aabf" />
+			  <StatCard title="Site Visits" value={totalSiteVisits} bg="#5c7cfa" />
+			  <StatCard title="Conversion %" value={`${avgConversionRatio}%`} bg="#15aabf" />
 			</>
 		  )}
 		</Row>
@@ -199,20 +232,13 @@ export default function DashboardSummary() {
 
       {/* ================= ROW 1 ================= */}
       <Row className="g-4">
-	  {/*
-        <Col md={6}>
-          <DashboardCard title="Inventory Status">
-		    <ChartBox>
-				<Bar data={inventoryChart} />
-			</ChartBox>
-          </DashboardCard>
-		</Col>
-	  */}
 		{hasInventory && (
 		  <Col md={6}>
 			<DashboardCard title="Inventory Status">
 			  <ChartBox>
-				<Bar data={inventoryChart} />
+				<div onClick={() => navigate("/dashboard/inventory")} style={{ cursor: "pointer" }}>
+				  <Bar data={inventoryChart} />
+				</div>
 			  </ChartBox>
 			</DashboardCard>
 		  </Col>
@@ -227,38 +253,8 @@ export default function DashboardSummary() {
 			</DashboardCard>
 		  </Col>
 		)}
-		
-		{/*
-			<Col md={6}>
-			  <DashboardCard title="Finance Overview">
-				<ChartBox>
-					<Bar data={financeChart} options={{ maintainAspectRatio: false }} />
-				</ChartBox>
-			  </DashboardCard>
-			</Col>
-		 </Row>
-		*/}	
-      
 
       {/* ================= ROW 2 ================= */}
-      
-	  {/* <Row>
-        <Col md={6}>
-          <DashboardCard title="Agent Performance">
-		    <ChartBox>
-				<Bar data={agentChart} />
-			</ChartBox>
-          </DashboardCard>
-        </Col>
-        <Col md={3}>
-          <DashboardCard title="Commission Distribution">
-		    <ChartBox>
-				<Doughnut data={commissionChart} />
-			</ChartBox>
-          </DashboardCard>
-        </Col>
-	  */}
-	  
 	  {hasAgents && (
 		<Col md={6}>
 		  <DashboardCard title="Agent Performance">
@@ -307,4 +303,4 @@ const Kpi = ({ title, value }) => (
 );
 
 const sum = (arr, key) =>
-  arr.reduce((a, b) => a + (b[key] || 0), 0).toLocaleString();
+  arr.reduce((a, b) => a + (b[key] || 0), 0);
