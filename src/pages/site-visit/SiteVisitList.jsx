@@ -6,6 +6,7 @@ import SiteVisitFormDrawer from "./SiteVisitFormDrawer";
 import SiteVisitViewDrawer from "./SiteVisitViewDrawer";
 import SiteVisitEditDrawer from "./SiteVisitEditDrawer";
 import SitePaymentDrawer from "./SitePaymentDrawer";
+import useModule from "../../hooks/useModule";
 
 export default function SiteVisitList() {
   const [data, setData] = useState([]);
@@ -19,6 +20,11 @@ export default function SiteVisitList() {
   const [paymentDrawerOpen, setPaymentDrawerOpen] = useState(false);
   const [showPaymentDrawer, setShowPaymentDrawer] = useState(false);
   const [selectedVisit, setSelectedVisit] = useState(null);
+  
+  const featureUrl = "/api/site-visits";
+  const module = useModule(featureUrl);
+  const feature = module.features.find(f => f.url);
+  const isFinance = (feature.financeRole == "FINANCE") ? true : false;
 
   useEffect(() => {
     fetchVisits();
@@ -133,6 +139,7 @@ export default function SiteVisitList() {
 					setShowEditDrawer(true);
 				  }}
                 />
+				{isFinance && (
                 <FaMoneyBillWave
                   className="text-success cursor-pointer"
 				  style={{ cursor: 'pointer' }}
@@ -146,6 +153,7 @@ export default function SiteVisitList() {
 					setPaymentDrawerOpen(true);
 				  }}
                 />
+				)}
               </td>
             </tr>
           ))}

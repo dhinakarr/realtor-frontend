@@ -1,15 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { FaTimes, FaUpload } from "react-icons/fa";
 import API from "../../api/api";
 import "./CustomerDocumentsOverlay.css";
-
+import { useToast } from "../common/ToastProvider";
 
 export default function CustomerDocumentsOverlay({ customerId, onClose }) {
   const [existingDocs, setExistingDocs] = useState([]);
   const [documentType, setDocumentType] = useState("");
   const [documentNumber, setDocumentNumber] = useState("");
   const [files, setFiles] = useState([]);
-
+  const { showToast } = useToast();
+  
   const fetchDocuments = () => {
     API.get(`/api/customers/${customerId}/documents`)
       .then((res) => setExistingDocs(res.data || []))
@@ -19,13 +20,13 @@ export default function CustomerDocumentsOverlay({ customerId, onClose }) {
   useEffect(() => {
     fetchDocuments();
   }, [customerId]);
-
+  
+  const fileInputRef = useRef(null);
   const handleUpload = () => {
     if (!documentType || !documentNumber || files.length === 0) {
-      alert("Please enter document details and choose files.");
+      showToast("Please enter document details and choose files.", "danger");
       return;
     }
-
     const formData = new FormData();
     formData.append("documentType", documentType);
     formData.append("documentNumber", documentNumber);
@@ -40,13 +41,17 @@ export default function CustomerDocumentsOverlay({ customerId, onClose }) {
       .then(() => {
         fetchDocuments();
         setDocumentType("");
-        setDocumentNumber("");
-        setFiles([]);
-        alert("Documents uploaded successfully!");
+		setDocumentNumber("");
+		setFiles([]);
+
+		if (fileInputRef.current) {
+			fileInputRef.current.value = "";
+		}
+        showToast("Documents uploaded successfully!", "success");
       })
       .catch((err) => {
         console.error(err);
-        alert("Upload failed");
+        showToast("Upload failed", "danger");
       });
   };
 

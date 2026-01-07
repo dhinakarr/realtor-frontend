@@ -3,6 +3,7 @@ import { Card, Row, Col, Spinner } from "react-bootstrap";
 import { Bar, Line, Doughnut } from "react-chartjs-2";
 import API from "../api/API";
 import { useNavigate } from "react-router-dom";
+import "./dashboard.css";
 
 /* Chart.js registration */
 import {
@@ -142,16 +143,27 @@ export default function DashboardSummary() {
       {
         label: "Sold",
         data: data.inventory.map(p => p.sold),
-        backgroundColor: "#ff6b6b",
+        backgroundColor: "#ff6b6b",	
       },
     ],
   };
   
   const ChartBox = ({ children, height = 250 }) => (
-	  <div style={{ height }}>
+	  <div className="chart-box" style={{ height }}>
 		{children}
 	  </div>
 	);
+  
+	const chartOptions = {
+	  responsive: true,
+	  maintainAspectRatio: false,
+	  plugins: {
+		legend: {
+		  position: "bottom",
+		},
+	  },
+	};
+  
 
   const financeChart = {
 	  labels: data.finance.map(f => f.projectName),
@@ -199,7 +211,17 @@ export default function DashboardSummary() {
 
   return (
     <>
-		<h3 className="mb-3">Dashboard</h3>
+		<div className="d-flex justify-content-between align-items-center mb-3">
+		  <h3 className="mb-0">Dashboard</h3>
+
+		  <button
+			className="btn btn-outline-primary btn-sm"
+			onClick={() => navigate("/performance/users")}
+		  >
+			View Performance →
+		  </button>
+		</div>
+
       {/* ================= KPI CARDS ================= */}
       <Row className="mb-4 g-4">
 		  {hasInventory && (
@@ -231,62 +253,62 @@ export default function DashboardSummary() {
 
 
       {/* ================= ROW 1 ================= */}
-      <Row className="g-4">
+      <div className="dashboard-grid">
 		{hasInventory && (
-		  <Col md={6}>
-			<DashboardCard title="Inventory Status">
+		  
+			<DashboardCard className="grid-item" title="Inventory Status">
 			  <ChartBox>
-				<div onClick={() => navigate("/dashboard/inventory")} style={{ cursor: "pointer" }}>
-				  <Bar data={inventoryChart} />
-				</div>
+				  <Bar data={inventoryChart} options={chartOptions} />
 			  </ChartBox>
 			</DashboardCard>
-		  </Col>
+		  
 		)}
 		
 		{hasFinance && (
-		  <Col md={6}>
-			<DashboardCard title="Finance Overview">
+		 
+			<DashboardCard className="grid-item" title="Finance Overview">
 			  <ChartBox>
-				<Bar data={financeChart} options={{ maintainAspectRatio: false }} />
+				<Bar data={financeChart} options={chartOptions} />
 			  </ChartBox>
 			</DashboardCard>
-		  </Col>
+		 
 		)}
 
       {/* ================= ROW 2 ================= */}
 	  {hasAgents && (
-		<Col md={6}>
-		  <DashboardCard title="Agent Performance">
+		
+		  <DashboardCard className="grid-item" title="Agent Performance">
 			<ChartBox>
-			  <Bar data={agentChart} />
+			  <Bar data={agentChart} options={chartOptions} />
 			</ChartBox>
 		  </DashboardCard>
-		</Col>
+		
 	  )}
 
 	  {hasCommissions && (
-		<Col md={3}>
-		  <DashboardCard title="Commission Distribution">
+		
+		  <DashboardCard className="grid-item" title="Commission Distribution">
 			<ChartBox>
-			  <Doughnut data={commissionChart} />
+			  <Doughnut data={commissionChart} options={chartOptions} />
 			</ChartBox>
 		  </DashboardCard>
-		</Col>
+		
 	  )}
 	  
-      </Row>
+      </div>
     </>
   );
 }
 
 /* ================= UI COMPONENTS ================= */
 
-const DashboardCard = ({ title, children }) => (
-  <Card className="mb-4 shadow-sm border-0">
-    <Card.Body>
+const DashboardCard = ({ title, children, className = "" }) => (
+  <Card className={`shadow-sm border-0 h-100 ${className}`}>
+    <Card.Body className="d-flex flex-column">
       <Card.Title className="fw-semibold mb-3">{title}</Card.Title>
+	  <div className="flex-grow-1">
       {children}
+	  </div>
     </Card.Body>
   </Card>
 );

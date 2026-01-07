@@ -1,15 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import API from "../../api/api";
 import { FaTimes, FaUpload, FaRegFileAlt, FaFilePdf, FaFileImage, FaFileWord, FaFileExcel, FaFile } from "react-icons/fa";
 import "./UploadDocumentsOverlay.css";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
+import { useToast } from "../../components/common/ToastProvider";
 
 export default function UploadDocumentsOverlay({ show, customerId, onClose }) {
   const [existingDocs, setExistingDocs] = useState([]);
   const [documentType, setDocumentType] = useState("");
   const [documentNumber, setDocumentNumber] = useState("");
   const [uploadFiles, setUploadFiles] = useState([]);
+  const [files, setFiles] = useState([]);
+  const { showToast } = useToast();
   
   const BASE_URL = API.defaults.baseURL; 
 
@@ -33,7 +36,7 @@ export default function UploadDocumentsOverlay({ show, customerId, onClose }) {
     //setDocuments(Array.from(e.target.files));
 	setUploadFiles(Array.from(e.target.files));
   }
-
+  const fileInputRef = useRef(null);
   async function handleUpload() {
     //if (!documents.length) return;
 	if (!uploadFiles.length) return;
@@ -51,9 +54,17 @@ export default function UploadDocumentsOverlay({ show, customerId, onClose }) {
       await loadExistingDocuments(); 
       //setDocuments([]);
 	  setUploadFiles([]);
-      alert("Documents uploaded successfully");
+	  setDocumentType("");
+	  setDocumentNumber("");
+	  setFiles([]);
+
+	if (fileInputRef.current) {
+		fileInputRef.current.value = "";
+	}
+      showToast("Documents uploaded successfully","success");
     } catch (err) {
       console.error("Upload error", err);
+	  showToast("Failed to upload Documents","danger");
     }
   }
   
@@ -104,10 +115,10 @@ export default function UploadDocumentsOverlay({ show, customerId, onClose }) {
 				  prev.filter((d) => String(d.documentId) !== String(documentId))
 				);
 
-				toast.success("Document deleted successfully");
+				showToast("Document deleted successfully", "success");
 			  } catch (err) {
 				console.error(err);
-				toast.error("Failed to delete document");
+				showToast("Failed to delete document", "danger");
 			  }
 			},
 		  },

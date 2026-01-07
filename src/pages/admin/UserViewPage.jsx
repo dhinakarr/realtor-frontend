@@ -5,8 +5,9 @@ import PageHeader from "../../components/PageHeader";
 import useModule from "../../hooks/useModule";
 import { mapApiToRoute } from "../../utils/mapApiToRoute";
 
-export default function UserViewPage() {
-  const { id } = useParams();
+export default function UserViewPage({ id: propId, hideHeader = false }) {
+  const { id: paramId } = useParams();
+  const id = propId || paramId;
   const navigate = useNavigate();
 
   // Load module + features (sidebar & breadcrumb header)
@@ -16,6 +17,10 @@ export default function UserViewPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+	  if (!id) {
+		console.log("UserViewPage id: "+id);
+		return;
+	  }
     API.get(`/api/users/${id}`)
       .then((res) => {
         setRecord(res.data.data || {});
@@ -32,7 +37,7 @@ export default function UserViewPage() {
     <div className="container mt-4">
 
       {/* === PAGE HEADER (Navigation, Breadcrumb, Feature Links) === */}
-      {module && (
+      {!hideHeader && module && (
         <PageHeader module={module} mapApiToRoute={mapApiToRoute} />
       )}
 
@@ -113,12 +118,14 @@ export default function UserViewPage() {
             </table>
           </>
         )}
-		
+		{!hideHeader && (
 				  <div className="d-flex justify-content-start mt-4">
+			
 			  <button className="btn btn-outline-primary" onClick={() => navigate("/admin/users")}>
 				<i className="fa fa-arrow-left me-1"></i> Back
 			  </button>
 			</div>
+		)}
       </div>
     </div>
   );

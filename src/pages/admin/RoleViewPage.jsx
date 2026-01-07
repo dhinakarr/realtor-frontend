@@ -57,7 +57,11 @@ export default function RoleViewPage() {
             <tr>
               <th>Superior Role</th>
               <td>{record.managerRole}</td>
-            </tr>           
+            </tr>       
+			<tr>
+              <th>Role Type</th>
+              <td>{record.financeRole}</td>
+            </tr>			
           </tbody>
         </table>
 	

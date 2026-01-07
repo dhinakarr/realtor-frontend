@@ -11,3 +11,37 @@
 .table td {
   white-space: nowrap;
 }
+.dashboard-grid {
+  display: grid;
+  gap: 2rem;
+}
+.span-2 {
+  grid-column: span 2;
+}
+.grid-item {
+  width: 100%; /* ensures grid item respects column width */
+}
+
+.chart-box {
+  width: 100%;
+  height: 250px;
+  position: relative;
+}
+
+.chart-box canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+/* Desktop & tablets */
+@media (min-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}

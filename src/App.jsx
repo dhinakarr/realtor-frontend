@@ -8,6 +8,7 @@ import EditProfile from "./pages/EditProfile";
 import PublicProjectDetailsPage from "./pages/PublicProjectDetailsPage";
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import UserPerformancePage from './pages/UserPerformancePage';
 import InventoryDetails from './pages/InventoryDetails';
 import ModulePage from './pages/ModulePage';
 import UserCreatePage from './pages/admin/UserCreatePage';
@@ -71,7 +72,7 @@ function App() {
             <Route path="/login" element={<Login setUser={setUser} />} />
             <Route path="/dashboard" element={user ? <Dashboard /> : <Login setUser={setUser} />} />
 			<Route path="/dashboard/inventory" element={<InventoryDetails />} />
-			
+			<Route path="/performance/users" element={<UserPerformancePage />} />
 			
 			<Route path="/module/:moduleName" element={user ? <ModulePage user={user} /> : <Login setUser={setUser} />} />
 			

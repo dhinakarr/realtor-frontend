@@ -135,7 +135,7 @@ const CustomerViewOverlay = ({ customerId, onClose }) => {
 					{isImage ? (
 					  <img src={fileUrl} alt="document" className="doc-thumb" />
 					) : (
-					  <span className="doc-icon-wrapper">{getFileIcon(doc.filePath)}</span>
+					  <span className="doc-icon-wrapper">{getIconForFile(doc.filePath)}</span>
 					)}
 
 					<span className="doc-label">

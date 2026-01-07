@@ -1,10 +1,15 @@
 import React, { useState } from "react";
 import { Table, Spinner } from "react-bootstrap";
 import { FaMoneyBillWave, FaCommentDots } from "react-icons/fa";
-
+import useModule from "../../hooks/useModule";
 
 const ReceivableDetailsTable = ({ data, loading, onAction }) => {
-
+	
+  const featureUrl = "/api/site-visits";
+  const module = useModule(featureUrl);
+  const feature = module.features.find(f => f.url);
+  const isFinance = (feature.financeRole == "FINANCE") ? true : false;
+//console.log("ReceivableDetailsTable isFinance: ", isFinance);
 	
 	if (loading) return <Spinner animation="border" />;
 
@@ -14,6 +19,7 @@ const ReceivableDetailsTable = ({ data, loading, onAction }) => {
 	
 	const ActionIcons = ({ row, onAction }) => (
 		  <div className="d-flex justify-content-center gap-3">
+		  {isFinance && (
 			<FaMoneyBillWave
 			  size={20}
 			  style={{ cursor: "pointer" }}
@@ -23,7 +29,7 @@ const ReceivableDetailsTable = ({ data, loading, onAction }) => {
 				onAction("PAYMENT", row);
 			  }}
 			/>
-
+		  )}
 			<FaCommentDots
 			  title="Customer Comments"
 			  className="text-primary cursor-pointer"

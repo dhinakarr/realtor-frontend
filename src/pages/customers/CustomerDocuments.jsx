@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import API from "../../api/api";
 import "./CustomerOverlay.css";
+import { useToast } from "../common/ToastProvider";
 
 export default function CustomerDocuments({ show, customerId, onClose, onUpdated }) {
   const [fields, setFields] = useState([]);
@@ -9,6 +10,7 @@ export default function CustomerDocuments({ show, customerId, onClose, onUpdated
   const [profileImage, setProfileImage] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
   const [loading, setLoading] = useState(false);
+  const { showToast } = useToast();
 
   // ---------------------------------------------------
   // Load Form Definition

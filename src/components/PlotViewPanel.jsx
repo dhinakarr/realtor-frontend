@@ -32,6 +32,7 @@ export default function PlotViewPanel({ plotId, onClose, onBook }) {
     basePrice: "Base Price",
     surveyNum: "Survey Number",
     facing: "Facing",
+	registrationCharges: "Registration Charges",
     totalPrice: "Total Price",
     isPrime: "Prime Plot?",
     status: "Status",

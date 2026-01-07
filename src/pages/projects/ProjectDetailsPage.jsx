@@ -34,6 +34,7 @@ export default function ProjectDetailsPage() {
   const canCreate = feature.canCreate;
   const canEdit   = feature.canUpdate;
   const canDelete = feature.canDelete;
+  const isFinance = (feature.financeRole == "FINANCE") ? true : false;
 
   const loadProject = () => {
     API.get(`/api/projects/details/${id}`)
@@ -177,7 +178,7 @@ export default function ProjectDetailsPage() {
 				<p><small>Price / Sqft:</small> ₹{project.pricePerSqft}</p>
 			  </td>
 			  <td style={{ width: "40%" }}>
-				<p><small>Registration Charges:</small> ₹{project.regCharges}</p>
+				<p><small>Registration Charges %:</small> {project.regCharges}</p>
 				<p><small>Documentation Charges:</small> ₹{project.docCharges}</p>
 				<p><small>Other Charges:</small> ₹{project.otherCharges}</p>
 				<p><small>Guideline Value:</small> ₹{project.guidanceValue}</p>
@@ -221,7 +222,7 @@ export default function ProjectDetailsPage() {
 
 						{plot.status !== "CANCELLED" && (
 						  <div className="bottom-icons">
-						  {canEdit && (
+						  {isFinance && (
 							<FaMoneyBill
 							  className="plot-icon finance"
 							  size={24}

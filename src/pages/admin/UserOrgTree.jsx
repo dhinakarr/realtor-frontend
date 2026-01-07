@@ -5,18 +5,19 @@ import PageHeader from "../../components/PageHeader";
 import useModule from "../../hooks/useModule";
 import API from "../../api/api";
 import "./UserOrgTree.css";
+import UserViewPage from "./UserViewPage";
 
 /**
  * Recursive renderer for org chart
  */
-const RenderTree = ({ node }) => {
+const RenderTree = ({ node, onUserClick }) => {
   if (!node) return null;
-
+    
   return (
     <TreeNode
       key={node.userId}
       label={
-        <div className="tree-node">
+        <div className="tree-node clickable" onClick={() => onUserClick(node.userId)}>
           <FaUser className="me-2" />
           {node.userName}
         </div>
@@ -24,7 +25,9 @@ const RenderTree = ({ node }) => {
     >
       {node.children &&
         node.children.map((child) => (
-          <RenderTree key={child.userId} node={child} />
+          <RenderTree key={child.userId} node={child} 
+		  onUserClick={onUserClick} 
+		/>
         ))}
     </TreeNode>
   );
@@ -37,6 +40,23 @@ export default function UserOrgTree({ data }) {
   
   const [treeData, setTreeData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [selectedUserId, setSelectedUserId] = useState(null);
+  const [showDrawer, setShowDrawer] = useState(false);
+  
+  const openUser = (userId) => {	
+	if (!userId) {
+		console.error("openUser called with invalid userId", userId);
+		return;
+	  }
+    setSelectedUserId(userId);
+    setShowDrawer(true);	
+  };
+
+  const closeDrawer = () => {
+	  
+    setShowDrawer(false);
+    setSelectedUserId(null);
+  };
   
   useEffect(() => {
     API.get("/api/users/tree")
@@ -72,10 +92,29 @@ export default function UserOrgTree({ data }) {
           lineBorderRadius="10px"
         >
           {treeData.map((root) => (
-				<RenderTree key={root.userId} node={root} />
+				<RenderTree key={root.userId} node={root} onUserClick={openUser} />
 			  ))}
         </Tree>
       )}
+	  
+	  {/* Right Slide Drawer */}
+		<div className={`user-drawer ${showDrawer ? "open" : ""}`}>
+		  <div className="drawer-header">
+			<span>User Details</span>
+			<button className="btn btn-sm btn-light" onClick={closeDrawer}>
+			  ✕
+			</button>
+		  </div>
+
+		  {selectedUserId && (
+			<UserViewPage id={selectedUserId} hideHeader />
+		  )}
+		</div>
+
+		{showDrawer && (
+		  <div className="drawer-backdrop" onClick={closeDrawer} />
+		)}
+
     </div>
   );
 }

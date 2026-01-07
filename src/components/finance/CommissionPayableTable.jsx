@@ -1,7 +1,14 @@
 import { Table, Spinner } from "react-bootstrap";
 import { FaMoneyBillWave, FaCommentDots } from "react-icons/fa";
+import useModule from "../../hooks/useModule";
 
 const CommissionPayableTable = ({ data, loading, onAction }) => {
+	
+	const featureUrl = "/api/site-visits";
+	const module = useModule(featureUrl);
+	const feature = module.features.find(f => f.url);
+	const isFinance = (feature.financeRole == "FINANCE") ? true : false;
+	
 	if (loading) return <Spinner animation="border" />;
 
 	if (!data || data.length === 0) {
@@ -41,6 +48,7 @@ const CommissionPayableTable = ({ data, loading, onAction }) => {
 
 						<td className="text-center">
 							<div className="d-flex justify-content-center gap-3">
+							{isFinance && (
 								<FaMoneyBillWave
 									className={`cursor-pointer ${
 										row.commissionPayable > 0
@@ -54,7 +62,7 @@ const CommissionPayableTable = ({ data, loading, onAction }) => {
 										onAction("PAY_COMMISSION", row)
 									}
 								/>
-
+							)}
 								<FaCommentDots
 									className="text-primary cursor-pointer"
 									title="Comments"

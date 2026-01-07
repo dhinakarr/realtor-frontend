@@ -3,16 +3,17 @@ import React, { useEffect, useState } from "react";
 import API from "../../api/api";
 import { toast } from "react-toastify";
 import { useNavigate, useParams } from "react-router-dom";
+import { useToast } from "../../components/common/ToastProvider";
 
 export default function ProjectFormPage() {
   const [formFields, setFormFields] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  
   const [formMeta, setFormMeta] = useState(null);
   const [formValues, setFormValues] = useState({});
   const [formErrors, setFormErrors] = useState({});
   const [changedFields, setChangedFields] = useState({});
-  
+  const { showToast } = useToast();
   const { id } = useParams();
   const isEditMode = !!id;
   const BASE_URL = API.defaults.baseURL;
@@ -30,8 +31,42 @@ export default function ProjectFormPage() {
   const validateForm = (values) => {
     let errors = {};
 
+	if (!formFields.length) return {};
+	
     formFields.forEach((field) => {
       const rules = field.extraSettings;
+	  const value = values[field.name];
+	  
+	  // REQUIRED
+		if (field.required && (value === undefined || value === "" || (typeof value === "string" && value.trim() === ""))) {
+		  errors[field.name] = field.extraSettings?.message || `${field.label} is required`;
+		  return;
+		}
+	  // MAX LENGTH (text / textarea)
+		if (rules?.maxLength &&
+		  typeof value === "string" &&
+		  value.length > rules.maxLength
+		) {
+		  errors[field.name] =
+			`${field.label} cannot exceed ${rules.maxLength} characters`;
+		}
+
+		// NUMBER validation
+		if (field.type === "number" && value !== undefined && value !== "") {
+		  if (isNaN(value)) {
+			errors[field.name] = `${field.label} must be a number`;
+		  }
+
+		  if (rules.min !== undefined && Number(value) < rules.min) {
+			errors[field.name] =
+			  `${field.label} must be at least ${rules.min}`;
+		  }
+
+		  if (rules.max !== undefined && Number(value) > rules.max) {
+			errors[field.name] =
+			  `${field.label} cannot exceed ${rules.max}`;
+		  }
+		}
 
       if (rules?.mustBeAfter) {
         const start = values[rules.mustBeAfter];
@@ -65,12 +100,22 @@ export default function ProjectFormPage() {
         name: f.apiField,
         label: f.displayLabel,
         type: f.fieldType,
-        required: f.extraSettings?.required || false,
+        required: f.required === true,
         extraSettings: f.extraSettings || {},
         options: f.lookupData || null,
       }));
-
-      setFormFields(mapped);
+	  
+	  const initValues = {};
+	  form.fields.forEach(f => {
+		  initValues[f.apiField] = record?.[f.apiField] ?? "";
+		});
+	  setFormFields(mapped);	
+	  setFormValues({
+		  ...initValues,
+		  existingFiles: record?.files || [],
+		  newFiles: [],
+		});
+	  
 
       if (isEditMode && record) {
         setFormValues({
@@ -108,11 +153,11 @@ export default function ProjectFormPage() {
           ),
         }));
       } else {
-        toast.error(res.data?.message || "Delete failed");
+        showToast(res.data?.message || "Delete failed");
       }
     } catch (error) {
       console.error("Delete file error", error);
-      toast.error("Error deleting file");
+      showToast("Error deleting file", "danger");
     }
   };
   
@@ -121,10 +166,8 @@ export default function ProjectFormPage() {
   // ------------------------------------------------------------
   const updateField = (name, value) => {
 	  const updated = { ...formValues, [name]: value };
-	  const errors = validateForm(updated);
-
 	  setFormValues(updated);
-	  setFormErrors(errors);
+	  setFormErrors(validateForm(updated));
 
 	  // Track only in EDIT mode
 	  if (isEditMode) {
@@ -140,6 +183,15 @@ export default function ProjectFormPage() {
   // ------------------------------------------------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
+	
+	const errors = validateForm(formValues);
+	
+    setFormErrors(errors);
+
+	if (Object.keys(errors).length > 0) {
+		showToast("Please fix validation errors", "danger");
+		return;
+	}
 
     let payload = {};
 
@@ -174,24 +226,23 @@ export default function ProjectFormPage() {
 
     try {
       let res;
-//console.log("ProjectFormPage.handleSubmit isEditMode: "+isEditMode);
+
       if (isEditMode) {
         res = await API.patch(`/api/projects/${id}`, formDataToSend, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-        toast.success("Project updated successfully!");
+        showToast("Project updated successfully!", "success");
       } else {
         res = await API.post("/api/projects/all", formDataToSend, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-		//console.log("ProjectFormPage.handleSubmit res: "+res);
-        toast.success("Project created successfully!");
+        showToast("Project created successfully!", "success");
       }
 
       navigate("/projects/list");
     } catch (err) {
       console.error("Save failed:", err);
-      toast.error("Error saving project");
+      showToast("Error saving project", "danger");
     }
   };
 
@@ -231,175 +282,137 @@ export default function ProjectFormPage() {
         )}
 
         <form onSubmit={handleSubmit} className="row g-4">
-          {formFields.map((field) => (
-            <div key={field.name} className="col-md-6">
-              <label className="form-label fw-semibold">
-                {field.label}
-              </label>
+		  {formFields.map((field) => {
+			const value = formValues[field.name] || "";
+			const error = formErrors[field.name];
 
-              {/* TEXT */}
-              {field.type === "text" && (
-                <input
-                  type="text"
-                  className="form-control"
-                  value={formValues[field.name] || ""}
-                  onChange={(e) =>
-                    updateField(field.name, e.target.value)
-                  }
-                  required={field.required}
-                />
-              )}
+			return (
+			  <div key={field.name} className="col-md-6">
+				<label className="form-label fw-semibold">{field.label}</label>
 
-              {/* NUMBER */}
-              {field.type === "number" && (
-                <input
-                  type="number"
-                  className="form-control"
-                  value={formValues[field.name] || ""}
-                  onChange={(e) =>
-                    updateField(field.name, e.target.value)
-                  }
-                  required={field.required}
-                />
-              )}
+				{/* TEXT / NUMBER / TEXTAREA / DATE */}
+				{["text", "number", "textarea", "date"].includes(field.type) && (
+				  <>
+					{field.type === "textarea" ? (
+					  <textarea
+						rows={3}
+						className={`form-control ${error ? "is-invalid" : ""}`}
+						value={value}
+						maxLength={field.extraSettings?.maxLength}
+						onChange={(e) => updateField(field.name, e.target.value)}
+						required={field.required}
+					  />
+					) : (
+					  <input
+						type={field.type}
+						className={`form-control ${error ? "is-invalid" : ""}`}
+						value={value}
+						maxLength={field.type === "text" ? field.extraSettings?.maxLength : undefined}
+						onChange={(e) => updateField(field.name, e.target.value)}
+						required={field.required}
+					  />
+					)}
+					{error && <div className="invalid-feedback d-block">{error}</div>}
+				  </>
+				)}
 
-              {/* TEXTAREA */}
-              {field.type === "textarea" && (
-                <textarea
-                  rows="3"
-                  className="form-control"
-                  value={formValues[field.name] || ""}
-                  onChange={(e) =>
-                    updateField(field.name, e.target.value)
-                  }
-                  required={field.required}
-                />
-              )}
+				{/* FILE */}
+				{field.type === "file" && (
+				  <div>
+					{/* Existing files (edit mode) */}
+					{isEditMode && formValues.existingFiles?.length > 0 && (
+					  <div className="mb-2 d-flex flex-wrap">
+						{formValues.existingFiles.map((f) => {
+						  const imgUrl = `${BASE_URL}/api/projects/file/${f.projectFileId}`;
+						  return (
+							<div
+							  key={f.projectFileId}
+							  className="position-relative me-2 mb-2"
+							  style={{ display: "inline-block" }}
+							>
+							  <img
+								src={imgUrl}
+								alt=""
+								style={{
+								  height: "90px",
+								  width: "120px",
+								  objectFit: "cover",
+								  borderRadius: "6px",
+								  border: "1px solid #ddd",
+								}}
+							  />
+							  <button
+								type="button"
+								onClick={() => handleDeleteFile(f.projectFileId)}
+								className="btn btn-danger btn-sm position-absolute"
+								style={{
+								  top: "-8px",
+								  right: "-8px",
+								  borderRadius: "50%",
+								  padding: "2px 6px",
+								  lineHeight: "10px",
+								}}
+							  >
+								×
+							  </button>
+							</div>
+						  );
+						})}
+					  </div>
+					)}
+					<input
+					  type="file"
+					  multiple
+					  className="form-control"
+					  onChange={(e) => {
+						const newFiles = Array.from(e.target.files);
+						setFormValues((prev) => ({
+						  ...prev,
+						  newFiles: [...(prev.newFiles || []), ...newFiles],
+						}));
+					  }}
+					/>
+				  </div>
+				)}
 
-              {/* DATE */}
-              {field.type === "date" && (
-                <input
-                  type="date"
-                  className="form-control"
-                  value={formValues[field.name] || ""}
-                  onChange={(e) =>
-                    updateField(field.name, e.target.value)
-                  }
-                  required={field.required}
-                />
-              )}
+				{/* SELECT */}
+				{field.type === "select" && (
+				  <>
+					<select
+					  className={`form-select ${error ? "is-invalid" : ""}`}
+					  value={value}
+					  onChange={(e) => updateField(field.name, e.target.value)}
+					  required={field.required}
+					>
+					  <option value="">Select</option>
+					  {field.options?.map((opt) => (
+						<option key={opt.value} value={opt.value}>
+						  {opt.label}
+						</option>
+					  ))}
+					</select>
+					{error && <div className="invalid-feedback d-block">{error}</div>}
+				  </>
+				)}
+			  </div>
+			);
+		  })}
 
-              {/* FILE FIELD (CREATE + EDIT) */}
-              {field.type === "file" && (
-                <div>
-                  {/* EXISTING FILES (EDIT MODE) */}
-                  {isEditMode &&
-                    formValues.existingFiles?.length > 0 && (
-                      <div className="mb-2 d-flex flex-wrap">
-                        {formValues.existingFiles.map((f) => {
-                          const imgUrl = `${BASE_URL}/api/projects/file/${f.projectFileId}`
-console.log("imgUrl: "+imgUrl);
-                          return (
-                            <div
-                              key={f.projectFileId}
-                              className="position-relative me-2 mb-2"
-                              style={{ display: "inline-block" }}
-                            >
-                              <img
-                                src={imgUrl}
-                                alt=""
-                                style={{
-                                  height: "90px",
-                                  width: "120px",
-                                  objectFit: "cover",
-                                  borderRadius: "6px",
-                                  border: "1px solid #ddd",
-                                }}
-                              />
+		  <div className="col-12 mt-3 text-center">
+			<button type="submit" className="btn btn-success px-4">
+			  Save
+			</button>
 
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  handleDeleteFile(f.projectFileId)
-                                }
-                                className="btn btn-danger btn-sm position-absolute"
-                                style={{
-                                  top: "-8px",
-                                  right: "-8px",
-                                  borderRadius: "50%",
-                                  padding: "2px 6px",
-                                  lineHeight: "10px",
-                                }}
-                              >
-                                ×
-                              </button>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
+			<button
+			  type="button"
+			  className="btn btn-secondary ms-3 px-4"
+			  onClick={() => navigate("/projects/list")}
+			>
+			  Back
+			</button>
+		  </div>
+		</form>
 
-                  {/* NEW FILES */}
-                  <input
-                    type="file"
-                    multiple
-                    className="form-control"
-                    onChange={(e) => {
-                      const newFiles = Array.from(e.target.files);
-                      setFormValues((prev) => ({
-                        ...prev,
-                        newFiles: [
-                          ...(prev.newFiles || []),
-                          ...newFiles,
-                        ],
-                      }));
-                    }}
-                  />
-                </div>
-              )}
-
-              {/* SELECT */}
-              {field.type === "select" && (
-                <select
-                  className="form-select"
-                  value={formValues[field.name] || ""}
-                  onChange={(e) =>
-                    updateField(field.name, e.target.value)
-                  }
-                  required={field.required}
-                >
-                  <option value="">Select</option>
-                  {field.options?.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
-              )}
-
-              {/* FIELD ERRORS */}
-              {formErrors[field.name] && (
-                <small className="text-danger">
-                  {formErrors[field.name]}
-                </small>
-              )}
-            </div>
-          ))}
-
-          <div className="col-12 mt-3 text-center">
-            <button type="submit" className="btn btn-success px-4">
-              Save
-            </button>
-
-            <button
-              type="button"
-              className="btn btn-secondary ms-3 px-4"
-              onClick={() => navigate("/projects/list")}
-            >
-              Back
-            </button>
-          </div>
-        </form>
       </div>
     </div>
   );
