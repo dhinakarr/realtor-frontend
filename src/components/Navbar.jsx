@@ -1,150 +1,192 @@
-// components/Navbar.jsx
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Dropdown } from 'bootstrap';
-import API from "../api/api.js";
+import { Navbar as RBNavbar, Nav, Container, Badge, Fade } from "react-bootstrap";
+
+import API from "../api/api";
+import useNotifications from "../hooks/useNotifications";
+import NotificationBell from "./NotificationBell";
+import NotificationDropdown from "./NotificationDropdown";
+import listenForForegroundMessages from "../firebase/firebaseMessaging";
 
 export default function Navbar({ user, setUser }) {
   const navigate = useNavigate();
-  const btnRef = useRef(null);
-  const dropdownInstanceRef = useRef(null);
-  
+
+  const {
+    unreadCount,
+    notifications,
+    loadNotifications,
+    markAsRead,
+    markAllAsRead
+  } = useNotifications(user);
+
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+
+  const notificationRef = useRef(null);
+  const profileRef = useRef(null);
+
+  /* ---------------- Click outside / ESC ---------------- */
   useEffect(() => {
-    if (btnRef.current && !dropdownInstanceRef.current) {
-		dropdownInstanceRef.current = new Dropdown(btnRef.current); 
-	}
-    return () => {
-      if (dropdownInstanceRef.current) {
-        dropdownInstanceRef.current.dispose();
-        dropdownInstanceRef.current = null;
+    const handler = (e) => {
+      if (notificationRef.current && !notificationRef.current.contains(e.target)) {
+        setShowNotifications(false);
+      }
+      if (profileRef.current && !profileRef.current.contains(e.target)) {
+        setShowProfile(false);
       }
     };
-  }, [user]);
-  
-  useEffect(() => {
-	  if (!localStorage.getItem("user")) {
-		navigate("/");
-	  }
-	}, []);
 
+    const esc = (e) => e.key === "Escape" && (
+      setShowNotifications(false),
+      setShowProfile(false)
+    );
+
+    document.addEventListener("mousedown", handler);
+    document.addEventListener("keydown", esc);
+    return () => {
+      document.removeEventListener("mousedown", handler);
+      document.removeEventListener("keydown", esc);
+    };
+  }, []);
+
+  /* ---------------- Firebase (optional) ---------------- */
+  useEffect(() => {
+    if (!user) return;
+
+    listenForForegroundMessages(() => {})
+      .catch(() => setNotificationsEnabled(false));
+  }, [user]);
+
+  /* ---------------- Logout ---------------- */
   const handleLogout = async () => {
     try {
-      const refreshToken = user?.token?.refreshToken;
-      if (refreshToken) {
-        await API.post(
-          "/logout",
-          {},
-          { headers: { Authorization: `Bearer ${user.token.accessToken}` } }
-        );
-      }
-      localStorage.clear();
-	  localStorage.removeItem("user");
-      setUser(null);
-    } catch (err) {
-      console.error("Logout error:", err);
+      await API.post("/logout", {}, {
+        headers: { Authorization: `Bearer ${user.token.accessToken}` }
+      });
+    } catch (e) {
+      console.warn("Logout failed", e);
     } finally {
-      navigate("/");
-    }
-  };
-  
-  const handleDropdownToggle = () => {
-    if (dropdownInstanceRef.current) {
-      dropdownInstanceRef.current.toggle();
+      setUser(null);
+      navigate("/login");
     }
   };
 
   const email = user?.token?.email;
 
   return (
-    <nav
-      className="d-flex align-items-center px-4 py-2	"
-      style={{ backgroundColor: "hsl(270, 70%, 40%)" }}
-    >
-      <div className="d-flex align-items-center">
-        <img
-          src="/logo.png"
-          alt="Logo"
-          style={{ width: "60px", marginRight: "20px" }}
-        />
-        <h4 className="m-0 text-white">Diamond Realty</h4>
-      </div>
+    <RBNavbar expand="lg" className="px-4" style={{ backgroundColor: "hsl(270, 70%, 40%)" }}>
+      <Container fluid>
+        <RBNavbar.Brand className="text-white">
+          <img src="/logo.png" width={50} className="me-2" />
+          Diamond Realty
+        </RBNavbar.Brand>
 
-      <div className="mx-auto d-flex align-items-center gap-4 ms-auto me-4">
-	     {user && (
-			<>
-			  <Link
-				to="/dashboard"
-				className="text-white text-decoration-none fw-semibold"
-			  >
-				Dashboard
-			  </Link>
+        <Nav className="ms-auto align-items-center gap-4">
 
-			  <Link
-				to="/"
-				className="text-white text-decoration-none fw-semibold"
-			  >
-				Home
-			  </Link>
-			</>
-		  )}
-	    <div className="ms-auto d-flex align-items-center">
-        {user ? (
-          <div className="dropdown">
-            {/* NOTE: removed data-bs-toggle attribute to avoid auto-init conflict */}
-            <button
-			  ref={btnRef}
-              className="btn btn-secondary dropdown-toggle d-flex align-items-center"
-              type="button"
-              id="dropdownMenuButton"
-			  data-bs-toggle="dropdown"
-              aria-expanded="false"
-			  onClick={handleDropdownToggle}
-            >
-              <span className="me-2">{email}</span>
-              <img
-                src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-                  email || "user"
-                )}`}
-                alt="avatar"
-                className="rounded-circle"
-                style={{ width: "35px", height: "35px" }}
-              />
-            </button>
+          {/* -------- Logged OUT -------- */}
+          {!user && (
+            <>
+              <Link to="/login" className="text-white text-decoration-none">
+                Sign In
+              </Link>
+            </>
+          )}
 
-            <ul
-              className="dropdown-menu dropdown-menu-end"
-              aria-labelledby="dropdownMenuButton"
-            >
-              <li>
-                <Link className="dropdown-item" to={`/profile/${user?.token?.userId}`}>
-				  User Profile
-				</Link>
-              </li>
-              <li>
-                <Link className="dropdown-item" to="/change-password">
-                  Change Password
-                </Link>
-              </li>
-              <li>
-                <hr className="dropdown-divider" />
-              </li>
-              <li>
+          {/* -------- Logged IN -------- */}
+          {user && (
+            <>
+              <Link to="/dashboard" className="text-white text-decoration-none">
+                Dashboard
+              </Link>
+			  
+			  <Link to="/" className="text-white text-decoration-none">
+                Home
+              </Link>
+
+              {/* 🔔 Notifications */}
+              <div ref={notificationRef} className="position-relative">
                 <button
-                  className="dropdown-item text-danger"
-                  onClick={handleLogout}
+                  className="btn btn-link text-white p-0"
+                  disabled={!notificationsEnabled}
+                  onClick={() => {
+                    loadNotifications();
+                    setShowNotifications((p) => !p);
+                    setShowProfile(false);
+                  }}
                 >
-                  Logout
+                  <NotificationBell unreadCount={unreadCount} />
+                  {unreadCount > 0 && (
+                    <Badge bg="danger" pill className="position-absolute top-0 start-100">
+                      {unreadCount}
+                    </Badge>
+                  )}
                 </button>
-              </li>
-            </ul>
-          </div>
-        ) : (
-          <Link to="/login" className="btn btn-primary">
-            Login
-          </Link>
-        )}
-		</div>
-      </div>
-    </nav>
+
+                {showNotifications && (
+                  <Fade in>
+                    <div className="dropdown-menu dropdown-menu-end mt-2" style={{ minWidth: 340 }}>
+                      <div className="px-3 py-2 d-flex justify-content-between">
+                        <strong>Notifications</strong>
+                        <button className="btn btn-sm btn-link" onClick={markAllAsRead}>
+                          Mark all
+                        </button>
+                      </div>
+                      <NotificationDropdown
+                        notifications={notifications}
+                        onRead={markAsRead}
+                      />
+                    </div>
+                  </Fade>
+                )}
+              </div>
+
+              {/* 👤 Profile */}
+              <div ref={profileRef} className="position-relative">
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => {
+                    setShowProfile((p) => !p);
+                    setShowNotifications(false);
+                  }}
+                >
+                  <span className="text-truncate" style={{ maxWidth: 160 }}>
+					{email}
+				  </span>
+
+				  <img
+					src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
+					  email || "user"
+					)}&background=6f42c1&color=fff`}
+					alt="avatar"
+					className="rounded-circle"
+					width={32}
+					height={32}
+				  />
+                </button>
+
+                {showProfile && (
+                  <Fade in>
+                    <ul className="dropdown-menu dropdown-menu-end mt-2">
+                      <li>
+                        <Link className="dropdown-item" to="/profile">
+                          Profile
+                        </Link>
+                      </li>
+                      <li><hr className="dropdown-divider" /></li>
+                      <li>
+                        <button className="dropdown-item text-danger" onClick={handleLogout}>
+                          Logout
+                        </button>
+                      </li>
+                    </ul>
+                  </Fade>
+                )}
+              </div>
+            </>
+          )}
+        </Nav>
+      </Container>
+    </RBNavbar>
   );
 }

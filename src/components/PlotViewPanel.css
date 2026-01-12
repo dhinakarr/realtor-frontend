@@ -4,7 +4,7 @@
   background: rgba(0,0,0,0.35);
   display: flex;
   justify-content: flex-end;
-  z-index: 9999;
+  z-index: 1040;
   animation: fadeIn 0.18s;
 }
 
@@ -60,4 +60,150 @@
   .plot-view-panel {
     width: 100%;
   }
+}
+@media print {
+  body {
+    background: white !important;
+  }
+
+  .plot-view-overlay {
+    position: static !important;
+    background: none !important;
+  }
+
+  .btn {
+    display: none !important;
+  }
+}
+/* ============================= */
+/* PRINT STYLES */
+/* ============================= */
+@page {
+  size: A4;
+  margin: 20mm;
+}
+
+@media print {
+  body {
+    background: #fff !important;
+  }
+
+  /* Hide overlay effect */
+  .plot-view-overlay {
+    position: static !important;
+    background: none !important;
+  }
+
+  /* Hide all buttons */
+  .btn {
+    display: none !important;
+  }
+
+  /* Print container */
+  .print-container {
+    font-family: Arial, sans-serif;
+    color: #000;
+  }
+
+  /* HEADER */
+  .print-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 2px solid #333;
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+	width: 100%;
+	position: relative;
+  }
+
+  .print-logo {
+    height: 50px;
+    width: auto;
+  }
+
+  .print-header-text h5 {
+    margin: 0;
+    font-size: 16px;
+  }
+
+  .print-header-text small {
+    color: #555;
+  }
+
+  /* CONTENT */
+  .plot-detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px dotted #ccc;
+  }
+
+  .detail-label {
+    font-weight: 600;
+  }
+
+  /* FOOTER */
+  .print-footer {
+    position: fixed;
+    bottom: 15mm;
+    left: 20mm;
+    right: 20mm;
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: #555;
+    border-top: 1px solid #ccc;
+    padding-top: 6px;
+  }
+
+  /* Page numbers */
+  .page-number::after {
+    content: "Page " counter(page);
+  }
+}
+/* ============================= */
+/* SCREEN (DEFAULT) */
+/* ============================= */
+.print-header,
+.print-footer {
+  display: none;
+}
+
+/* ============================= */
+/* PRINT ONLY */
+/* ============================= */
+@media print {
+  .print-header,
+  .print-footer {
+    display: flex;
+  }
+}
+/* Cancel booking modal backdrop */
+.cancel-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1060;
+}
+
+/* Cancel booking modal */
+.cancel-modal {
+  z-index: 2070;
+}
+.print-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.print-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+}
+
+.company-name {
+  font-size: 14px;
 }

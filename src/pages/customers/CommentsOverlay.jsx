@@ -62,7 +62,7 @@ export default function CommentsOverlay({ show, customerId, onClose }) {
   return (
     <div className={`comments-overlay ${show ? "open" : ""}`}>
       <div className="comments-header">
-        <h4>Comments</h4>
+        <h5>Comments</h5>
         <FaTimes className="close-icon" onClick={onClose} />
       </div>
 

@@ -1,19 +1,20 @@
 import React from "react";
 import { Card, Row, Col } from "react-bootstrap";
+import "./SummaryCards.css";
 
 
 
-const SummaryCard = ({ title, value, onClick, variant = "light" }) => (
+const SummaryCard = ({ title, value, onClick, variant = "dark" }) => (
 	<Card
 		bg={variant}
 		text={variant === "light" ? "dark" : "white"}
-		className="mb-3 cursor-pointer"
+		className={`summary-card summary-${variant}`}
 		onClick={onClick}
 		style={{ cursor: "pointer" }}
 	>
-		<Card.Body>
-			<Card.Title className="fs-6">{title}</Card.Title>
-			<Card.Text className="fs-4 fw-bold">
+		<Card.Body className="summary-body">
+			<Card.Title className="summary-title">{title}</Card.Title>
+			<Card.Text className="summary-value">
 				₹ {value?.toLocaleString() ?? 0}
 			</Card.Text>
 		</Card.Body>
@@ -24,8 +25,17 @@ const FinanceSummaryCards = ({ data, onFilter }) => {
 	if (!data) return null;
 
 	return (
-		<Row className="mb-4">
-			<Col md={3}>
+		<Row className="mb-4 g-1">
+			<Col md={2}>
+				<SummaryCard
+					title="Total Sales"
+					value={data.totalSaleAmount}
+					variant="primary"
+					onClick={() => onFilter?.({ type: "SALE" })}
+				/>
+			</Col>
+			
+			<Col md={2}>
 				<SummaryCard
 					title="Total Receivable"
 					value={data.totalReceivable}
@@ -34,26 +44,28 @@ const FinanceSummaryCards = ({ data, onFilter }) => {
 				/>
 			</Col>
 
-			<Col md={3}>
+			<Col md={2}>
 				<SummaryCard
-					title="Received This Month"
+					title="Received"
 					value={data.receivedThisMonth}
 					variant="success"
+					onClick={() => onFilter({ type: "RECEIVED" })}
 				/>
 			</Col>
 
-			<Col md={3}>
+			<Col md={2}>
 				<SummaryCard
 					title="Paid This Month"
 					value={data.commissionPaidThisMonth}
 					variant="info"
+					onClick={() => onFilter({ type: "PAID" })}
 					
 				/>
 			</Col>
 
-			<Col md={3}>
+			<Col md={2}>
 				<SummaryCard
-					title="Commission Payable"
+					title="Payable"
 					value={data.commissionPayable}
 					variant="danger"
 					onClick={() => onFilter?.({ type: "PAYABLE" })}

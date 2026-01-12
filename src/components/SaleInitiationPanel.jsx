@@ -19,7 +19,7 @@ export default function SaleInitiationPanel({ plotId, projectId, onClose, onSucc
     ])
       .then(([plotRes, custRes]) => {
         if (plotRes.data?.success) 
-			setPlot(plotRes.data.data);
+			setPlot(plotRes.data.data.plotData);
         if (custRes.data?.success) 
 			setCustomers(custRes.data.data);
 		

@@ -10,6 +10,9 @@ import CommissionPayableTable from "../../components/finance/CommissionPayableTa
 import { getFinanceSummary, getCashFlow } from "../../api/financeApi";
 import API from "../../api/api";
 import { useToast } from "../../components/common/ToastProvider";
+import SaleDetailsTable from "../../components/finance/SaleDetailsTable";
+import TransactionHistoryModal from "../../components/finance/TransactionHistoryModal";
+import { Table, Modal } from "react-bootstrap";
 
 const FinanceDashboard = () => {
 
@@ -19,6 +22,7 @@ const FinanceDashboard = () => {
 	const [drawer, setDrawer] = useState({ open: false });
 	const { showToast } = useToast();
 	const [viewType, setViewType] = useState("CASHFLOW"); 
+	//const [showTable, setShowTable] = useState(false);
 // SUMMARY | RECEIVABLE | PAYABLE
 
 	const [tableData, setTableData] = useState([]);
@@ -28,12 +32,25 @@ const FinanceDashboard = () => {
 	const [selectedPlotId, setSelectedPlotId] = useState(null);
 	const [showCommentsOverlay, setShowCommentsOverlay] = useState(false);
 	const [selectedCustomerId, setSelectedCustomerId] = useState(null);
+	const [selectedOutstanding, setSelectedOutstanding] = useState(0);
+	
+	const [showTxnModal, setShowTxnModal] = useState(false);
+	const [saleId, setSaleId] = useState(null);
+	const [txnType, setTxnType] = useState(null);
+	const [agentId, setAgentId] = useState(null);
 
 	useEffect(() => {
 		loadSummary();
 		loadCashFlow();
 	}, []);
-
+	
+	const handleAmountClick = (saleId, txnType, agentId = null) => {
+	  setSaleId(saleId);
+	  setTxnType(txnType);
+	  setAgentId(agentId);
+	  setShowTxnModal(true);
+	};
+	
 	const loadSummary = async () => {
 		const res = await getFinanceSummary();
 		setSummary(res.data.data);
@@ -44,7 +61,7 @@ const FinanceDashboard = () => {
 		setRows(res.data.data);
 	};
 	
-	const handleAction = async (row, action) => {
+	const handleCashflowAction = async (row, action) => {
 	  try {	
 		if (action === "VERIFY") {
 			if (!window.confirm("Verify this payment? This cannot be undone.")) {
@@ -66,42 +83,155 @@ const FinanceDashboard = () => {
 	};
 	
 	const handleFilter = async ({ type }) => {
-		setLoading(true);
+	  setLoading(true);
 
-		try {
-			let url = "";
+	  try {
+		let url;
 
-			if (type === "RECEIVABLE") {
-				url = "/api/finance/receivable/details";
-			} else if (type === "PAYABLE") {
-				url = "/api/finance/payable/details";
-			}
+		switch (type) {
+		  case "RECEIVED":
+			url = "/api/finance/received/details";
+			break;
 
-			// Axios call (token already handled in API instance)
-			const res = await API.get(url);
+		  case "PAID":
+			url = "/api/finance/paid/details";
+			break;
 
-			// Axios response data
-			const json = res.data;
+		  case "SALE":
+			url = "/api/finance/sale/details";
+			break;
 
-			// Backend-level failure
-			if (!json?.success) {
-				showToast("API returned failure");
-				throw new Error(json?.message || "API returned failure");
-			}
+		  case "RECEIVABLE":
+			url = "/api/finance/receivable/details";
+			break;
 
-			setTableData(json.data || []);
-			setViewType(type);
+		  case "PAYABLE":
+			url = "/api/finance/payable/details";
+			break;
 
-		} catch (err) {
-			showToast("Finance API error");
-			console.error(
-				"Finance API error:",
-				err.response?.data || err.message
-			);
-		} finally {
-			setLoading(false);
+		  default:
+			throw new Error(`Unknown filter type: ${type}`);
 		}
+
+		const res = await API.get(url);
+		const json = res.data;
+
+		if (!json?.success) {
+		  throw new Error(json?.message || "API returned failure");
+		}
+
+		setTableData(json.data || []);
+		setViewType(type);
+		
+
+	  } catch (err) {
+		showToast("Finance API error");
+		console.error("Finance API error:", err.message);
+	  } finally {
+		setLoading(false);
+	  }
 	};
+
+	
+	const columnsByType = {
+	  RECEIVED: [
+		{ key: "projectName", label: "Project" },
+		{ key: "plotNumber", label: "Plot" },
+		{ key: "customerName", label: "Customer" },
+		{ key: "agentName", label: "Agent" },
+		{ key: "saleAmount", label: "Sale Amount" },
+		{
+		  key: "totalReceived",
+		  label: "Received",
+		  isAmount: true,
+		  clickable: true,
+		  txnType: "RECEIVED"
+		},
+		{ key: "outstandingAmount", label: "Outstanding" }
+	  ],
+
+	  PAID: [
+		{ key: "projectName", label: "Project" },
+		{ key: "plotNumber", label: "Plot" },
+		{ key: "agentName", label: "Agent" },
+		{ key: "saleAmount", label: "Sale Amount" },
+		{ key: "paymentDate", label: "Paid Date" },
+		{ key: "totalCommission", label: "Commission" },
+		{
+		  key: "commissionPaid",
+		  label: "Paid",
+		  isAmount: true,
+		  clickable: true,
+		  txnType: "PAID"
+		},
+		{
+		  key: "commissionPayable",
+		  label: "Commission",
+		  isAmount: true,
+		  txnType: "PAID"
+		}
+	  ]
+	};
+	
+	const formatAmount = (value) => {
+	  if (value == null || isNaN(value)) return "₹0.00";
+
+	  return Number(value).toLocaleString("en-IN", {
+		minimumFractionDigits: 2,
+		maximumFractionDigits: 2,
+	  });
+	};
+
+
+	const FinanceDetailsTable = ({ type, data, onAmountClick }) => {
+	  const columns = columnsByType[type];
+
+	  if (!columns) {
+		return <div className="text-muted">No table configuration</div>;
+	  }
+
+	  return (
+		<Table striped bordered hover size="sm">
+		  <thead>
+			<tr>
+			  {columns.map(col => (
+				<th key={col.key}>{col.label}</th>
+			  ))}
+			</tr>
+		  </thead>
+		  <tbody>
+			{data.map((row, idx) => (
+			  <tr key={idx}>
+				{columns.map(col => (
+				  <td key={col.key}>
+				  {col.clickable && col.isAmount && onAmountClick ? (
+					  <span
+						className="fw-semibold text-primary"
+						style={{ cursor: "pointer", textDecoration: "underline" }}
+						onClick={() =>
+						  onAmountClick(row.saleId, col.txnType, row.agentId)
+						}
+					  >
+						{formatAmount(row[col.key])}
+					  </span>
+					) : col.isAmount ? (
+					  formatAmount(row[col.key])
+					) : (
+					  row[col.key] ?? "-"
+					)}
+
+				</td>
+
+
+				))}
+			  </tr>
+			))}
+		  </tbody>
+		</Table>
+	  );
+	};
+
+
 
 	const SectionHeader = ({ title, onBack }) => (
 		<div className="d-flex justify-content-between align-items-center mb-3">
@@ -115,10 +245,11 @@ const FinanceDashboard = () => {
 		</div>
 	);
 
-	const onAction = (action, row ) => {
+	const handleTableAction = (action, row ) => {
 		//console.log("@FinanceDashbord row: "+JSON.stringify(row));
 		if (action === "PAYMENT") {
 			setSelectedPlotId(row.plotId);
+			setSelectedOutstanding(Number(row.outstandingAmount || 0));
 			setShowPaymentModal(true);
 		}
 		
@@ -171,11 +302,13 @@ const FinanceDashboard = () => {
 	};
 	
 	const buildPaymentPayload = (data, type) => {
+		const paymentDateTime = `${data.paymentDate}T00:00:00`;
 	  if (type === "RECEIVABLE") {
 		return {
 		  paymentType: "RECEIVED",
 		  plotId: data.plotId,
 		  amount: data.amount,
+		  paymentDate:paymentDateTime,
 		  paymentMode: data.paymentMode,
 		  transactionRef: data.transactionRef,
 		  remarks: data.remarks
@@ -188,6 +321,7 @@ const FinanceDashboard = () => {
 		  saleId: data.saleId,
 		  paidTo: data.paidTo,
 		  amount: data.amount,
+		  paymentDate: paymentDateTime,
 		  paymentMode: data.paymentMode,
 		  transactionRef: data.transactionRef,
 		  remarks: data.remarks
@@ -204,14 +338,15 @@ const FinanceDashboard = () => {
 			  paymentType: "PAID",
 			  saleId: drawer.row.saleId,
 			  amount: Number(drawer.row.commissionPayable), // already rounded
+			  
 			  paidTo: drawer.row.agentId,                    // ✅ CRITICAL
-			  paymentMode: formValues.paymentMode,
-			  transactionRef: formValues.transactionRef,
-			  remarks: formValues.remarks
+			  paymentMode: payload.paymentMode,
+			  transactionRef: payload.transactionRef,
+			  remarks: payload.remarks
 			};
 		  
 		  console.log("handlePaymentSubmit paidTo: "+jsonData);
-		//await API.post("/api/payments", jsonData);
+		await API.post("/api/payments", jsonData);
 		showToast("Payment saved successfully");
 		setShowPaymentModal(false);	
 		loadSummary();
@@ -223,11 +358,26 @@ const FinanceDashboard = () => {
 	};
 
 	return (
-		<div className="p-4">
-			<h2 className="text-xl font-semibold mb-4">Finance Operations</h2>
+		<div className="p-2">
+			<h4 className="text-xl font-semibold mb-4">Finance Operations</h4>
 
 			<FinanceSummaryCards data={summary} onFilter={handleFilter} />
 
+			
+			{/* SALE VIEW */}
+			{viewType === "SALE"  && tableData?.[0]?.saleId && (
+			  <>
+				<SectionHeader
+				  title="Sale Details"
+				  onBack={() => setViewType("CASHFLOW")}
+				/>
+				<SaleDetailsTable
+				  data={tableData}
+				  loading={loading}
+				/>
+			  </>
+			)}
+			
 			{/* RECEIVABLE VIEW */}
 			{viewType === "RECEIVABLE" && (
 				<>
@@ -238,10 +388,40 @@ const FinanceDashboard = () => {
 					<ReceivableDetailsTable
 						data={tableData}
 						loading={loading}
-						onAction={onAction}
+						onAction={handleTableAction}
 						
 					/>
 				</>
+			)}
+			
+			{/* RECEIVED VIEW */}
+			{viewType === "RECEIVED" && (
+			  <>
+				<SectionHeader
+				  title="Received Details"
+				  onBack={() => setViewType("CASHFLOW")}
+				/>
+				<FinanceDetailsTable
+				  type="RECEIVED"
+				  data={tableData}
+				  onAmountClick={handleAmountClick}
+				/>
+			  </>
+			)}
+
+			{/* PAID VIEW */}
+			{viewType === "PAID" && (
+			  <>
+				<SectionHeader
+				  title="Commission Paid Details"
+				  onBack={() => setViewType("CASHFLOW")}
+				/>
+				<FinanceDetailsTable
+				  type="PAID"
+				  data={tableData}
+				  onAmountClick={handleAmountClick}
+				/>
+			  </>
 			)}
 
 			{/* PAYABLE VIEW */}
@@ -254,7 +434,7 @@ const FinanceDashboard = () => {
 					<CommissionPayableTable
 						data={tableData}
 						loading={loading}
-						onAction={onAction}
+						onAction={handleTableAction}
 					/>
 				</>
 			)}
@@ -269,20 +449,35 @@ const FinanceDashboard = () => {
 						}}
 					/>
 
-					<CashFlowTable
-						rows={rows}
-						onAction={(row, action) =>
-							setDrawer({ open: true, row, action })
-						}
-					/>
+					<CashFlowTable rows={rows} onAction={handleCashflowAction} />
 				</>
 			)}
+			
+			<Modal
+			  size="xl"
+			>
+			  <Modal.Header closeButton>
+				<Modal.Title>
+				  {viewType === "RECEIVED" && "Received Details"}
+				  {viewType === "PAID" && "Commission Paid Details"}
+				</Modal.Title>
+			  </Modal.Header>
+
+			  <Modal.Body>
+				<FinanceDetailsTable
+				  type={viewType}
+				  data={tableData}
+				/>
+			  </Modal.Body>
+			</Modal>
+
+
 
 			<PaymentDrawer
 				open={drawer.open}
 				row={drawer.row}
 				action={drawer.action}
-				onClose={() => setDrawer({ open: false })}
+				onClose={() => setDrawer(d => ({ ...d, open: false }))}
 				onSuccess={() => {
 					loadSummary();
 					loadCashFlow();
@@ -293,14 +488,25 @@ const FinanceDashboard = () => {
 			<PaymentModal
 			  open={showPaymentModal}
 			  plotId={selectedPlotId}
+			  outstandingAmount={selectedOutstanding}
 			  onClose={() => setShowPaymentModal(false)}
 			  onSubmit={submitReceivablePayment}
+			  
 			/>
 			<CommentsOverlay
 			  show={showCommentsOverlay}
 			  customerId={selectedCustomerId}
 			  onClose={() => setShowCommentsOverlay(false)}
 			/>
+			
+			<TransactionHistoryModal
+			  show={showTxnModal}
+			  onHide={() => setShowTxnModal(false)}
+			  saleId={saleId}
+			  txnType={txnType}
+			  agentId={agentId}
+			/>
+
 		</div>
 	);
 };

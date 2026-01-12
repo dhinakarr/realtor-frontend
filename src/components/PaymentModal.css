@@ -9,8 +9,8 @@
 }
 
 .payment-drawer {
-  width: 420px;
-  height: 100%;
+  width: 550px;
+  height: 99%;
   background: #ffffff;
   display: flex;
   flex-direction: column;
@@ -29,7 +29,7 @@
 
 /* HEADER */
 .payment-header {
-  padding: 18px 20px;
+  padding: 2px 4px;
   border-bottom: 1px solid #e5e7eb;
   display: flex;
   justify-content: space-between;
@@ -53,35 +53,40 @@
   background: transparent;
   font-size: 20px;
   cursor: pointer;
+  padding: 4px 40px;
 }
 
 /* BODY */
 .payment-body {
-  padding: 20px;
+  padding: 10px;
   overflow-y: auto;
   flex: 1;
 }
 
-.form-group {
-  margin-bottom: 16px;
+.payment-body .form-group {
+  margin-bottom: 6px;   /* try 4–8px */
+}
+.payment-body label {
+  margin-bottom: 2px;
+  font-size: 0.85rem;
 }
 
 .form-group label {
   display: block;
-  font-size: 13px;
-  font-weight: 500;
-  margin-bottom: 6px;
+  font-size: 11px;
+  font-weight: 300;
   color: #374151;
+  line-height: 1.2;
 }
 
 .form-group input,
 .form-group select,
 .form-group textarea {
-  width: 100%;
-  padding: 10px 12px;
+  width: 60%;
+  padding: 2px 2px;
   border-radius: 6px;
   border: 1px solid #d1d5db;
-  font-size: 14px;
+  font-size: 11px;
 }
 
 .form-group input:focus,
@@ -94,17 +99,17 @@
 
 /* FOOTER */
 .payment-footer {
-  padding: 16px 20px;
+  padding: 1px 4px;
   border-top: 1px solid #e5e7eb;
   display: flex;
-  gap: 12px;
+  gap: 1px;
 }
 
 .btn-outline {
   flex: 1;
   background: white;
   border: 1px solid #d1d5db;
-  padding: 10px;
+  padding: 2px 2px;
   border-radius: 6px;
   cursor: pointer;
 }
@@ -118,11 +123,69 @@
   background: #2563eb;
   color: white;
   border: none;
-  padding: 10px;
+  padding: 1px;
   border-radius: 6px;
   cursor: pointer;
 }
 
 .btn-primary:hover {
   background: #1d4ed8;
+}
+.payment-body.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  row-gap: 0.1rem;
+  column-gap: 6px;
+}		
+
+.form-group.full-width {
+  grid-column: span 2;
+}
+
+.outstanding-info {
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+.transaction-history {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid #eee;
+}
+
+.transaction-history h5 {
+  margin-bottom: 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.txn-table-wrapper {
+  max-height: 180px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+.txn-table {
+  width: 98%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.txn-table th,
+.txn-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid #eee;
+}
+
+.txn-table th {
+  background: #f8f9fa;
+  position: sticky;
+  top: 0;
+}
+.txn-table tr.latest {
+  background: #e9f7ef;
+  font-weight: 600;
 }

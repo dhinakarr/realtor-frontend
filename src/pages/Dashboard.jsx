@@ -107,7 +107,7 @@ export default function DashboardSummary() {
 
 /* ================= Cards ================= */
 	const StatCard = ({ title, value, bg, onClick }) => (
-	  <Col className="d-flex">
+	  <Col xs={6} sm={4} md={3} lg={2} className="d-flex">
 		<Card
 		  className="border-0 shadow-sm flex-fill"
 		  style={{
@@ -117,7 +117,7 @@ export default function DashboardSummary() {
 		  }}
 		  onClick={onClick}
 		>
-		  <Card.Body className="py-3 px-3 text-center">
+		  <Card.Body className="py-1 px-2 text-center">
 			<div className="fw-bold opacity-75">{title}</div>
 			<div className="fw-bold fs-5">{value}</div>
 		  </Card.Body>
@@ -243,6 +243,13 @@ export default function DashboardSummary() {
 			  <StatCard title="Outstanding" value={`₹${totalOutstanding.toLocaleString()}`} bg="#845ef7" />
 			</>
 		  )}
+		  {hasCommissions && (
+			  <StatCard
+				title="Total Commission"
+				value={`₹${totalCommission.toLocaleString("en-IN")}`}
+				bg="#845ef7"
+			  />
+			)}
 		  {hasVisits && (
 			<>
 			  <StatCard title="Site Visits" value={totalSiteVisits} bg="#5c7cfa" />
