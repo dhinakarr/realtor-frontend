@@ -10,7 +10,7 @@ export default function UserCreatePage() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
   const module = useModule("/api/users");
-  
+  const { showToast } = useToast();
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState(null);
   const [record, setRecord] = useState({});
@@ -83,14 +83,19 @@ export default function UserCreatePage() {
 	  if (imageFile) {
 		formData.append("profileImage", imageFile);
 	  }
-
-	  API.post("/api/users", formData, {
-		headers: {
-		  Authorization: `Bearer ${token}`,
-		},
-	  })
-		.then(() => navigate("/admin/users"))
-		.catch((err) => console.error(err));
+	  try {
+		  const res = API.post("/api/users", formData, {
+			headers: {
+			  Authorization: `Bearer ${token}`,
+			},
+		  })
+		  if (res.data?.message)
+			  showToast("User created successfully", "success");
+		  navigate("/admin/users")
+	  } catch(err) {
+		  console.error(err);
+		  showToast("Error in User creation", "danger");
+	  }
 	};
 
 

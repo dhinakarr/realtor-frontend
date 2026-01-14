@@ -1,3 +1,7 @@
+/* =========================
+   OVERLAY & DRAWER
+========================= */
+
 .payment-overlay {
   position: fixed;
   inset: 0;
@@ -9,108 +13,133 @@
 }
 
 .payment-drawer {
-  width: 550px;
-  height: 99%;
+  width: 500px;
+  height: 100%;
   background: #ffffff;
   display: flex;
   flex-direction: column;
   box-shadow: -6px 0 20px rgba(0, 0, 0, 0.2);
-  animation: slideIn 0.3s ease-out;
+  animation: slideIn 0.25s ease-out;
 }
 
 @keyframes slideIn {
-  from {
-    transform: translateX(100%);
-  }
-  to {
-    transform: translateX(0);
-  }
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
 }
 
-/* HEADER */
+/* =========================
+   HEADER
+========================= */
+
 .payment-header {
-  padding: 2px 4px;
+  padding: 4px 30px;
   border-bottom: 1px solid #e5e7eb;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.payment-header h2 {
+.payment-header h5 {
   margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.payment-header p {
-  margin: 4px 0 0;
-  font-size: 12px;
-  color: #6b7280;
+  font-size: 16px;
+  font-weight: 800;
 }
 
 .close-btn {
   border: none;
   background: transparent;
-  font-size: 20px;
+  font-size: 18px;
   cursor: pointer;
-  padding: 4px 40px;
+  padding: 4px;
 }
 
-/* BODY */
+/* =========================
+   FORM BODY
+========================= */
+
 .payment-body {
-  padding: 10px;
-  overflow-y: auto;
   flex: 1;
+  padding: 4px 14px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: 12px;
+  row-gap: 10px; /* 🔑 visually pleasing rhythm */
+  overflow-y: auto;
 }
 
-.payment-body .form-group {
-  margin-bottom: 6px;   /* try 4–8px */
+/* Summary text */
+.payment-body > .text-muted {
+  font-size: 12px;
+  color: #6b7280;
 }
+
+/* =========================
+   FIELD BLOCK
+========================= */
+
+.payment-body > div {
+  display: flex;
+  flex-direction: column;
+}
+
+/* =========================
+   LABEL
+========================= */
+
 .payment-body label {
-  margin-bottom: 2px;
-  font-size: 0.85rem;
-}
-
-.form-group label {
-  display: block;
   font-size: 11px;
-  font-weight: 300;
-  color: #374151;
-  line-height: 1.2;
+  font-weight: 500;
+  color: #4b5563;
+  margin-bottom: 4px;
 }
 
-.form-group input,
-.form-group select,
-.form-group textarea {
-  width: 60%;
+/* =========================
+   INPUTS & SELECTS
+========================= */
+
+.payment-body input,
+.payment-body select {
+  height: 38px;
   padding: 2px 2px;
+  font-size: 13px;
+
   border-radius: 6px;
   border: 1px solid #d1d5db;
-  font-size: 11px;
+  background: #ffffff;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
+/* Focus */
+.payment-body input:focus,
+.payment-body select:focus {
   outline: none;
   border-color: #2563eb;
-  box-shadow: 0 0 0 1px #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
 }
 
-/* FOOTER */
+/* Invalid */
+.payment-body .is-invalid {
+  border-color: #dc2626;
+}
+
+/* =========================
+   FOOTER
+========================= */
+
 .payment-footer {
-  padding: 1px 4px;
+  padding: 2px 14px;
   border-top: 1px solid #e5e7eb;
   display: flex;
-  gap: 1px;
+  gap: 10px;
 }
 
 .btn-outline {
   flex: 1;
-  background: white;
+  background: #ffffff;
   border: 1px solid #d1d5db;
-  padding: 2px 2px;
+  padding: 4px 12px;
   border-radius: 6px;
+  font-size: 13px;
   cursor: pointer;
 }
 
@@ -121,71 +150,54 @@
 .btn-primary {
   flex: 1;
   background: #2563eb;
-  color: white;
+  color: #ffffff;
   border: none;
-  padding: 1px;
+  padding: 4px 12px;
   border-radius: 6px;
+  font-size: 13px;
   cursor: pointer;
 }
 
 .btn-primary:hover {
   background: #1d4ed8;
 }
-.payment-body.grid-2 {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  row-gap: 0.1rem;
-  column-gap: 6px;
-}		
 
-.form-group.full-width {
-  grid-column: span 2;
-}
+/* =========================
+   TRANSACTION HISTORY
+========================= */
 
-.outstanding-info {
-  padding: 8px 12px;
-  background: #f8f9fa;
-  border-radius: 6px;
-  margin-bottom: 4px;
-  font-size: 14px;
-}
 .transaction-history {
-  margin-top: 12px;
-  padding-top: 8px;
-  border-top: 1px solid #eee;
+  padding: 12px 14px;
+  border-top: 1px solid #e5e7eb;
 }
 
 .transaction-history h5 {
-  margin-bottom: 6px;
   font-size: 14px;
   font-weight: 600;
+  margin-bottom: 8px;
 }
 
 .txn-table-wrapper {
   max-height: 180px;
   overflow-y: auto;
-  border: 1px solid #ddd;
+  border: 1px solid #e5e7eb;
   border-radius: 6px;
 }
 
 .txn-table {
-  width: 98%;
+  width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .txn-table th,
 .txn-table td {
-  padding: 6px 8px;
-  border-bottom: 1px solid #eee;
+  padding: 8px;
+  border-bottom: 1px solid #f1f5f9;
 }
 
 .txn-table th {
-  background: #f8f9fa;
+  background: #f9fafb;
   position: sticky;
   top: 0;
-}
-.txn-table tr.latest {
-  background: #e9f7ef;
-  font-weight: 600;
 }

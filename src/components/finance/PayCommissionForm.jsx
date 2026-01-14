@@ -108,7 +108,7 @@ const PayCommissionForm = ({ row, onCancel, onSuccess }) => {
 			  Commission Paid: ₹{totalPaid}
 			</span>
 			<span>
-			  Outstanding: <strong>₹{formatted}</strong>
+			  Outstanding: <strong>{formatted}</strong>
 			</span>
 		  </div>
 		</div>

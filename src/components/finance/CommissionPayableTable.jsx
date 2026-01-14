@@ -14,6 +14,15 @@ const CommissionPayableTable = ({ data, loading, onAction }) => {
 	if (!data || data.length === 0) {
 		return <div className="text-muted">No payable commissions found</div>;
 	}
+	
+	const formatAmount = (value) => {
+	  if (value == null || isNaN(value)) return "₹0.00";
+
+	  return Number(value).toLocaleString("en-IN", {
+		minimumFractionDigits: 2,
+		maximumFractionDigits: 2,
+	  });
+	};
 
 	return (
 		<Table striped bordered hover size="sm">
@@ -37,13 +46,13 @@ const CommissionPayableTable = ({ data, loading, onAction }) => {
 						<td>{row.agentName}</td>
 
 						<td className="text-end">
-							 {(row.commissionEligible ?? 0).toLocaleString()}
+							 {formatAmount(row.commissionEligible ?? 0).toLocaleString()}
 						</td>
 						<td className="text-end">
-							 {(row.commissionPaid ?? 0).toLocaleString()}
+							 {formatAmount(row.commissionPaid ?? 0).toLocaleString()}
 						</td>
 						<td className="text-end fw-bold text-danger">
-							 {(row.commissionPayable ?? 0).toLocaleString()}
+							 {formatAmount(row.commissionPayable ?? 0)}
 						</td>
 
 						<td className="text-center">

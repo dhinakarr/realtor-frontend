@@ -129,10 +129,10 @@ export default function PaymentModal({ open, onClose, plotId, outstandingAmount,
 			  Total received: {totalReceived}
 		  </div>
 		  <div className="text-muted mt-1">
-			  OutStanding: <strong>{outstandingAmount}</strong>
+			  OutStanding: {outstandingAmount}
 		  </div>
 
-          <div className="form-group">
+          <div>
             <label>Payment Type</label>
             <select
               name="paymentType"
@@ -145,7 +145,7 @@ export default function PaymentModal({ open, onClose, plotId, outstandingAmount,
             </select>
           </div>
 
-          <div className="form-group">
+          <div>
             <label>Payment Date</label>
             <input
               type="date"
@@ -157,7 +157,7 @@ export default function PaymentModal({ open, onClose, plotId, outstandingAmount,
             {errors.paymentDate && <div className="invalid-feedback">{errors.paymentDate}</div>}
           </div>
 
-          <div className="form-group">
+          <div>
             <label>Amount</label>
             <input
               type="number"
@@ -169,7 +169,7 @@ export default function PaymentModal({ open, onClose, plotId, outstandingAmount,
             {errors.amount && <div className="invalid-feedback">{errors.amount}</div>}
           </div>
 
-          <div className="form-group">
+          <div>
             <label>Payment Mode</label>
             <select
               name="paymentMode"
@@ -186,7 +186,7 @@ export default function PaymentModal({ open, onClose, plotId, outstandingAmount,
             {errors.paymentMode && <div className="invalid-feedback">{errors.paymentMode}</div>}
           </div>
 
-          <div className="form-group full-width">
+          <div>
             <label>Transaction Reference</label>
             <input
               name="transactionRef"
@@ -195,11 +195,10 @@ export default function PaymentModal({ open, onClose, plotId, outstandingAmount,
             />
           </div>
 
-          <div className="form-group full-width">
+          <div>
             <label>Remarks</label>
-            <textarea
+            <input
               name="remarks"
-              rows="2"
               value={form.remarks}
               onChange={handleChange}
             />

@@ -34,7 +34,7 @@ import UserOrgTree from './pages/admin/UserOrgTree';
 import ProjectsPage from './pages/projects/ProjectsPage';
 import ProjectFormPage from "./pages/projects/ProjectFormPage";
 import ProjectDetailsPage from "./pages/projects/ProjectDetailsPage";
-
+import CommissionRuleCreate from "./pages/sales/CommissionRuleCreate";
 import CommissionRulesPage from "./pages/sales/CommissionRulesPage";
 import FinanceDashboard from "./pages/finance/FinanceDashboard";
 import CustomerListPage from "./pages/customers/CustomerListPage";
@@ -111,9 +111,10 @@ function App() {
 			<Route path="/projects/edit/:id" element={<ProjectFormPage />} />
 			<Route path="/projects/details/:id" element={<ProjectDetailsPage />} />
 			
-			{/* Sales pages will be given here*/}
+			{/* Sales pages will be given here
 			<Route path="/projects/:id/commission-rules" element={<CommissionRulesPage />} />
-			
+			*/}
+			<Route path="/projects/:id/commission-rules" element={<CommissionRuleCreate />} />
 			
 			{/* PermissionList pages */}
 			<Route path="/admin/permissions" element={<PermissionListPage />} />

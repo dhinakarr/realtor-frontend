@@ -223,7 +223,7 @@ export default function ProjectDetailsPage() {
 
 						{plot.status !== "CANCELLED" && (
 						  <div className="bottom-icons">
-						  {isFinance && (
+						  {/*isFinance && (
 							<FaMoneyBill
 							  className="plot-icon finance"
 							  size={24}
@@ -233,7 +233,7 @@ export default function ProjectDetailsPage() {
 								setShowPaymentModal(true);
 							  }}
 							/>
-						  )}
+						  )*/}
 						  {canDelete && (
 							<FaTrash
 							  className="plot-icon delete"

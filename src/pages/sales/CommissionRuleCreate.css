@@ -1,0 +1,106 @@
+ .commission-rule-create {
+  max-width: 95%;
+  margin-bottom: 4px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px 8px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-field label {
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.form-field input,
+.form-field select {
+  height: 44px;          /* was 44px */
+  padding: 4px 8px;     /* tighter */
+  font-size: 13px;
+}
+
+.form-field small.error {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #d32f2f;
+}
+
+.checkbox-row {
+  grid-column: span 2;
+  display: flex;
+  align-items: center;
+  height: 36px;
+}
+
+.form-actions {
+  margin-top: 4px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+}
+.form-actions {
+  margin-top: 4px;
+  padding-top: 16px;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+.rules-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 6px;
+  font-size: 13px;
+}
+
+.rules-table th,
+.rules-table td {
+  border: 1px solid #ddd;
+  padding: 4px;
+  text-align: left;
+}
+
+.rules-table th {
+  background: #f5f5f5;
+  font-weight: 600;
+}
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.page-header h4 {
+  margin: 0;
+}
+.action-cell {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.action-icon {
+  cursor: pointer;
+  margin: 0 10px;
+  font-size: 15px;
+}
+
+.action-icon.edit {
+  color: #0d6efd;
+}
+
+.action-icon.delete {
+  color: #dc3545;
+}
+
+.action-icon:hover {
+  opacity: 0.75;
+}
