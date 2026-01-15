@@ -4,6 +4,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import { FaPlus, FaEdit, FaTrash, FaMoneyBill } from "react-icons/fa";
 import API from "../../api/api";
 import "./ProjectDetailsPage.css";
+import PlotStatusDonut from "./PlotStatusDonut";
 import useModule from "../../hooks/useModule";
 import PlotEditPanel from "../../components/PlotEditPanel";
 import PlotViewPanel from "../../components/PlotViewPanel";
@@ -61,6 +62,16 @@ export default function ProjectDetailsPage() {
   if (!projectData) {
     return <div style={{ padding: "20px", textAlign: "center" }}>Loading...</div>;
   }
+  
+  const plotStatData = projectData?.stat
+  ? [
+      { name: "Available", count: projectData.stat.available },
+      { name: "Booked", count: projectData.stat.booked },
+      { name: "Sold", count: projectData.stat.sold },
+      { name: "Cancelled", count: projectData.stat.cancelled }
+    ]
+  : [];
+
 
   const { project, plots } = projectData;
 
@@ -160,35 +171,67 @@ export default function ProjectDetailsPage() {
 			</button>
 		  </div>
 		</div>
+		
       {/* PROJECT INFO */}
-      <div className="project-card" style={{ marginBottom: "20px", padding: "15px", border: "1px solid #ddd", borderRadius: "8px", backgroundColor: "#f9f9f9" }}>
-        {project.files?.length > 0 && (
-          <img
-            src={`${BASE_URL}/api/projects/file/${project.files[0].projectFileId}`}
-            alt={project.projectName}
-            style={{ width: "100%", borderRadius: "8px", marginBottom: "15px", height:"450px" }}
-          />
-        )}
-        <h4 style={{ margin: "0 0 10px" }}>{project.projectName}</h4>
-		<table className="table table-transparent">
-		  <tbody>
-			<tr>
-			  <td style={{ width: "40%" }}>
-				<p><small>Location:</small> {project.locationDetails}</p>
-				<p><small>Survey Number:</small> {project.surveyNumber}</p>
-				<p><small>Price / Sqft:</small> ₹{project.pricePerSqft}</p>
-			  </td>
-			  <td style={{ width: "40%" }}>
-				<p><small>Stamp Duty:</small> {project.regCharges}%</p>
-				<p><small>Documentation Charges:</small> ₹{project.docCharges}</p>
-				<p><small>Other Charges:</small> ₹{project.otherCharges}</p>
-				<p><small>Guideline Value:</small> ₹{project.guidanceValue}</p>
-			  </td>
-			</tr>
-		  </tbody>
-		</table>
+      <div className="project-card p-3 mb-3">
 
-      </div>
+		  {/* ================= ROW 1 : IMAGE ================= */}
+		  {project.files?.length > 0 && (
+			<div className="row mb-3">
+			  <div className="col-12">
+				<img
+				  src={`${BASE_URL}/api/projects/file/${project.files[0].projectFileId}`}
+				  alt={project.projectName}
+				  className="img-fluid rounded"
+				  style={{
+					width: "100%",
+					height: "420px",
+					objectFit: "cover"
+				  }}
+				/>
+			  </div>
+			</div>
+		  )}
+
+		  {/* ================= ROW 2 : DATA + CHART ================= */}
+		  <div className="row g-3 align-items-stretch">
+
+			{/* Column 1 */}
+			<div className="col-md-4">
+			  <h4 className="mb-3">{project.projectName}</h4>
+			  <p><small>Location:</small> {project.locationDetails}</p>
+			  <p><small>Survey Number:</small> {project.surveyNumber}</p>
+			  <p><small>Price / Sqft:</small> ₹{project.pricePerSqft}</p>
+			</div>
+
+			{/* Column 2 */}
+			<div className="col-md-4">
+			  <p><small>Stamp Duty:</small> {project.regCharges}%</p>
+			  <p><small>Documentation Charges:</small> ₹{project.docCharges}</p>
+			  <p><small>Other Charges:</small> ₹{project.otherCharges}</p>
+			  <p><small>Guideline Value:</small> ₹{project.guidanceValue}</p>
+			</div>
+
+			{/* Column 3 : Chart */}
+			<div className="col-md-4 d-flex flex-column align-items-center">
+			  <h6 className="mb-2">Inventory Status</h6>
+
+			  <div
+				style={{
+				  width: "100%",
+				  maxWidth: 260,
+				  height: 180
+				}}
+			  >
+				<PlotStatusDonut stat={projectData.stat} />
+			  </div>
+			</div>
+
+		  </div>
+		</div>
+
+
+
 
       {/* PLOT GRID */}
 			  <div className="project-grid">
@@ -206,7 +249,10 @@ export default function ProjectDetailsPage() {
 						  <div>Area: {plot.area} sft</div>
 						  <div>Facing: {plot.facing || ""}</div>
 						  <div>Survey: {plot.surveyNum}</div>
-						  <div>Total: {plot.totalPrice}</div>
+						  {plot.status === "AVAILABLE" && (
+							  <div>Total: ₹{plot.totalPrice}</div>
+							)}
+
 						</div>
 
 						{/* Edit Icon */}

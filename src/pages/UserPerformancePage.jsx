@@ -70,18 +70,20 @@ function SalesTable({ sales }) {
       <table className="table table-sm table-bordered">
         <thead>
           <tr>
+		    <th>Project Name</th>
             <th>Plot</th>
             <th>Customer</th>
-            <th>Amount</th>
+            <th>Plot Price</th>
             <th>Confirmed</th>
           </tr>
         </thead>
         <tbody>
           {sales.map(s => (
             <tr key={s.saleId}>
+			  <td>{s.projectName}</td>
               <td>{s.plotNumber}</td>
               <td>{s.customerName}</td>
-              <td>₹{s.saleAmount}</td>
+              <td>₹{s.baseAmount}</td>
               <td>{s.confirmedAt}</td>
             </tr>
           ))}
@@ -101,6 +103,7 @@ function ReceivableTable({ receivable }) {
         plotNumber: r.plotNumber,
         customerName: r.customerName,
         saleAmount: r.saleAmount,
+		baseAmount: r.baseAmount,
         received: 0
       };
       acc[key].received += r.totalReceived;
@@ -116,7 +119,7 @@ function ReceivableTable({ receivable }) {
           <tr>
             <th>Plot</th>
             <th>Customer</th>
-            <th>Sale</th>
+            <th>Plot Price</th>
             <th>Received</th>
             <th>Outstanding</th>
           </tr>
@@ -126,7 +129,7 @@ function ReceivableTable({ receivable }) {
             <tr key={r.plotNumber}>
               <td>{r.plotNumber}</td>
               <td>{r.customerName}</td>
-              <td>₹{r.saleAmount}</td>
+              <td>₹{r.baseAmount}</td>
               <td>₹{r.received}</td>
               <td>₹{r.saleAmount - r.received}</td>
             </tr>
@@ -147,7 +150,7 @@ function CommissionTable({ commission }) {
         <thead>
           <tr>
             <th>Project</th>
-            <th>Sale Amount</th>
+            <th>Plot Price</th>
             <th>Total</th>
             <th>Paid</th>
           </tr>
@@ -156,7 +159,7 @@ function CommissionTable({ commission }) {
           {commission.map(c => (
             <tr key={c.commissionId}>
               <td>{c.projectName}</td>
-              <td>₹{c.saleAmount}</td>
+              <td>₹{c.baseAmount}</td>
               <td>₹{c.totalCommission}</td>
               <td className="text-success">₹{c.commissionPaid}</td>
             </tr>
@@ -234,6 +237,8 @@ export default function UserPerformancePage() {
    TREE NODE
 ========================= */
 
+const INDENT = 16; // 👈 one level = 16px
+
 const TreeNode = memo(function TreeNode({
   node,
   level,
@@ -246,29 +251,51 @@ const TreeNode = memo(function TreeNode({
   return (
     <div>
       <div
-        className={`d-flex align-items-center py-1 px-2 rounded ${
+        className={`d-flex align-items-center py-1 rounded ${
           selectedUserId === node.userId ? "bg-primary text-white" : "hover-bg"
         }`}
-        style={{ paddingLeft: level * 20, cursor: "pointer" }}
+        style={{
+          paddingLeft: level * INDENT,
+          cursor: "pointer",
+          position: "relative"
+        }}
+        onClick={() => onUserSelect(node)}
       >
+        {/* vertical guide line */}
+        {level > 0 && (
+          <span
+            style={{
+              position: "absolute",
+              left: level * INDENT - INDENT / 2,
+              top: 0,
+              bottom: 0,
+              width: 1,
+              backgroundColor: "#ddd"
+            }}
+          />
+        )}
+
+        {/* expand / collapse */}
         {hasChildren ? (
           <span
-            className="me-2 fw-bold"
             onClick={e => {
               e.stopPropagation();
               setExpanded(!expanded);
             }}
-            style={{ width: 16 }}
+            style={{
+              width: 14,
+              textAlign: "center",
+              marginRight: 6,
+              fontWeight: 600
+            }}
           >
-            {expanded ? "−" : "+"}
+            {expanded ? "▾" : "▸"}
           </span>
         ) : (
-          <span style={{ width: 16 }} />
+          <span style={{ width: 14, marginRight: 6 }} />
         )}
 
-        <span onClick={() => onUserSelect(node)}>
-          {node.userName}
-        </span>
+        <span>{node.userName}</span>
       </div>
 
       {expanded &&
@@ -284,6 +311,8 @@ const TreeNode = memo(function TreeNode({
     </div>
   );
 });
+
+
 
 /* =========================
    PERFORMANCE PANEL
