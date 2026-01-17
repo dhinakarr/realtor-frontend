@@ -1,7 +1,8 @@
+import React from "react";
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Navbar as RBNavbar, Nav, Container, Badge, Fade } from "react-bootstrap";
-
+import "./Navbar.css";
 import API from "../api/api";
 import useNotifications from "../hooks/useNotifications";
 import NotificationBell from "./NotificationBell";
@@ -25,36 +26,62 @@ export default function Navbar({ user, setUser }) {
 
   const notificationRef = useRef(null);
   const profileRef = useRef(null);
+  const mountedRef = useRef(false);
+  const id = user?.token?.userId;
+
+    /* ---------------- Reset on Auth Change ---------------- */
+	useEffect(() => {
+	  // Ensure menus are closed when user logs in or out
+	  setShowProfile(false);
+	  setShowNotifications(false);
+	}, [user]);
 
   /* ---------------- Click outside / ESC ---------------- */
   useEffect(() => {
-    const handler = (e) => {
-      if (notificationRef.current && !notificationRef.current.contains(e.target)) {
-        setShowNotifications(false);
-      }
-      if (profileRef.current && !profileRef.current.contains(e.target)) {
-        setShowProfile(false);
-      }
-    };
+	  const handler = (e) => {
+		
 
-    const esc = (e) => e.key === "Escape" && (
-      setShowNotifications(false),
-      setShowProfile(false)
-    );
+		if (
+		  notificationRef.current &&
+		  !notificationRef.current.contains(e.target)
+		) {
+		  setShowNotifications(false);
+		}
 
-    document.addEventListener("mousedown", handler);
-    document.addEventListener("keydown", esc);
-    return () => {
-      document.removeEventListener("mousedown", handler);
-      document.removeEventListener("keydown", esc);
-    };
-  }, []);
+		if (
+		  profileRef.current &&
+		  !profileRef.current.contains(e.target)
+		) {
+		  setShowProfile(false);
+		  
+		}
+
+	  };
+
+	  const esc = (e) => {
+		if (e.key === "Escape") {
+		  setShowNotifications(false);
+		  setShowProfile(false);
+		}
+	  };
+
+	  document.addEventListener("mousedown", handler);
+	  document.addEventListener("keydown", esc);
+
+	  return () => {
+		document.removeEventListener("mousedown", handler);
+		document.removeEventListener("keydown", esc);
+	  };
+	}, []);
+
 
   /* ---------------- Firebase (optional) ---------------- */
   useEffect(() => {
     if (!user) return;
 
-    listenForForegroundMessages(() => {})
+    listenForForegroundMessages(() => {
+
+	})
       .catch(() => setNotificationsEnabled(false));
   }, [user]);
 
@@ -166,22 +193,26 @@ export default function Navbar({ user, setUser }) {
                 </button>
 
                 {showProfile && (
-                  <Fade in>
-                    <ul className="dropdown-menu dropdown-menu-end mt-2">
-                      <li>
-                        <Link className="dropdown-item" to="/profile">
-                          Profile
-                        </Link>
-                      </li>
-                      <li><hr className="dropdown-divider" /></li>
-                      <li>
-                        <button className="dropdown-item text-danger" onClick={handleLogout}>
-                          Logout
-                        </button>
-                      </li>
-                    </ul>
-                  </Fade>
-                )}
+				  <Fade in={showProfile} mountOnEnter unmountOnExit appear={false}>
+					<ul className="profile-menu" hidden={!showProfile}>
+					  <li>
+						<Link className="profile-item" to={`/profile/${id}`}>
+						  Profile
+						</Link>
+					  </li>
+					  <li><hr className="profile-divider" />Change Password</li>
+					  <li>
+						<button
+						  className="profile-item danger"
+						  onClick={handleLogout}
+						>
+						  Logout
+						</button>
+					  </li>
+					</ul>
+				  </Fade>
+				)}
+
               </div>
             </>
           )}

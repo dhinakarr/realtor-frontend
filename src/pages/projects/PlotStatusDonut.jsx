@@ -12,6 +12,7 @@ const COLORS = {
   Sold: "#2196f3",
   Cancelled: "#9e9e9e"
 };
+import React from "react";
 
 export default function PlotStatusDonut({ stat }) {
   if (!stat) return null;

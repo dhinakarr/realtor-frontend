@@ -10,7 +10,9 @@ export default function Profile() {
 
   const fetchUser = async () => {
     try {
-      const res = await API.get(`/api/users/${userId}`);
+		const id = userId;
+		console.log("Calling API with userId:", id);
+      const res = await API.get(`/api/users/${id}`);
       setUser(res.data.data);
     } catch (err) {
       console.error("Error fetching user:", err);

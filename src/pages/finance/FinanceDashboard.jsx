@@ -12,7 +12,7 @@ import API from "../../api/api";
 import { useToast } from "../../components/common/ToastProvider";
 import SaleDetailsTable from "../../components/finance/SaleDetailsTable";
 import TransactionHistoryModal from "../../components/finance/TransactionHistoryModal";
-import { Table, Modal } from "react-bootstrap";
+import { Table, Modal } from "react-bootstrap";	
 
 const FinanceDashboard = () => {
 

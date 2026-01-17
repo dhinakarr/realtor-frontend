@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import "./PaymentModal.css";
 import API from "../api/api";
 
@@ -125,6 +125,7 @@ export default function PaymentModal({ open, onClose, plotId, outstandingAmount,
         {/* Body */}
         
 		<div className="payment-body grid-2">
+		
 		  <div className="text-muted mt-1">
 			  Total received: {totalReceived}
 		  </div>
@@ -192,6 +193,7 @@ export default function PaymentModal({ open, onClose, plotId, outstandingAmount,
               name="transactionRef"
               value={form.transactionRef}
               onChange={handleChange}
+			  className="form-control"
             />
           </div>
 
@@ -201,6 +203,7 @@ export default function PaymentModal({ open, onClose, plotId, outstandingAmount,
               name="remarks"
               value={form.remarks}
               onChange={handleChange}
+			  className="form-control"
             />
           </div>
         </div>

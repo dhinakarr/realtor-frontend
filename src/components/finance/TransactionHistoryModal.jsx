@@ -1,5 +1,6 @@
+import React, { useEffect, useState } from "react";
 import { Modal, Table, Spinner } from "react-bootstrap";
-import { useEffect, useState } from "react";
+
 import API from "../../api/api";
 
 const TransactionHistoryModal = ({ show, onHide, saleId, txnType, agentId }) => {

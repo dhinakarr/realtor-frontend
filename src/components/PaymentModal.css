@@ -13,7 +13,7 @@
 }
 
 .payment-drawer {
-  width: 500px;
+  width: 550px;
   height: 100%;
   background: #ffffff;
   display: flex;
@@ -25,6 +25,16 @@
 @keyframes slideIn {
   from { transform: translateX(100%); }
   to   { transform: translateX(0); }
+}
+.form-control {
+  height: auto;
+  padding: 0.375rem 0.75rem;
+  line-height: 1.5;
+}
+
+
+.payment-body .form-control {
+  margin-bottom: 0 !important;
 }
 
 /* =========================
@@ -39,9 +49,9 @@
   align-items: center;
 }
 
-.payment-header h5 {
+.payment-header h6 {
   margin: 0;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 800;
 }
 
@@ -58,12 +68,13 @@
 ========================= */
 
 .payment-body {
-  flex: 1;
-  padding: 4px 14px;
+  flex: none;
+  max-height: 400px;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   column-gap: 12px;
-  row-gap: 10px; /* 🔑 visually pleasing rhythm */
+  row-gap: 4px;
+  padding: 8px 16px;
   overflow-y: auto;
 }
 
@@ -78,37 +89,42 @@
 ========================= */
 
 .payment-body > div {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: auto auto;
+  row-gap: 1px;
 }
+
 
 /* =========================
    LABEL
 ========================= */
 
+/* Labels: compact */
 .payment-body label {
   font-size: 11px;
-  font-weight: 500;
+  line-height: 1.1;
+  margin: 0;
   color: #4b5563;
-  margin-bottom: 4px;
 }
 
 /* =========================
    INPUTS & SELECTS
 ========================= */
 
+/* Inputs: compact but readable */
 .payment-body input,
 .payment-body select {
-  height: 38px;
-  padding: 2px 2px;
-  font-size: 13px;
+  height: 36px;
+  padding: 6px 8px;
+  box-sizing: border-box;
+}	
 
-  border-radius: 6px;
-  border: 1px solid #d1d5db;
-  background: #ffffff;
-  transition: border-color 0.15s, box-shadow 0.15s;
+/* Dropdown-specific fix */
+.payment-body select {
+  line-height: normal;       /* 👈 critical */
+  padding-right: 28px;       /* space for arrow */
+  font-size: 12px;
 }
-
 /* Focus */
 .payment-body input:focus,
 .payment-body select:focus {
@@ -121,16 +137,27 @@
 .payment-body .is-invalid {
   border-color: #dc2626;
 }
+.payment-body *,
+.payment-body *::before,
+.payment-body *::after {
+  box-sizing: border-box;
+}
+
+.invalid-feedback {
+  font-size: 11px;
+  line-height: 1.2;
+  margin-top: 2px;
+}
 
 /* =========================
    FOOTER
 ========================= */
 
 .payment-footer {
-  padding: 2px 14px;
+  padding: 8px 14px;
   border-top: 1px solid #e5e7eb;
   display: flex;
-  gap: 10px;
+  
 }
 
 .btn-outline {
@@ -200,4 +227,12 @@
   background: #f9fafb;
   position: sticky;
   top: 0;
+}
+.payment-summary {
+  grid-column: span 2;
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #6b7280;
+  padding-bottom: 4px;
 }

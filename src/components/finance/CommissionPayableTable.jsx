@@ -1,3 +1,4 @@
+import React from "react";
 import { Table, Spinner } from "react-bootstrap";
 import { FaMoneyBillWave, FaCommentDots } from "react-icons/fa";
 import useModule from "../../hooks/useModule";
