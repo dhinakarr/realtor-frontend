@@ -103,14 +103,15 @@ const PayCommissionForm = ({ row, onCancel, onSuccess }) => {
 		{/* Agent Summary */}
 		<div className="mb-2 g-1">
 		  <strong>Agent:</strong> {row.agentName}
-		  <div className="text-muted small mt-1">
-			<span className="me-3">
-			  Commission Paid: ₹{totalPaid}
-			</span>
-			<span>
-			  Outstanding: <strong>{formatted}</strong>
-			</span>
-		  </div>
+		  <div className="text-muted small mt-1 d-flex justify-content-between align-items-center text-nowrap">
+			  <span>
+				Commission Paid: <strong>₹{totalPaid}</strong>
+			  </span>
+			  <span>
+				Outstanding: <strong>{formatted}</strong>
+			  </span>
+			</div>
+
 		</div>
 
 		{/* Form */}

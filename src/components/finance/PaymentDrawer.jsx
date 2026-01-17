@@ -2,6 +2,7 @@ import React from "react";
 import { Offcanvas } from "react-bootstrap";
 import ReceivePaymentForm from "./ReceivePaymentForm";
 import PayCommissionForm from "./PayCommissionForm";
+import "./PaymentDrawer.css";
 
 const PaymentDrawer = ({ open, onClose, row, action, onSuccess }) => {
 	if (!row) return null;
@@ -14,7 +15,7 @@ const PaymentDrawer = ({ open, onClose, row, action, onSuccess }) => {
 			: "Payment";
 
 	return (
-		<Offcanvas show={open} onHide={onClose} placement="end">
+		<Offcanvas show={open} onHide={onClose} placement="end" className="payment-drawer">
 			<Offcanvas.Header closeButton>
 				<Offcanvas.Title>{title}</Offcanvas.Title>
 			</Offcanvas.Header>

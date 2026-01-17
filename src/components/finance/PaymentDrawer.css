@@ -1,0 +1,14 @@
+.payment-drawer {
+  width: 600px !important;   /* try 800–1000px */
+  max-width: 90vw;
+}
+.payment-drawer .offcanvas-body {
+  overflow-x: hidden;
+}
+
+
+@media (max-width: 768px) {
+  .payment-drawer {
+    width: 100% !important;
+  }
+}
