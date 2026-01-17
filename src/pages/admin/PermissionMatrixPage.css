@@ -1,0 +1,38 @@
+.permission-footer {
+  position: sticky;
+  bottom: 0;
+  background: #fff;
+  padding: 12px 16px;
+  border-top: 1px solid #ddd;
+}
+
+.permission-footer .save-btn {
+  width: auto !important;
+  min-width: 140px;
+  flex: 0 0 auto !important;
+}
+
+
+.permission-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.permission-table .feature-col {
+  width: 45%;
+  padding-left: 12px;
+}
+
+.permission-table .perm-col {
+  width: 15%;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.permission-table td {
+  vertical-align: middle;
+}
+
+.permission-table input[type="checkbox"] {
+  transform: scale(1.05);
+}

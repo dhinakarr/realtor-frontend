@@ -29,6 +29,7 @@ import FeatureViewPage from './pages/admin/FeatureViewPage';
 import FeatureEditPage from './pages/admin/FeatureEditPage';
 import PermissionListPage from './pages/admin/PermissionListPage';
 import PermissionCreatePage from './pages/admin/PermissionCreatePage';
+import PermissionMatrixPage from './pages/admin/PermissionMatrixPage';
 import UserOrgTree from './pages/admin/UserOrgTree';
 
 import ProjectsPage from './pages/projects/ProjectsPage';
@@ -117,7 +118,7 @@ function App() {
 			<Route path="/projects/:id/commission-rules" element={<CommissionRuleCreate />} />
 			
 			{/* PermissionList pages */}
-			<Route path="/admin/permissions" element={<PermissionListPage />} />
+			<Route path="/admin/permissions" element={<PermissionMatrixPage />} />
 			<Route path="/admin/permissions/create" element={<PermissionCreatePage />} />
 			
 			

@@ -30,9 +30,14 @@ export const ToastProvider = ({ children }) => {
 			{children}
 
 			<ToastContainer
-				  position="top-end"
 				  className="p-3"
-				  style={{ zIndex: 10000 }}
+				  style={{
+					position: "fixed",
+					top: "50%",
+					right: "16px",
+					transform: "translateY(-50%)",
+					zIndex: 10000,
+				  }}
 				>
 				{toasts.map((t) => (
 					<Toast
@@ -42,7 +47,7 @@ export const ToastProvider = ({ children }) => {
 					  delay={4000}
 					  autohide
 					>
-					  <Toast.Body className="text-black fw-semibold">
+					  <Toast.Body className="text-white fw-semibold">
 						{t.message}
 					  </Toast.Body>
 					</Toast>

@@ -87,17 +87,26 @@ export default function Navbar({ user, setUser }) {
 
   /* ---------------- Logout ---------------- */
   const handleLogout = async () => {
-    try {
-      await API.post("/logout", {}, {
-        headers: { Authorization: `Bearer ${user.token.accessToken}` }
-      });
-    } catch (e) {
-      console.warn("Logout failed", e);
-    } finally {
-      setUser(null);
-      navigate("/login");
-    }
-  };
+	  try {
+		// Call backend to invalidate session/token
+		await API.post("/logout", {}, {
+		  headers: { Authorization: `Bearer ${user?.token?.accessToken}` }
+		});
+	  } catch (e) {
+		console.warn("Logout failed", e);
+	  } finally {
+		// Clear React state
+		setUser(null);
+
+		// Clear any stored login info
+		localStorage.clear();   // removes all localStorage items
+		sessionStorage.clear(); // optional, if you store anything in sessionStorage
+
+		// Redirect to login
+		navigate("/login");
+	  }
+	};
+
 
   const email = user?.token?.email;
 
