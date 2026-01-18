@@ -6,7 +6,7 @@ import { useToast } from "../../components/common/ToastProvider";
 import useModule from "../../hooks/useModule";
 import { mapApiToRoute } from "../../utils/mapApiToRoute";
 
-export default function UserCreatePage() {
+export default function UserCreatePage({ onClose, onSuccess }) {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
   const module = useModule("/api/users");
@@ -58,7 +58,7 @@ export default function UserCreatePage() {
   // --------------------------------------------
   // FORM SUBMIT
   // --------------------------------------------
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
 	  e.preventDefault();
 
 	  if (!e.target.checkValidity()) {
@@ -84,17 +84,23 @@ export default function UserCreatePage() {
 		formData.append("profileImage", imageFile);
 	  }
 	  try {
-		  const res = API.post("/api/users", formData, {
+		  const res = await API.post("/api/users", formData, {
 			headers: {
 			  Authorization: `Bearer ${token}`,
 			},
 		  })
-		  if (res.data?.message)
-			  showToast("User created successfully", "success");
-		  navigate("/admin/users")
+	  
+		  showToast(res.data?.message || "User created successfully", "success");
+		  onSuccess?.();   // ✅ refresh list
+		  onClose?.();
 	  } catch(err) {
+		  const msg =
+			  err.response?.data?.message ||   // ApiResponse.failure(message)
+			  err.response?.data?.error ||
+			  "Error in User creation";
+
+			showToast(msg, "danger");
 		  console.error(err);
-		  showToast("Error in User creation", "danger");
 	  }
 	};
 
@@ -107,7 +113,7 @@ export default function UserCreatePage() {
   const renderField = (f) => {
     const value = record[f.apiField] || "";
     const extra = f.extraSettings || {};
-
+	const colClass = f.fieldType === "textarea" ? "col-md-12" : "col-md-6";
     // Clean pattern
     const cleanedPattern = extra.pattern
       ? extra.pattern.replace(/\\\\/g, "\\")
@@ -128,7 +134,7 @@ export default function UserCreatePage() {
     // SELECT INPUT
     if (f.fieldType === "select") {
       return (
-        <div className="mb-3" key={f.apiField}>
+        <div className={`${colClass} mb-2`} key={f.apiField}>
           <label className="form-label">{f.displayLabel}</label>
           <select {...commonProps} className="form-select">
             <option value="">Select {f.displayLabel}</option>
@@ -146,9 +152,9 @@ export default function UserCreatePage() {
     // TEXTAREA
     if (f.fieldType === "textarea") {
       return (
-        <div className="mb-3" key={f.apiField}>
+        <div className={`${colClass} mb-2`} key={f.apiField}>
           <label className="form-label">{f.displayLabel}</label>
-          <textarea {...commonProps} rows="3" />
+          <textarea {...commonProps} rows="2" />
         </div>
       );
     }
@@ -156,7 +162,7 @@ export default function UserCreatePage() {
     // NUMBER
     if (f.fieldType === "number") {
       return (
-        <div className="mb-3" key={f.apiField}>
+        <div className={`${colClass} mb-2`} key={f.apiField}>
           <label className="form-label">{f.displayLabel}</label>
           <input type="text" {...commonProps} />
         </div>
@@ -166,7 +172,7 @@ export default function UserCreatePage() {
     // EMAIL
     if (f.fieldType === "email") {
       return (
-        <div className="mb-3" key={f.apiField}>
+        <div className={`${colClass} mb-2`} key={f.apiField}>
           <label className="form-label">{f.displayLabel}</label>
           <input type="email" {...commonProps} />
         </div>
@@ -175,7 +181,7 @@ export default function UserCreatePage() {
 
     // DEFAULT INPUT
     return (
-      <div className="mb-3" key={f.apiField}>
+      <div className={`${colClass} mb-2`} key={f.apiField}>
         <label className="form-label">{f.displayLabel}</label>
         <input type={f.fieldType} {...commonProps} />
       </div>
@@ -187,16 +193,20 @@ export default function UserCreatePage() {
   // --------------------------------------------
   return (
     <div className="container">
+	{/*
 	  {module && <PageHeader module={module} mapApiToRoute={mapApiToRoute} />}
 	  <p></p>
-      <h3 className="text-center">Create User</h3>
+	<h3 className="text-center">Create User</h3> */}
 
-      <form className="card p-4 mt-3" onSubmit={handleSubmit}>
+      <form className="card p-1 mt-1" onSubmit={handleSubmit}>
         {/* Dynamic fields */}
-        {form.fields.map((f) => renderField(f))}
+        <div className="row">
+		  {form.fields.map((f) => renderField(f))}
+		</div>
+
 
         {/* Image upload */}
-        <div className="mb-3">
+        <div className="mb-1">
           <label className="form-label">Profile Image (optional)</label>
           <input
             type="file"
@@ -207,9 +217,9 @@ export default function UserCreatePage() {
         </div>
 
         {/* META */}
-        <h5 className="mt-4">Meta Fields (optional)</h5>
+        <h6 className="mt-4">Meta Fields (optional)</h6>
 
-        <div className="row mb-3">
+        <div className="row mb-1">
           <div className="col">
             <input
               type="text"

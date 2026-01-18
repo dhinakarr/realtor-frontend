@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import API from "../../api/api";
 import PageHeader from "../../components/PageHeader";
 import useModule from "../../hooks/useModule";
+import UserCreateOverlay from "./UserCreateOverlay";
+import UserEditOverlay from "./UserEditOverlay";
 
 import { Link } from "react-router-dom";
 import { FaUserPlus, FaPlus, FaEye, FaEdit, FaTrash } from "react-icons/fa";
@@ -16,6 +18,9 @@ export default function UsersListPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [searchTimeout, setSearchTimeout] = useState(null);
+  const [showCreate, setShowCreate] = useState(false);
+  const [showEditOverlay, setShowEditOverlay] = useState(false);
+  
   
   const featureUrl = "/api/users";
   const mapApiToRoute = (url) => url.replace("/api", "/admin");
@@ -37,6 +42,10 @@ export default function UsersListPage() {
       })
       .catch(() => {console.error("Failed to load users page:", err);});
   };
+  
+  useEffect(() => {
+    loadData();
+  }, []);
 
   useEffect(() => {
     if (search) {
@@ -132,9 +141,14 @@ export default function UsersListPage() {
 		  <div className="col-md-4 col-sm-12 text-center">
 			{feature?.canCreate && (
 
-				<Link to="/admin/users/create" className="btn btn-primary">
-      <FaUserPlus /> New
-    </Link>
+				<button
+				  type="button"
+				  onClick={() => setShowCreate(true)}
+				  className="btn btn-primary"
+				>
+				  <FaUserPlus /> New
+				</button>
+
 
 			)}
 		  </div>
@@ -175,27 +189,44 @@ export default function UsersListPage() {
                   </span>
                 </td>
                 <td>
-				{feature?.canRead && (
-                  <Link to={`/admin/users/view/${u.userId}`} title="View User" className="btn btn-link p-0 me-2">
-                    <FaEye />
-                  </Link>
-				)}
-				{feature?.canUpdate && (
-                  <Link to={`/admin/users/edit/${u.userId}`} title="Edit User" className="btn btn-link p-0 me-2">
-                    <FaEdit />
-                  </Link>
-				)}
-				{feature?.canDelete && (
-				  <span
-					onClick={() => handleDeleteClick(u.userId)}
-					className="text-danger"
-					style={{ cursor: "pointer" }}
-					title="Delete User"
-				  >
-					<FaTrash />
-				  </span>
-				)}
-                </td>
+				  <div className="d-flex align-items-center gap-3">
+					{feature?.canRead && (
+					  <Link
+						to={`/admin/users/view/${u.userId}`}
+						title="View User"
+						className="btn btn-link p-0"
+					  >
+						<FaEye />
+					  </Link>
+					)}
+
+					{feature?.canUpdate && (
+					  <button
+						type="button"
+						className="btn btn-link p-0"
+						title="Edit User"
+						onClick={() => {
+						  setSelectedUserId(u.userId);
+						  setShowEditOverlay(true);
+						}}
+					  >
+						<FaEdit />
+					  </button>
+					)}
+
+					{feature?.canDelete && (
+					  <span
+						title="Delete User"
+						onClick={() => handleDeleteClick(u.userId)}
+						className="text-danger"
+						style={{ cursor: "pointer" }}
+					  >
+						<FaTrash />
+					  </span>
+					)}
+				  </div>
+				</td>
+
               </tr>
             ))
           )}
@@ -252,6 +283,22 @@ export default function UsersListPage() {
           </ul>
         </nav>
       </div>
+	  
+	  
+	  <UserCreateOverlay
+		  show={showCreate}
+		  onClose={() => setShowCreate(false)}
+		  onSuccess={loadData}
+		/>
+		
+	  <UserEditOverlay
+		  show={showEditOverlay}
+		  userId={selectedUserId}
+		  onClose={() => setShowEditOverlay(false)}
+		  onSuccess={loadData}
+		/>
+
+	  
     </div>
   );
 }

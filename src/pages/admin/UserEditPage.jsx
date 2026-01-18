@@ -245,7 +245,7 @@ export default function UserEditPage() {
     if (img.length > 50 && !img.startsWith("data:image"))
       return "data:image/jpeg;base64," + img;
     if (img.startsWith("uploads") || img.startsWith("profile"))
-      return "http://localhost:8080/" + img;
+      return "http://127.0.0.1:8080/" + img;
     return img;
   };
 

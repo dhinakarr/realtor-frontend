@@ -16,6 +16,8 @@ export default function PermissionMatrixPage() {
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [baseModules, setBaseModules] = useState([]);
+
 
   /* ---------------- Load Roles ---------------- */
   useEffect(() => {
@@ -31,48 +33,78 @@ export default function PermissionMatrixPage() {
   }, []);
 
   /* ------------- Load Permissions ------------- */
+  
   useEffect(() => {
-    if (!selectedRole) return;
+	  API.get("/api/permissions/base") // roleId = null
+		.then(res => {
+		  const base = res.data.data.map(m => ({
+			...m,
+			features: m.features.map(f => ({
+			  ...f,
+			  permissionId: null,
+			  canRead: false,
+			  canCreate: false,
+			  canUpdate: false,
+			  canDelete: false
+			}))
+		  }));
 
-    setLoading(true);
-    API.get(`/api/permissions?roleId=${selectedRole}`)
-      .then(res => {
-        const rawModules = res.data?.data || [];
-		
-		const normalized = rawModules.map(module => ({
-		  ...module,
-		  features: module.features.reduce((acc, f) => {
-			const existing = acc.find(x => x.featureId === f.featureId);
+		  setBaseModules(base);
+		  setModules(base); // initial view
+		});
+	}, []);
 
-			if (!existing) {
-			  acc.push({
-				featureId: f.featureId,
-				featureName: f.featureName,
-				canRead: false,
-				canCreate: false,
-				canUpdate: false,
-				canDelete: false
-			  });
-			}
+  
+  useEffect(() => {
+	  if (!selectedRole || baseModules.length === 0) return;
 
-			if (f.roleId === selectedRole) {
-			  const target = acc.find(x => x.featureId === f.featureId);
-			  target.canRead = f.canRead;
-			  target.canCreate = f.canCreate;
-			  target.canUpdate = f.canUpdate;
-			  target.canDelete = f.canDelete;
-			}
+	  setLoading(true);
 
-			return acc;
-		  }, [])
-		}));
+	  API.get(`/api/permissions/${selectedRole}`)
+		.then(res => {
+		  const rolePerms = res.data.data || [];
 
-		setModules(normalized);
-	
-        setDirty(false);
-      })
-      .finally(() => setLoading(false));
-  }, [selectedRole]);
+		  // 🔑 FLATTEN ROLE PERMS
+		  const featurePermMap = {};
+		  rolePerms.forEach(m =>
+			m.features.forEach(f => {
+			  featurePermMap[f.featureId] = f;
+			})
+		  );
+
+		  // 🔥 RESET → APPLY
+		  const merged = baseModules.map(module => ({
+			...module,
+			features: module.features.map(feature => {
+			  const rp = featurePermMap[feature.featureId];
+
+			  return rp
+				? {
+					...feature,
+					permissionId: rp.permissionId,
+					canRead: rp.canRead,
+					canCreate: rp.canCreate,
+					canUpdate: rp.canUpdate,
+					canDelete: rp.canDelete
+				  }
+				: {
+					...feature,
+					permissionId: null,
+					canRead: false,
+					canCreate: false,
+					canUpdate: false,
+					canDelete: false
+				  };
+			})
+		  }));
+
+		  setModules(merged);
+		  setDirty(false);
+		})
+		.finally(() => setLoading(false));
+	}, [selectedRole, baseModules]);
+
+
 
   /* -------- Toggle Permission -------- */
   const togglePermission = (moduleId, featureId, perm) => {
@@ -139,16 +171,17 @@ export default function PermissionMatrixPage() {
 			<label className="fw-semibold">Role:</label>
 			<select
 			  className="form-select w-auto"
-			  
+			  value={selectedRole}
 			  onChange={e => setSelectedRole(e.target.value)}
 			>
-				<option selected value="">Select Role</option>
+			  <option value="">Select Role</option>
 			  {roles.map(r => (
 				<option key={r.roleId} value={r.roleId}>
 				  {r.roleName}
 				</option>
 			  ))}
 			</select>
+
 		  </div>
 
 		  <div className="flex-shrink-0">

@@ -38,6 +38,17 @@ export default function ProjectDetailsPage() {
   const canEdit   = feature.canUpdate;
   const canDelete = feature.canDelete;
   const isFinance = (feature.financeRole == "FINANCE") ? true : false;
+  
+  
+  const projectsUrl = "/api/projects";
+  const projectsModule = useModule(projectsUrl);
+  const projs = projectsModule.features.find(p => p.url);
+  const pCreate = projs.canCreate;
+  
+  const rulesUrl = "/api/commission-rules";
+  const rulesModule = useModule(rulesUrl);
+  const rules = rulesModule.features.find(r => r.url);
+  const rCreate = rules.canCreate;
 
   const loadProject = () => {
     API.get(`/api/projects/details/${id}`)
@@ -153,7 +164,7 @@ export default function ProjectDetailsPage() {
 			>
 			  Back
 			</button>
-
+			{rCreate && (
 			<button
 			  type="button"
 			  className="btn btn-primary"
@@ -161,7 +172,8 @@ export default function ProjectDetailsPage() {
 			>
 			  Commission Rules
 			</button>
-
+			)}
+			{pCreate && (
 			<button
 			  type="button"
 			  className="btn btn-primary"
@@ -169,6 +181,7 @@ export default function ProjectDetailsPage() {
 			>
 			  + New Project
 			</button>
+			)}
 		  </div>
 		</div>
 		

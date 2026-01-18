@@ -1,0 +1,19 @@
+.overlay-slide {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: 550px; /* adjust width */
+  max-width: 100%;
+  background: #fff;
+  box-shadow: -3px 0 10px rgba(0,0,0,0.2);
+  overflow-y: auto;
+  z-index: 1050;
+  padding: 1rem;
+  animation: slideIn 0.3s ease forwards;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}

@@ -19,7 +19,7 @@ const RenderTree = ({ node, onUserClick }) => {
       label={
         <div className="tree-node clickable" onClick={() => onUserClick(node.userId)}>
           <FaUser className="me-2" />
-          {node.userName}
+          {node.userName} ({node.employeeId})
         </div>
       }
     >

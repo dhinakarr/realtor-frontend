@@ -10,9 +10,10 @@ async function fetchUserHierarchy() {
 
   const raw = res.data.data;
 
-  const normalize = node => ({
+  const normalize = node => ({ 
     userId: node.userId ?? node.id,
     userName: node.userName ?? node.name,
+	employeeId: node.employeeId ?? node.empId ?? null,
     children: (node.children ?? node.subordinates ?? []).map(normalize)
   });
 
@@ -295,7 +296,7 @@ const TreeNode = memo(function TreeNode({
           <span style={{ width: 14, marginRight: 6 }} />
         )}
 
-        <span>{node.userName}</span>
+        <span>{node.userName} ({node.employeeId})</span>
       </div>
 
       {expanded &&
