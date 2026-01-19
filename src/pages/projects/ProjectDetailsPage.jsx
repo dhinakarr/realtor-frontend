@@ -31,9 +31,8 @@ export default function ProjectDetailsPage() {
   
   const featureUrl = "/api/plots";
   const module = useModule(featureUrl);
-  //console.log("ProjectDetailsPage module: "+JSON.stringify(module));
   const feature = module.features.find(f => f.url);
-  //console.log("ProjectsPage feature.canCreate: "+JSON.stringify(feature.canCreate));
+
   const canCreate = feature.canCreate;
   const canEdit   = feature.canUpdate;
   const canDelete = feature.canDelete;
@@ -42,13 +41,14 @@ export default function ProjectDetailsPage() {
   
   const projectsUrl = "/api/projects";
   const projectsModule = useModule(projectsUrl);
-  const projs = projectsModule.features.find(p => p.url);
-  const pCreate = projs.canCreate;
+  const projs = projectsModule?.features?.find(p => p.url === projectsUrl);
+  const pCreate = projs?.canCreate ?? false;
+  const pEdit = projs?.canUpdate ?? false;
   
   const rulesUrl = "/api/commission-rules";
   const rulesModule = useModule(rulesUrl);
-  const rules = rulesModule.features.find(r => r.url);
-  const rCreate = rules.canCreate;
+  const rules = rulesModule?.features?.find(r => r.url === rulesUrl);
+  const rCreate = rules?.canCreate ?? false;
 
   const loadProject = () => {
     API.get(`/api/projects/details/${id}`)

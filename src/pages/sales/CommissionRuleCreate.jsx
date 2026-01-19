@@ -4,6 +4,7 @@ import API from "../../api/api";
 import "./CommissionRuleCreate.css";
 import { useToast } from "../../components/common/ToastProvider";
 import { FaEdit, FaTrash } from "react-icons/fa";
+import useModule from "../../hooks/useModule";
 
 export default function CommissionRuleCreate() {
   const navigate = useNavigate();
@@ -18,6 +19,15 @@ export default function CommissionRuleCreate() {
   const { showToast } = useToast();
   const [editingRuleId, setEditingRuleId] = useState(null);
   const isEditMode = Boolean(editingRuleId);
+  
+  const commissionUrl = "/api/commission-rules";
+  const commissionModule = useModule(commissionUrl);
+  console.log("commissionModule: "+JSON.stringify(commissionModule));
+  const rulesFlag = commissionModule?.features?.find(r => r.url === commissionUrl);
+
+  const rCreate = rulesFlag?.canCreate ?? false;
+  const canEdit   = rulesFlag?.canUpdate ?? false;
+  const canDelete = rulesFlag?.canDelete ?? false;
   
   useEffect(() => {
 	  if (!projectId) return;
@@ -228,7 +238,7 @@ export default function CommissionRuleCreate() {
 		</div>
 
 
-		<div className="form-grid">
+		<div className="form-grid" style={{ width: "75%", textAlign: "center" }} >
 
 		  {/* Role */}
 		  <div className="form-field">
@@ -360,7 +370,7 @@ export default function CommissionRuleCreate() {
 		) : rules.length === 0 ? (
 		  <p className="text-muted">No rules created for this project yet.</p>
 		) : (
-		  <table className="rules-table">
+		  <table className="rules-table" style={{ width: "75%", textAlign: "center" }}>
 			<thead>
 			  <tr>
 				<th>Role</th>
@@ -386,16 +396,20 @@ export default function CommissionRuleCreate() {
 				  <td>{rule.effectiveFrom}</td>
 				  <td>{rule.active ? "Active" : "Inactive"}</td>
 				  <td className="action-cell">
+				  {canEdit && (
 					<FaEdit
 					  title="Edit"
 					  className="action-icon edit"
 					  onClick={() => handleEditRule(rule)}
 					/>
+				  )}
+				  {canDelete && (
 					<FaTrash
 					  title="Delete"
 					  className="action-icon delete"
 					  onClick={() => handleDeleteRule(rule.ruleId)}
 					/>
+				  )}
 				  </td>
 				</tr>
 			  ))}

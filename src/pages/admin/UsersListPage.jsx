@@ -162,7 +162,7 @@ export default function UsersListPage() {
             <th>Name</th>
             <th>Role Name</th>
             <th>Email</th>
-            <th>Manager name</th>
+            <th>Reporting Manager</th>
 			<th>Mobile</th>
             <th>Status</th>
             <th style={{ width: "140px" }}>Actions</th>
@@ -177,7 +177,7 @@ export default function UsersListPage() {
             </tr>
           ) : (
             list.map((u) => (
-              <tr key={u.userId}>
+              <tr key={u.userId} title={`Employee ID: ${u.employeeId}`}>
                 <td>{u.fullName}</td>
                 <td>{u.roleName}</td>
                 <td>{u.email}</td>
