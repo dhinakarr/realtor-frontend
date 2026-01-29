@@ -8,7 +8,7 @@ export default function useNotifications(user) {
 
   const loadUnreadCount = async () => {
     const res = await API.get("/api/alerts/unread-count");
-    setUnreadCount(res.data);
+    setUnreadCount(res.data.data  || []);
   };
   
   const markAllAsRead = async () => {
@@ -22,7 +22,7 @@ export default function useNotifications(user) {
 
   const loadNotifications = async () => {
     const res = await API.get("/api/alerts");
-    setNotifications(res.data);
+    setNotifications(res.data.data || []);
   };
 
   const markAsRead = async (id) => {
@@ -33,7 +33,9 @@ export default function useNotifications(user) {
 
   useEffect(() => {
 	  if (!user) return;
-
+	  
+	  loadUnreadCount();
+	  
 	  listenForForegroundMessages((msg) => {
 		setNotifications((prev) => [msg, ...prev]);
 		setUnreadCount((c) => c + 1);
@@ -44,7 +46,9 @@ export default function useNotifications(user) {
   return {
     unreadCount,
     notifications,
+	loadUnreadCount,
     loadNotifications,
-    markAsRead
+    markAsRead,
+	markAllAsRead
   };
 }

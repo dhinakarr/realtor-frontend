@@ -121,13 +121,15 @@ export default function UserEditOverlay({ show, onClose, userId, onSuccess }) {
     const extra = f.extraSettings || {};
     const hasError = !!errors[f.apiField];
     const colClass = f.fieldType === "textarea" ? "col-md-12" : "col-md-6";
-
+	const isEmailField = f.apiField === "email";
+	
     const commonProps = {
       className: `form-control ${hasError ? "is-invalid" : ""}`,
       value,
       placeholder: extra.placeholder || "",
       onChange: (e) => updateField(f.apiField, e.target.value),
       required: f.required || false,
+	  disabled: isEmailField,
     };
 
     if (f.fieldType === "select") {

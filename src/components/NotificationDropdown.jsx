@@ -1,11 +1,12 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function NotificationDropdown({ notifications, onRead }) {
+export default function NotificationDropdown({ notifications, onRead, onClose  }) {
 	const navigate = useNavigate();
-	
+	//console.log("NotificationDropdown notifications: "+JSON.stringify(notifications));
   const handleClick = (n) => {
     onRead(n.id);
+	onClose();
     if (n.redirectUrl) {
       navigate(n.redirectUrl);
     }
@@ -23,11 +24,19 @@ export default function NotificationDropdown({ notifications, onRead }) {
         <div
           key={n.id}
           className={`dropdown-item ${!n.read ? "fw-bold" : ""}`}
-          onClick={() => handleClick(n)}
-          style={{ cursor: "pointer" }}
+          onClick={(e) => {
+			e.stopPropagation();
+			handleClick(n);
+		  }}
+		  style={{
+			cursor: "pointer",
+			whiteSpace: "normal",
+			wordBreak: "break-word",
+			overflowWrap: "anywhere"
+		  }}
         >
           <div>{n.title}</div>
-          <small className="text-muted">{n.body}</small>
+          <small className="text-muted">{n.message}</small>
         </div>
       ))}
     </>

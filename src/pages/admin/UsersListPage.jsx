@@ -1,13 +1,13 @@
 // /src/pages/admin/UsersListPage.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import API from "../../api/api";
 import PageHeader from "../../components/PageHeader";
 import useModule from "../../hooks/useModule";
 import UserCreateOverlay from "./UserCreateOverlay";
 import UserEditOverlay from "./UserEditOverlay";
-
+import UploadDocumentOverlay from "./UploadDocumentOverlay";
 import { Link } from "react-router-dom";
-import { FaUserPlus, FaPlus, FaEye, FaEdit, FaTrash } from "react-icons/fa";
+import { FaUserPlus, FaPlus, FaEye, FaEdit, FaTrash, FaUpload } from "react-icons/fa";
 
 export default function UsersListPage() {
   const [list, setList] = useState([]);
@@ -20,7 +20,8 @@ export default function UsersListPage() {
   const [searchTimeout, setSearchTimeout] = useState(null);
   const [showCreate, setShowCreate] = useState(false);
   const [showEditOverlay, setShowEditOverlay] = useState(false);
-  
+  const [showUploadOverlay, setShowUploadOverlay] = useState(false);
+    
   
   const featureUrl = "/api/users";
   const mapApiToRoute = (url) => url.replace("/api", "/admin");
@@ -28,37 +29,33 @@ export default function UsersListPage() {
   const moduleName = useModule(featureUrl).moduleName;
   
   const normalizeUrl = (url) => "/" + url.replace(/^\/+/, "").trim().toLowerCase();
-  const feature = module.features.find(
+  const feature = module?.features?.find(
 			  f => normalizeUrl(f.url) === normalizeUrl(featureUrl)
 			);
 //console.log("UserListPage feature: "+JSON.stringify(feature));
 
-  const loadData = () => {
-    API.get(`/api/users/pages?page=${page-1}&size=${size}`)
-      .then((res) => {
-        const result = res.data.data || {};
-        setList(result.data || []);
-        setTotalPages(result.totalPages || 1);
-      })
-      .catch(() => {console.error("Failed to load users page:", err);});
-  };
-  
-  useEffect(() => {
-    loadData();
-  }, []);
+  const loadData = useCallback(() => {
+	  API.get(`/api/users/pages?page=${page}&size=${size}`)
+		.then((res) => {
+		  const result = res.data.data || {};
+		  setList(result.data || []);
+		  setTotalPages(result.totalPages || 1);
+		})
+		.catch((err) => {
+		  console.error("Failed to load users page:", err);
+		});
+	}, [page, size]);
 
+  
   useEffect(() => {
     if (search) {
     searchUsers(search);	
 	  } else {
 		loadData();
 	  }
-  }, [page]);
-/*
-  const filtered = list.filter((u) =>
-    u.fullName.toLowerCase().includes(search.toLowerCase())
-  );
-*/
+  }, [page, search, loadData]);
+  
+  
   const handleDeleteClick = (userId) => {
 	  setSelectedUserId(userId);
 	  setShowDeleteModal(true);
@@ -165,13 +162,13 @@ export default function UsersListPage() {
             <th>Reporting Manager</th>
 			<th>Mobile</th>
             <th>Status</th>
-            <th style={{ width: "140px" }}>Actions</th>
+            <th style={{ width: "100px" }}>Actions</th>
           </tr>
         </thead>
         <tbody>
           {list.length === 0 ? (
             <tr>
-              <td colSpan="6" className="text-center">
+              <td colSpan="7" className="text-center">
                 No users found
               </td>
             </tr>
@@ -189,7 +186,7 @@ export default function UsersListPage() {
                   </span>
                 </td>
                 <td>
-				  <div className="d-flex align-items-center gap-3">
+				  <div className="d-flex align-items-center gap-1">
 					{feature?.canRead && (
 					  <Link
 						to={`/admin/users/view/${u.userId}`}
@@ -224,6 +221,18 @@ export default function UsersListPage() {
 						<FaTrash />
 					  </span>
 					)}
+					
+					<button
+						type="button"
+						className="btn btn-link p-0"
+						title="Upload Document"
+						onClick={() => {
+						  setSelectedUserId(u.userId);
+						  setShowUploadOverlay(true);
+						}}
+					  >
+						<FaUpload className="text-primary" />
+					  </button>
 				  </div>
 				</td>
 
@@ -296,6 +305,16 @@ export default function UsersListPage() {
 		  userId={selectedUserId}
 		  onClose={() => setShowEditOverlay(false)}
 		  onSuccess={loadData}
+		/>
+
+		<UploadDocumentOverlay
+		  show={showUploadOverlay}
+		  userId={selectedUserId}
+		  onClose={() => setShowUploadOverlay(false)}
+		  onSuccess={() => {
+			setShowUploadOverlay(false);
+			// optional: reload user list or show toast
+		  }}
 		/>
 
 	  

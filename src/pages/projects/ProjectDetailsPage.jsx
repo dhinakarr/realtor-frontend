@@ -8,6 +8,8 @@ import PlotStatusDonut from "./PlotStatusDonut";
 import useModule from "../../hooks/useModule";
 import PlotEditPanel from "../../components/PlotEditPanel";
 import PlotViewPanel from "../../components/PlotViewPanel";
+import ChartMount from "../../components/ChartMount";
+
 import SaleInitiationPanel from "../../components/SaleInitiationPanel";
 import PaymentModal from "../../components/PaymentModal";
 import CancelBookingPanel from "../../components/CancelBookingPanel";
@@ -95,6 +97,8 @@ export default function ProjectDetailsPage() {
       default: return "#ffffff";
     }
   };
+  
+  
 
   const cancelPlot = (plotId) => {
     //if (!window.confirm("Are you sure you want to cancel this plot?")) return;
@@ -226,7 +230,9 @@ export default function ProjectDetailsPage() {
 			</div>
 
 			{/* Column 3 : Chart */}
-			<div className="col-md-4 d-flex flex-column align-items-center">
+			<div className="col-md-4 d-flex flex-column align-items-center"
+			 style={{ minWidth: 0 }}
+			>
 			  <h6 className="mb-2">Inventory Status</h6>
 
 			  <div
@@ -236,7 +242,9 @@ export default function ProjectDetailsPage() {
 				  height: 180
 				}}
 			  >
-				<PlotStatusDonut stat={projectData.stat} />
+				<ChartMount>
+				  <PlotStatusDonut stat={projectData.stat} />
+				</ChartMount>
 			  </div>
 			</div>
 
@@ -248,7 +256,15 @@ export default function ProjectDetailsPage() {
 
       {/* PLOT GRID */}
 			  <div className="project-grid">
-				  {plots.map((plot) => (
+				  {plots
+					  .filter((plot) => {
+						// Management users see everything
+						if (pCreate) return true;
+
+						// Other users should NOT see cancelled plots
+						return plot.status !== "CANCELLED";
+					  })
+					  .map((plot) => (
 					<div
 					  key={plot.plotId}
 					  className={`plot-square ${plot._animate ? "fade-anim" : ""}`}

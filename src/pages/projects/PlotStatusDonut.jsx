@@ -12,10 +12,18 @@ const COLORS = {
   Sold: "#2196f3",
   Cancelled: "#9e9e9e"
 };
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 export default function PlotStatusDonut({ stat }) {
-  if (!stat) return null;
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setReady(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
+
+	
+  if (!ready || !stat) return null;
 
   const data = [
     { name: "Available", value: stat.available },
@@ -25,7 +33,8 @@ export default function PlotStatusDonut({ stat }) {
   ].filter(d => d.value > 0);
 
   return (
-    <ResponsiveContainer width="100%" height="100%">
+  
+    <ResponsiveContainer>
       <PieChart>
         <Pie
           data={data}

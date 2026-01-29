@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API from '../api/api.js';
+import { registerDevice } from "../firebase/registerDevice";
 
 export default function Login({ setUser }) {
   const [username, setUsername] = useState('');
@@ -26,7 +27,7 @@ export default function Login({ setUser }) {
 	  //console.log("LoginPage Data Received: "+JSON.stringify(data));
       // Update parent state
       setUser(data);
-
+	  await registerDevice();
       navigate('/dashboard');
     } catch (err) {
       alert('Login failed: ' + (err.response?.data?.message || err.message));

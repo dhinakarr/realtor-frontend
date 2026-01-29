@@ -40,7 +40,7 @@ export default function Sidebar() {
   const normalizeModuleName = (name) => name.replace(/-/g, '');
   
   return (
-    <div style={{ width: '70px', backgroundColor: 'hsl(270, 70%, 40%)', color: 'white', minHeight: '100vh', padding: '0.5rem' }}>
+    <div style={{ width: '70px', backgroundColor: '#001F3F', color: 'white', minHeight: '100vh', padding: '0.5rem' }}>
       {permissions.map((module) => (
 		  
 			//const route = moduleRouteMap[module.moduleName] || `/${module.moduleName.toLowerCase()}/list`;

@@ -1,0 +1,155 @@
+.upload-overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 420px;
+  height: 100vh;
+  background: #fff;
+  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.15);
+  animation: slideIn 0.3s ease-out;
+  z-index: 1050;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.upload-header {
+  padding: 16px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.upload-content {
+  overflow-y: auto;
+}
+.upload-body {
+  padding: 12px;
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: auto;   /* OR */
+  justify-content: space-between; /* OR */
+  min-height / padding-bottom
+}
+.doc-icon-wrapper {
+  text-decoration: none;
+}
+
+.doc-thumb {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  transition: transform 0.15s ease;
+}
+
+.doc-thumb:hover {
+  transform: scale(1.05);
+}
+
+.doc-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.doc-icon.pdf {
+  background-color: #dc3545; /* bootstrap danger */
+}
+.doc-tile {
+  position: relative;
+  width: 48px;
+  height: 48px;
+}
+
+.doc-thumb {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+
+.doc-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.doc-icon.pdf {
+  background-color: #dc3545;
+}
+
+
+.doc-icon-container {
+  position: relative;
+  display: inline-block;
+}
+
+.doc-thumb {
+  width: 42px;
+  height: 42px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.doc-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.doc-icon.pdf {
+  background: #f44336;
+  color: #fff;
+}
+
+.doc-delete {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 18px;
+  height: 18px;
+  background: #dc3545;
+  color: #fff;
+  border-radius: 50%;
+  font-size: 12px;
+  line-height: 18px;
+  text-align: center;
+  cursor: pointer;
+  z-index: 10;
+  opacity: 0;
+}
+
+.doc-icon-container:hover .doc-delete {
+  opacity: 1;
+}

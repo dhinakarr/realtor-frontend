@@ -160,7 +160,9 @@
   display: block;
   width: 100%;
 }
-
+.project-details-container .col-md-4 {
+  min-width: 0;
+}
 /* ===============================
    HEADER FIX (BULLETPROOF)
 ================================ */

@@ -1,5 +1,4 @@
-import React from "react";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Navbar as RBNavbar, Nav, Container, Badge, Fade } from "react-bootstrap";
 import "./Navbar.css";
@@ -26,7 +25,7 @@ export default function Navbar({ user, setUser }) {
 
   const notificationRef = useRef(null);
   const profileRef = useRef(null);
-  const mountedRef = useRef(false);
+
   const id = user?.token?.userId;
 
     /* ---------------- Reset on Auth Change ---------------- */
@@ -111,11 +110,10 @@ export default function Navbar({ user, setUser }) {
   const email = user?.token?.email;
 
   return (
-    <RBNavbar expand="lg" className="px-4" style={{ backgroundColor: "hsl(270, 70%, 40%)" }}>
+    <RBNavbar expand="lg" className="px-4" style={{ backgroundColor: "#001F3F" }}>
       <Container fluid>
         <RBNavbar.Brand className="text-white">
-          <img src="/logo.png" width={50} className="me-2" />
-          Diamond Realty
+          <img src="/logo.png" height={60} className="me-2" />
         </RBNavbar.Brand>
 
         <Nav className="ms-auto align-items-center gap-4">
@@ -132,16 +130,16 @@ export default function Navbar({ user, setUser }) {
           {/* -------- Logged IN -------- */}
           {user && (
             <>
-              <Link to="/dashboard" className="text-white text-decoration-none">
+			{/*<Link to="/dashboard" className="text-white text-decoration-none">
                 Dashboard
-              </Link>
+			</Link> */}
 			  
 			  <Link to="/" className="text-white text-decoration-none">
-                Home
+                <strong>Home</strong>
               </Link>
 
               {/* 🔔 Notifications */}
-              <div ref={notificationRef} className="position-relative">
+              <div ref={notificationRef} style={{ position: "relative", display: "inline-block" }}>
                 <button
                   className="btn btn-link text-white p-0"
                   disabled={!notificationsEnabled}
@@ -151,26 +149,44 @@ export default function Navbar({ user, setUser }) {
                     setShowProfile(false);
                   }}
                 >
+				
                   <NotificationBell unreadCount={unreadCount} />
-                  {unreadCount > 0 && (
+                  {/*{unreadCount > 0 && (
                     <Badge bg="danger" pill className="position-absolute top-0 start-100">
                       {unreadCount}
                     </Badge>
-                  )}
+				)} */}
                 </button>
 
                 {showNotifications && (
                   <Fade in>
-                    <div className="dropdown-menu dropdown-menu-end mt-2" style={{ minWidth: 340 }}>
+                    <div
+						  className="dropdown-menu show"
+						  style={{
+							position: "absolute",
+							top: "100%",
+							left: "100%",              // anchor to bell
+							transform: "translateX(-100%)",
+							marginTop: "8px",
+							width: 350,                // FIXED WIDTH = stable
+							maxWidth: "90vw",
+							zIndex: 1000
+						  }}
+
+						>
                       <div className="px-3 py-2 d-flex justify-content-between">
                         <strong>Notifications</strong>
-                        <button className="btn btn-sm btn-link" onClick={markAllAsRead}>
+                        <button className="btn btn-sm btn-link" onClick={(e) => {
+							e.stopPropagation();     // 🔥 prevent outside handler
+							markAllAsRead();
+						  }}>
                           Mark all
                         </button>
                       </div>
                       <NotificationDropdown
                         notifications={notifications}
                         onRead={markAsRead}
+						onClose={() => setShowNotifications(false)}
                       />
                     </div>
                   </Fade>

@@ -17,8 +17,22 @@ export default async function listenForForegroundMessages(onReceive) {
     const messaging = getMessaging(firebaseApp);
 
     onMessage(messaging, (payload) => {
-      console.log("📩 FCM Foreground Message:", payload);
-      onReceive(payload);
+      //console.log("📩 FCM Foreground Message:", payload);
+	  
+	  // 👇 SHOW notification manually
+	  if (Notification.permission === "granted") {
+		new Notification(payload.notification?.title ?? "Notification", {
+		  body: payload.notification?.body,
+		  icon: "/icon.png",
+		  data: payload.data
+		});
+	  }
+	  
+      onReceive({
+		  title: payload.notification?.title,
+		  body: payload.notification?.body,
+		  data: payload.data
+		});
     });
 
   } catch (err) {
