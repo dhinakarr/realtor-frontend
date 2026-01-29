@@ -43,3 +43,54 @@
   max-width: fit-content !important;
 }
 
+.project-icon-overlay {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 8px;
+  z-index: 2;
+}
+
+.project-icon {
+  font-size: 24px;              /* IMPORTANT */
+  color: #0d6efd;               /* IMPORTANT */
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 6px;
+  border-radius: 50%;
+  display: flex;                /* IMPORTANT */
+  align-items: center;
+  justify-content: center;
+}
+
+
+.project-icon:hover {
+  background: #0d6efd;
+  color: #fff;
+}
+.video-thumb-wrapper {
+  width: 110px;
+  height: 70px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.video-thumb {
+  width: 100%;
+  height: 100%;
+  background: #000;
+  color: white;
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  opacity: 0.85;
+}
+
+.video-thumb:hover {
+  opacity: 1;
+}

@@ -28,9 +28,10 @@ export default function ProjectDetailsPage() {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [selectedSale, setSelectedSale] = useState(null);
   const [cancelPlotId, setCancelPlotId] = useState(null);
+  const [activeMedia, setActiveMedia] = useState(null);
 
   const BASE_URL = API.defaults.baseURL;
-  
+
   const featureUrl = "/api/plots";
   const module = useModule(featureUrl);
   const feature = module.features.find(f => f.url);
@@ -98,7 +99,18 @@ export default function ProjectDetailsPage() {
     }
   };
   
-  
+  const galleryImages =
+	  project.documents?.filter(
+		d => d.documentType === "IMAGE"
+	  ) || [];
+
+  const galleryVideos =
+	  project.documents?.filter(
+		d => d.documentType === "VIDEO"
+	  ) || [];
+
+  //console.log("documents", JSON.stringify(project.documents));
+
 
   const cancelPlot = (plotId) => {
     //if (!window.confirm("Are you sure you want to cancel this plot?")) return;
@@ -202,7 +214,7 @@ export default function ProjectDetailsPage() {
 				  className="img-fluid rounded"
 				  style={{
 					width: "100%",
-					height: "420px",
+					height: "300px",
 					objectFit: "cover"
 				  }}
 				/>
@@ -326,24 +338,60 @@ export default function ProjectDetailsPage() {
 					  </div>
 					</div>
 				  ))}
-				  
-				  
-				  {/* Project Images Gallery */}
-					{project.files?.length > 1 && (
-					  <div className="project-images-gallery mt-3">
-						{project.files.slice(1).map((file, index) => (
-						  <img
-							key={file.projectFileId}
-							src={`${BASE_URL}/api/projects/file/${file.projectFileId}`}
-							alt={`${project.projectName} - ${index + 2}`}
-							className="project-gallery-img"
-						  />
-						))}
-					  </div>
-					)}
-
-				  
 				</div>
+				
+				{/* ================= PROJECT GALLERY (SEPARATE SECTION) ==============*/}
+				{(galleryImages.length > 0 || galleryVideos.length > 0) && (
+				<section className="project-media-section">
+				 <h5 className="mb-3">Project Media</h5>
+				  <div className="project-gallery mt-4">
+
+					{/* Images */}
+						{galleryImages.map(doc => (
+						  <div
+							key={doc.documentId}
+							className="gallery-item"
+							onClick={() =>
+							  setActiveMedia({
+								type: "IMAGE",
+								src: `${BASE_URL}${doc.filePath}`
+							  })
+							}
+						  >
+							<img
+							  src={`${BASE_URL}${doc.filePath}`}
+							  alt={doc.documentNumber}
+							/>
+						  </div>
+						))}
+
+						{/* Videos */}
+						{galleryVideos.map(doc => (
+						  <div
+							key={doc.documentId}
+							className="gallery-item video"
+							onClick={() =>
+							  setActiveMedia({
+								type: "VIDEO",
+								src: `${BASE_URL}${doc.filePath}`
+							  })
+							}
+						  >
+							<video
+							  src={`${BASE_URL}${doc.filePath}`}
+							  muted
+							  playsInline
+							  style={{ width: "100%", height: "140px", objectFit: "cover" }}
+							/>
+							<span className="play-icon">▶</span>
+						  </div>
+						))}
+
+
+					
+				  </div>
+				</section>  
+				)}
 
 		{salePlotId && (
 		  <SaleInitiationPanel
@@ -356,6 +404,19 @@ export default function ProjectDetailsPage() {
 			onSuccess={refreshProjectDetails}
 		  />
 		)}
+		
+		{activeMedia && (
+		  <div className="media-modal" onClick={() => setActiveMedia(null)}>
+			<div className="media-modal-content" onClick={e => e.stopPropagation()}>
+			  {activeMedia.type === "IMAGE" ? (
+				<img src={activeMedia.src} alt="" />
+			  ) : (
+				<video src={activeMedia.src} controls autoPlay />
+			  )}
+			</div>
+		  </div>
+		)}
+
 		
 		<PaymentModal
 		  open={showPaymentModal}

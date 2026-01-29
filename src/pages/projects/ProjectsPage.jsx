@@ -5,6 +5,8 @@ import API from "../../api/api";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 import useModule from "../../hooks/useModule";
 import "./ProjectPage.css";
+import UploadDocumentOverlay from "./UploadDocumentOverlay";
+import { FaUpload } from "react-icons/fa";
 
 export default function ProjectPage() {
   const [projects, setProjects] = useState([]);
@@ -12,6 +14,10 @@ export default function ProjectPage() {
   const navigate = useNavigate();
   const featureUrl = "/api/projects";
   const module = useModule(featureUrl);
+  const [selectedProjectId, setSelectedProjectId] = useState(null);
+  const [showUploadOverlay, setShowUploadOverlay] = useState(false);
+  const [showVideoModal, setShowVideoModal] = useState(false);
+  const [activeVideo, setActiveVideo] = useState(null);
   
   const feature = module.features.find(f => f.url  === featureUrl);
   //console.log("ProjectsPage feature.canCreate: "+JSON.stringify(feature.canCreate));
@@ -46,6 +52,8 @@ export default function ProjectPage() {
     }
 	
   };
+  
+  
 
   const handleNewProject = () => navigate("/projects/create");
 
@@ -118,7 +126,10 @@ export default function ProjectPage() {
             project.files && project.files.length > 0
               ? `${BASE_URL}/api/projects/file/${project.files[0].projectFileId}`
               : null;
-//console.log("ProjectsPage project: "+img);
+		  const videoDoc = project.documents?.find(
+			  d => d.documentType === "VIDEO"
+			);
+//console.log("ProjectsPage videoDoc: "+videoDoc);
           return (
             <div
 				  key={project.projectId}
@@ -126,19 +137,30 @@ export default function ProjectPage() {
 				>
               <div className="card shadow-sm h-100 position-relative cursor-pointer hover:shadow-lg"
                 onClick={() => handleView(project.projectId)}>
-			  
-                {/* Edit Icon (top-right) */}
-                {canEdit && (
-                  <FaEdit
-                    className="position-absolute"
-                    style={{ top: "10px", right: "10px", cursor: "pointer" }}
-                    onClick={(e) => {
+				
+				<div className="project-icon-overlay">
+				  {canEdit && (
+					<FaEdit
+					  title="Edit Project"
+					  className="project-icon"
+					  onClick={(e) => {
 						e.stopPropagation();
 						handleEdit(project.projectId);
-					  }
-					}
-                  />
-                )}
+					  }}
+					/>
+				  )}
+
+				  <FaUpload
+					title="Upload Document"
+					className="project-icon"
+					onClick={(e) => {
+					  e.stopPropagation();
+					  setSelectedProjectId(project.projectId);
+					  setShowUploadOverlay(true);
+					}}
+				  />
+				</div>
+
 
                 {/* Image */}
                 {img && (
@@ -156,27 +178,48 @@ export default function ProjectPage() {
                   />
                 )}
 
-                <div className="card-body">
-                  {/* Project Name */}
-                  <h5 className="fw-bold mb-1">{project.projectName}</h5>
-				  
-				  <small className="text-muted">
-                    {project.locationDetails} 
-                  </small>
-				  <p></p>
-                  {/* Plot Number */}
-                  <small className="text-muted">
-                    Plots: {project.noOfPlots} (Start: {project.plotStartNumber})
-                  </small>
+                <div className="card-body d-flex justify-content-between gap-3">
+  
+				  {/* LEFT SIDE – project details */}
+				  <div className="flex-grow-1">
+					<h5 className="fw-bold mb-1">{project.projectName}</h5>
 
-                  {/* Location or survey number */}
-                  <div className="mt-2 text-secondary">
-                    Survey Number: <small>{project.surveyNumber}</small>
-                  </div>
-				  <div className="mt-2 text-secondary">
-                    Guideline Value: <small>{project.guidanceValue}</small>
-                  </div>
-                </div>
+					<small className="text-muted">
+					  {project.locationDetails}
+					</small>
+
+					<p className="mb-1" />
+
+					<small className="text-muted">
+					  Plots: {project.noOfPlots} (Start: {project.plotStartNumber})
+					</small>
+
+					<div className="mt-2 text-secondary">
+					  Survey Number: <small>{project.surveyNumber}</small>
+					</div>
+
+					<div className="mt-2 text-secondary">
+					  Guideline Value: <small>{project.guidanceValue}</small>
+					</div>
+				  </div>
+
+				  {/* RIGHT SIDE – video thumbnail */}
+				  {videoDoc && (
+					<div
+					  className="video-thumb-wrapper"
+					  onClick={(e) => {
+						e.stopPropagation();
+						setActiveVideo(videoDoc);
+						setShowVideoModal(true);
+					  }}
+					>
+					  <div className="video-thumb">
+						▶
+					  </div>
+					</div>
+				  )}
+				</div>
+
 
                 {/* Card Footer */}
                 <div className="card-footer bg-white position-relative" style={{ minHeight: "30px" }}>
@@ -240,6 +283,52 @@ export default function ProjectPage() {
 			</div>
 		  </div>
 		)}
+		
+		{/* PLAYING VIDEO MODAL */}
+		{showVideoModal && activeVideo && (
+		  <div
+			className="modal fade show"
+			style={{ display: "block", background: "rgba(0,0,0,0.6)" }}
+			onClick={() => setShowVideoModal(false)}
+		  >
+			<div
+			  className="modal-dialog modal-lg modal-dialog-centered"
+			  onClick={(e) => e.stopPropagation()}
+			>
+			  <div className="modal-content">
+
+				<div className="modal-header">
+				  <h5 className="modal-title">Project Video</h5>
+				  <button
+					className="btn-close"
+					onClick={() => setShowVideoModal(false)}
+				  />
+				</div>
+
+				<div className="modal-body p-0">
+				  <video
+					src={`${BASE_URL}${activeVideo.filePath}`}
+					controls
+					autoPlay
+					style={{ width: "100%", maxHeight: "70vh" }}
+				  />
+				</div>
+
+			  </div>
+			</div>
+		  </div>
+		)}
+
+		
+		<UploadDocumentOverlay
+		  show={showUploadOverlay}
+		  projectId={selectedProjectId}
+		  onClose={() => setShowUploadOverlay(false)}
+		  onSuccess={() => {
+			setShowUploadOverlay(false);
+			// optional: reload user list or show toast
+		  }}
+		/>
 	  
     </div>
   );

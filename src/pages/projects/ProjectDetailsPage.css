@@ -1,17 +1,21 @@
 .project-grid {
   display: grid;
-  grid-template-columns: repeat(10, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   gap: 12px;
   margin-top: 20px;
   padding: 8px;
+  overflow-x: auto;
+  overflow-y: visible; 
+  z-index: 1;
 }
-.plot-square {
+.plot-square {	
   position: relative;
   aspect-ratio: 1 / 1;    /* FIXED SQUARE */
   border: 1px solid #ccc;
   border-radius: 6px;
   overflow: visible;
   cursor: pointer;
+  pointer-events: auto;
   transition: box-shadow 0.2s;
   padding: 4px;
   display: flex;
@@ -122,23 +126,45 @@
   border-radius: 3px;
 }
 
-.project-gallery-img {
-  height: 120px;
-  border-radius: 6px;
-  object-fit: cover;
-  flex: 0 0 auto; /* ensures images do not shrink */
-  cursor: pointer;
-  transition: transform 0.2s;
+.project-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
 }
 
-.project-gallery-img:hover {
-  transform: scale(1.05);
+.gallery-item {
+  cursor: pointer;
+  border-radius: 8px;
+  overflow: hidden;
 }
+
+.gallery-item img,
+.gallery-item video {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+}
+
+.media-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.media-modal-content img,
+.media-modal-content video {
+  max-width: 90vw;
+  max-height: 90vh;
+}
+
 
 /* ===============================
    PROJECT HEADER (HARD FIX)
 ================================ */
-
 .project-header {
   display: flex;
   align-items: center;
@@ -146,6 +172,17 @@
   gap: 16px;
   margin-bottom: 20px;
   width: 100%;
+}
+.project-header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* Kill global button rules */
+.project-header-actions button {
+  width: auto !important;
+  display: inline-flex !important;
+  white-space: nowrap;
 }
 
 .project-title {
@@ -163,27 +200,7 @@
 .project-details-container .col-md-4 {
   min-width: 0;
 }
-/* ===============================
-   HEADER FIX (BULLETPROOF)
-================================ */
-.project-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
 
-.project-header-actions {
-  display: flex;
-  gap: 10px;
-}
-
-/* Kill global button rules */
-.project-header-actions button {
-  width: auto !important;
-  display: inline-flex !important;
-  white-space: nowrap;
-}
 .table-transparent {
   background-color: transparent !important;
 }
@@ -191,4 +208,11 @@
 .table-transparent td,
 .table-transparent th {
   background-color: transparent !important;
+}
+
+.project-media-section {
+  position: relative;
+  z-index: 20;
+  margin-top: 32px;
+  pointer-events: auto;
 }
