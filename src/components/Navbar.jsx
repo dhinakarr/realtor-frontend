@@ -130,9 +130,9 @@ export default function Navbar({ user, setUser }) {
           {/* -------- Logged IN -------- */}
           {user && (
             <>
-			{/*<Link to="/dashboard" className="text-white text-decoration-none">
-                Dashboard
-			</Link> */}
+			<Link to="/dashboard" className="text-white text-decoration-none">
+                <strong>Dashboard</strong>
+			</Link> 
 			  
 			  <Link to="/" className="text-white text-decoration-none">
                 <strong>Home</strong>

@@ -44,6 +44,7 @@ export default function UploadDocumentOverlay({ show, projectId, onClose, onSucc
 	  const ext = filePath.split(".").pop().toLowerCase();
 
 	  if (["jpg", "jpeg", "png", "gif", "webp"].includes(ext)) return "image";
+	  if (["mp4", "webm", "ogg"].includes(ext)) return "video";
 	  if (ext === "pdf") return "pdf";
 	  if (["doc", "docx"].includes(ext)) return "word";
 	  if (["xls", "xlsx"].includes(ext)) return "excel";
@@ -52,9 +53,20 @@ export default function UploadDocumentOverlay({ show, projectId, onClose, onSucc
 
 	  return "file";
 	};
+	
+	// Create a helper to get the full URL
+	const getFullUrl = (path) => {
+	  if (!path) return "";
+	  // If path is already a full URL, return it
+	  if (path.startsWith("http")) return path;
+	  
+	  const cleanBase = BASE_URL.endsWith("/") ? BASE_URL.slice(0, -1) : BASE_URL;
+	  const cleanPath = path.startsWith("/") ? path : `/${path}`;
+	  
+	  return `${cleanBase}${cleanPath}`;
+	};
 
-	
-	
+
 	const handleDelete = async (docId) => {
 	  if (!window.confirm("Delete this document?")) return;
 
@@ -180,7 +192,7 @@ export default function UploadDocumentOverlay({ show, projectId, onClose, onSucc
           </button>
         </div>
 
-		<div className="d-flex flex-wrap gap-1">
+		<div className="d-flex flex-wrap gap-3">
 			<div  className="mb-2">
 			<h6>Uploaded Documents</h6>
 
@@ -201,10 +213,28 @@ export default function UploadDocumentOverlay({ show, projectId, onClose, onSucc
 					case "image":
 					  return (
 						<img
-						  src={`${BASE_URL}${doc.filePath}`}
+						  key={doc.documentId + "-" + new Date().getTime()} 
+						  
+						  src={`${getFullUrl(doc.filePath)}?v=${doc.documentId}`} 
 						  alt={doc.documentType}
 						  className="doc-thumb"
 						/>
+					  );
+
+					case "video":
+					  return (
+						<video
+						  key={doc.documentId} // Use a stable key
+						  controls
+						  preload="metadata"
+						  style={{ width: "100%", maxHeight: "90px", backgroundColor: "#000" }}
+						>
+						  <source 
+							src={`${BASE_URL}${doc.filePath}`} 
+							type="video/mp4" 
+						  />
+						  Your browser does not support the video tag.
+						</video>
 					  );
 
 					case "pdf":
@@ -226,6 +256,7 @@ export default function UploadDocumentOverlay({ show, projectId, onClose, onSucc
 					  return <div className="doc-icon file">FILE</div>;
 				  }
 				})()}
+
 
 				
 			  </a>

@@ -40,29 +40,29 @@ export default function Sidebar() {
   const normalizeModuleName = (name) => name.replace(/-/g, '');
   
   return (
-    <div style={{ width: '70px', backgroundColor: '#001F3F', color: 'white', minHeight: '100vh', padding: '0.5rem' }}>
-      {permissions.map((module) => (
-		  
-			//const route = moduleRouteMap[module.moduleName] || `/${module.moduleName.toLowerCase()}/list`;
-          <div key={module.moduleId} className="mb-3 text-center">
-			  <OverlayTrigger
-				placement="right"
-				overlay={<Tooltip id={`tooltip-${module.moduleName}`}>{module.moduleName}</Tooltip>}
-				>
-			  
-				  <Link
-					  to={
-						moduleRouteMap[module.moduleName] || // keep Admin unchanged
-						`/${module.moduleName.toLowerCase()}/list` // dynamic route for new modules
-					  }
-					  className={`sidebar-link d-flex flex-column align-items-center text-white text-decoration-none p-2 rounded`}
-					>
-					  <span className="icon">{moduleIcons[module.moduleName] || '📁'}</span>
-						  {/*<span className="text mt-1 small" style={{fontSize: '0.6rem'}}>{module.moduleName}</span> */}
-					</Link>
-			  </OverlayTrigger>	
-          </div>
-        ))}
-    </div>
+    <div style={{width: '60px', minWidth: '60px', maxWidth: '60px', flex: '0 0 60px',
+		backgroundColor: '#001F3F', color: 'white', minHeight: '100vh', padding: '0.5rem',
+		display: 'flex', flexDirection: 'column', alignItems: 'center',}}
+	>
+	  {permissions.map((module) => (
+		<OverlayTrigger
+		  key={module.moduleId}
+		  placement="right"
+		  overlay={<Tooltip id={`tooltip-${module.moduleName}`}>{module.moduleName}</Tooltip>}
+		>
+		  <Link
+			to={moduleRouteMap[module.moduleName] || `/${module.moduleName.toLowerCase()}/list`}
+			className="sidebar-link d-flex flex-column align-items-center justify-content-center text-white text-decoration-none rounded mb-3"
+			style={{width: '100%', height: '50px', minWidth: '0', boxSizing: 'border-box',}}
+		  >
+			<span className="icon" style={{width: '100%', textAlign: 'center', display: 'inline-block',}}
+			>
+			  {moduleIcons[module.moduleName] || '📁'}
+			</span>
+		  </Link>
+		</OverlayTrigger>
+	  ))}
+	</div>
+
   );  
 }

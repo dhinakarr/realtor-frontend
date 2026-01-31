@@ -11,9 +11,7 @@
   padding-left: 5px !important;
   padding-right: 5px !important;
 }
-/* ===============================
-   PROJECTS PAGE HEADER FIX
-================================ */
+
 /* =====================================
    FORCE PROJECTS HEADER LAYOUT
 ===================================== */
@@ -69,18 +67,55 @@
   background: #0d6efd;
   color: #fff;
 }
+.video-thumb-container {
+  flex: 0 0 80px;     /* 🔥 HARD STOP */
+  max-width: 80px;
+  min-width: 80px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .video-thumb-wrapper {
-  width: 110px;
-  height: 70px;
-  cursor: pointer;
+  width: 80px;
+  height: 80px;
+  background: #e5e5e5;
+  border-radius: 8px;
+
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+.video-thumb-icon {
+  width: 42px;
+  height: 42px;
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.video-thumb-wrapper:hover .video-thumb-icon {
+  transform: scale(1.1);
+}
+
+.video-thumb-wrapper {
+  transition: background 0.2s ease;
+}
+
+.video-thumb-icon {
+  transition: transform 0.2s ease;
+}
+
 .video-thumb {
-  width: 100%;
-  height: 100%;
+  width: 50%;
+  height: 50%;
   background: #000;
   color: white;
   font-size: 28px;

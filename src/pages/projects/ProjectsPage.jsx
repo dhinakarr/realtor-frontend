@@ -126,9 +126,7 @@ export default function ProjectPage() {
             project.files && project.files.length > 0
               ? `${BASE_URL}/api/projects/file/${project.files[0].projectFileId}`
               : null;
-		  const videoDoc = project.documents?.find(
-			  d => d.documentType === "VIDEO"
-			);
+		  const videoDoc = project.documents?.find(d => d.documentType === "VIDEO");
 //console.log("ProjectsPage videoDoc: "+videoDoc);
           return (
             <div
@@ -178,7 +176,7 @@ export default function ProjectPage() {
                   />
                 )}
 
-                <div className="card-body d-flex justify-content-between gap-3">
+                <div className="card-body d-flex align-items-center gap-3">
   
 				  {/* LEFT SIDE – project details */}
 				  <div className="flex-grow-1">
@@ -205,18 +203,18 @@ export default function ProjectPage() {
 
 				  {/* RIGHT SIDE – video thumbnail */}
 				  {videoDoc && (
+				  <div className="video-thumb-container">
 					<div
-					  className="video-thumb-wrapper"
-					  onClick={(e) => {
-						e.stopPropagation();
-						setActiveVideo(videoDoc);
-						setShowVideoModal(true);
-					  }}
-					>
-					  <div className="video-thumb">
-						▶
+						className="video-thumb-wrapper"
+						onClick={(e) => {
+						  e.stopPropagation();
+						  setActiveVideo(videoDoc);
+						  setShowVideoModal(true);
+						}}
+					  >
+						<span className="video-thumb-icon">▶</span>
 					  </div>
-					</div>
+				  </div>	  
 				  )}
 				</div>
 

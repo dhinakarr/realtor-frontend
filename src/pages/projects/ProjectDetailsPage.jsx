@@ -29,6 +29,8 @@ export default function ProjectDetailsPage() {
   const [selectedSale, setSelectedSale] = useState(null);
   const [cancelPlotId, setCancelPlotId] = useState(null);
   const [activeMedia, setActiveMedia] = useState(null);
+  const [showVideoModal, setShowVideoModal] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(false);
 
   const BASE_URL = API.defaults.baseURL;
 
@@ -99,18 +101,10 @@ export default function ProjectDetailsPage() {
     }
   };
   
-  const galleryImages =
-	  project.documents?.filter(
-		d => d.documentType === "IMAGE"
-	  ) || [];
-
-  const galleryVideos =
-	  project.documents?.filter(
-		d => d.documentType === "VIDEO"
-	  ) || [];
+  const galleryImages = project.documents?.filter(d => d.documentType === "IMAGE") || [];
+  const galleryVideos = project.documents?.filter(d => d.documentType === "VIDEO") || [];
 
   //console.log("documents", JSON.stringify(project.documents));
-
 
   const cancelPlot = (plotId) => {
     //if (!window.confirm("Are you sure you want to cancel this plot?")) return;
@@ -344,49 +338,44 @@ export default function ProjectDetailsPage() {
 				{(galleryImages.length > 0 || galleryVideos.length > 0) && (
 				<section className="project-media-section">
 				 <h5 className="mb-3">Project Media</h5>
-				  <div className="project-gallery mt-4">
+				  <div className="project-gallery mt-1">
 
 					{/* Images */}
-						{galleryImages.map(doc => (
-						  <div
-							key={doc.documentId}
-							className="gallery-item"
-							onClick={() =>
-							  setActiveMedia({
-								type: "IMAGE",
-								src: `${BASE_URL}${doc.filePath}`
-							  })
-							}
-						  >
-							<img
-							  src={`${BASE_URL}${doc.filePath}`}
-							  alt={doc.documentNumber}
-							/>
-						  </div>
-						))}
+					{galleryImages.map(doc => (
+					  <div
+						key={doc.documentId}
+						className="gallery-item"
+						onClick={() => {
+						  setActiveMedia(doc);
+						  setShowImageModal(true);
+						}}
+					  >
+						<img
+						  src={`${BASE_URL}${doc.filePath}`}
+						  alt={doc.documentNumber}
+						/>
+					  </div>
+					))}
 
-						{/* Videos */}
-						{galleryVideos.map(doc => (
-						  <div
-							key={doc.documentId}
-							className="gallery-item video"
-							onClick={() =>
-							  setActiveMedia({
-								type: "VIDEO",
-								src: `${BASE_URL}${doc.filePath}`
-							  })
-							}
-						  >
-							<video
-							  src={`${BASE_URL}${doc.filePath}`}
-							  muted
-							  playsInline
-							  style={{ width: "100%", height: "140px", objectFit: "cover" }}
-							/>
-							<span className="play-icon">▶</span>
-						  </div>
-						))}
 
+					{/* Videos */}
+					{galleryVideos.map(doc => (
+					  <div
+						key={doc.documentId}
+						className="video-thumb-wrapper"
+						onClick={() => {
+						  setActiveMedia(doc);
+						  setShowVideoModal(true);
+						}}
+					  >
+						<video
+						  src={`${BASE_URL}${doc.filePath}`}
+						  muted
+						  preload="metadata"
+						/>
+						<span className="play-icon">▶</span>
+					  </div>
+					))}
 
 					
 				  </div>
@@ -405,18 +394,7 @@ export default function ProjectDetailsPage() {
 		  />
 		)}
 		
-		{activeMedia && (
-		  <div className="media-modal" onClick={() => setActiveMedia(null)}>
-			<div className="media-modal-content" onClick={e => e.stopPropagation()}>
-			  {activeMedia.type === "IMAGE" ? (
-				<img src={activeMedia.src} alt="" />
-			  ) : (
-				<video src={activeMedia.src} controls autoPlay />
-			  )}
-			</div>
-		  </div>
-		)}
-
+		
 		
 		<PaymentModal
 		  open={showPaymentModal}
@@ -433,6 +411,97 @@ export default function ProjectDetailsPage() {
           onSaved={loadProject}
         />
       )}
+	  
+	  {/* PLAYING VIDEO MODAL */}
+		{showVideoModal && activeMedia && (
+		  <div className="modal fade show" style={{ display: "block", background: "rgba(0,0,0,0.6)" }}
+			   onClick={() => setShowVideoModal(false)}>
+
+			<div className="modal-dialog modal-lg modal-dialog-centered"
+				 onClick={e => e.stopPropagation()}>
+
+			  <div className="modal-content">
+				<div className="modal-header">
+				  <h5 className="modal-title">Project Video</h5>
+				  <button className="btn-close" onClick={() => setShowVideoModal(false)} />
+				</div>
+
+				<div className="modal-body p-0">
+				  <video
+					key={activeMedia.documentId}   // <-- this forces React to recreate the video element
+					src={`${BASE_URL}${activeMedia.filePath}`}
+					controls
+					autoPlay
+					playsInline
+					preload="metadata"
+					style={{ width: "100%", maxHeight: "70vh" }}
+				  />
+				</div>
+			  </div>
+
+			</div>
+		  </div>
+		)}
+
+
+		{/* SHOWING IMAGE MODAL */}
+		{showImageModal && activeMedia && (
+		  <div
+			style={{
+			  position: "fixed",
+			  inset: 0,
+			  background: "rgba(0,0,0,0.85)",
+			  zIndex: 1050,
+			  display: "flex",
+			  alignItems: "center",
+			  justifyContent: "center",
+			}}
+			onClick={() => setShowImageModal(false)} // click outside closes
+		  >
+			<div
+			  style={{
+				position: "relative",
+				maxWidth: "90%",
+				maxHeight: "90%",
+			  }}
+			  onClick={(e) => e.stopPropagation()} // clicks on image itself don’t close
+			>
+			  {/* Close Button */}
+			  <button
+				onClick={() => setShowImageModal(false)}
+				style={{
+				  position: "absolute",
+				  top: "-10px",
+				  right: "-10px",
+				  background: "white",
+				  border: "none",
+				  borderRadius: "50%",
+				  width: "30px",
+				  height: "30px",
+				  cursor: "pointer",
+				  fontWeight: "bold",
+				  zIndex: 10,
+				}}
+			  >
+				×
+			  </button>
+
+			  <img
+				src={`${BASE_URL}${activeMedia.filePath}`}
+				alt=""
+				style={{
+				  maxWidth: "100%",
+				  maxHeight: "100%",
+				  objectFit: "contain",
+				  display: "block",
+				}}
+			  />
+			</div>
+		  </div>
+		)}
+
+
+
 
       {viewPlotId && (
         <PlotViewPanel
