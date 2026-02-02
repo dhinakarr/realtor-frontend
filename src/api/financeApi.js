@@ -1,7 +1,7 @@
 import API from "./api";
 
-export const getFinanceSummary = () =>
-	API.get("/api/finance/summary");
+export const getFinanceSummary = (params) =>
+	API.get("/api/finance/summary", { params });
 
 export const getCashFlow = (params) =>
 	API.get("/api/finance/cashflow", { params });

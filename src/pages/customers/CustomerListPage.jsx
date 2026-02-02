@@ -145,7 +145,7 @@ export default function CustomerListPage() {
               <th>Customer Name</th>
               <th>Email</th>
               <th>Mobile</th>
-              <th style={{ width: "150px" }}>Action</th>
+              <th style={{ width: "80px" }}>Action</th>
             </tr>
           </thead>
 

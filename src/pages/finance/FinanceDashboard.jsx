@@ -22,6 +22,7 @@ const FinanceDashboard = () => {
 	const [drawer, setDrawer] = useState({ open: false });
 	const { showToast } = useToast();
 	const [viewType, setViewType] = useState("CASHFLOW"); 
+	
 	//const [showTable, setShowTable] = useState(false);
 // SUMMARY | RECEIVABLE | PAYABLE
 
@@ -38,11 +39,23 @@ const FinanceDashboard = () => {
 	const [saleId, setSaleId] = useState(null);
 	const [txnType, setTxnType] = useState(null);
 	const [agentId, setAgentId] = useState(null);
+	
+	const getDefaultDateRange = () => {
+	  const now = new Date();
+	  const start = new Date(now.getFullYear(), now.getMonth(), 1);
 
+	  return {
+		from: start.toISOString().split("T")[0],
+		to: now.toISOString().split("T")[0],
+	  };
+	};
+	
+	const [dateRange, setDateRange] = useState(getDefaultDateRange());
+	
 	useEffect(() => {
-		loadSummary();
-		loadCashFlow();
-	}, []);
+		loadSummary(dateRange);
+		loadCashFlow(filters, dateRange);
+	}, [dateRange, filters]);
 	
 	const handleAmountClick = (saleId, txnType, agentId = null) => {
 	  setSaleId(saleId);
@@ -51,15 +64,19 @@ const FinanceDashboard = () => {
 	  setShowTxnModal(true);
 	};
 	
-	const loadSummary = async () => {
-		const res = await getFinanceSummary();
-		setSummary(res.data.data);
+	const loadSummary = async (range = dateRange) => {
+	  const res = await getFinanceSummary(range);
+	  setSummary(res.data.data);
 	};
 
-	const loadCashFlow = async (f = filters) => {
-		const res = await getCashFlow(f);
-		setRows(res.data.data);
+	const loadCashFlow = async (f = filters, range = dateRange) => {
+	  const res = await getCashFlow({
+		...f,
+		...range,
+	  });
+	  setRows(res.data.data);
 	};
+
 	
 	const handleCashflowAction = async (row, action) => {
 	  try {	
@@ -84,6 +101,12 @@ const FinanceDashboard = () => {
 	
 	const handleFilter = async ({ type }) => {
 	  setLoading(true);
+	  
+	  if (!dateRange?.from || !dateRange?.to) {
+		  console.error("Invalid dateRange:", dateRange);
+		  showToast("Invalid date range", "danger");
+		  return;
+		}
 
 	  try {
 		let url;
@@ -92,47 +115,39 @@ const FinanceDashboard = () => {
 		  case "RECEIVED":
 			url = "/api/finance/received/details";
 			break;
-
 		  case "PAID":
 			url = "/api/finance/paid/details";
 			break;
-
 		  case "SALE":
 			url = "/api/finance/sale/details";
 			break;
-
 		  case "RECEIVABLE":
 			url = "/api/finance/receivable/details";
 			break;
-
 		  case "PAYABLE":
 			url = "/api/finance/payable/details";
 			break;
-
 		  default:
 			throw new Error(`Unknown filter type: ${type}`);
 		}
 
-		const res = await API.get(url);
-		const json = res.data;
+		const res = await API.get(url, {
+		  params: {
+			from: dateRange.from,
+			to: dateRange.to
+		  }
+		});
 
-		if (!json?.success) {
-		  throw new Error(json?.message || "API returned failure");
-		}
-
-		setTableData(json.data || []);
+		setTableData(res.data.data || []);
 		setViewType(type);
-		
 
 	  } catch (err) {
-		showToast("Finance API error");
-		console.error("Finance API error:", err.message);
+		showToast("Finance API error", "danger");
 	  } finally {
 		setLoading(false);
 	  }
 	};
 
-	
 	const columnsByType = {
 	  RECEIVED: [
 		{ key: "projectName", label: "Project" },
@@ -166,7 +181,7 @@ const FinanceDashboard = () => {
 		},
 		{
 		  key: "commissionPayable",
-		  label: "Commission",
+		  label: "Outstanding",
 		  isAmount: true,
 		  txnType: "PAID"
 		}
@@ -360,15 +375,22 @@ const FinanceDashboard = () => {
 	return (
 		<div className="p-2">
 			<h4 className="text-xl font-semibold mb-4">Finance Operations</h4>
-
-			<FinanceSummaryCards data={summary} onFilter={handleFilter} />
+			<div className="sticky-top bg-white z-3 pb-2">
+				<FinanceFilters
+					  value={dateRange}
+					  onApply={(range) => {
+						setDateRange(range);
+					  }}
+					/>
+			</div>
+			<FinanceSummaryCards data={summary} dateRange={dateRange} onFilter={handleFilter} />
 
 			
 			{/* SALE VIEW */}
 			{viewType === "SALE"  && tableData?.[0]?.saleId && (
 			  <>
 				<SectionHeader
-				  title="Sale Details"
+				  title={`Sale Details (${dateRange.from} → ${dateRange.to})`}
 				  onBack={() => setViewType("CASHFLOW")}
 				/>
 				<SaleDetailsTable
@@ -382,7 +404,7 @@ const FinanceDashboard = () => {
 			{viewType === "RECEIVABLE" && (
 				<>
 					<SectionHeader
-						title="Receivable Details"
+						title={`Receivable Details (${dateRange.from} → ${dateRange.to})`}
 						onBack={() => setViewType("CASHFLOW")}
 					/>
 					<ReceivableDetailsTable
@@ -398,7 +420,7 @@ const FinanceDashboard = () => {
 			{viewType === "RECEIVED" && (
 			  <>
 				<SectionHeader
-				  title="Received Details"
+				  title={`Received Details (${dateRange.from} → ${dateRange.to})`}
 				  onBack={() => setViewType("CASHFLOW")}
 				/>
 				<FinanceDetailsTable
@@ -413,7 +435,7 @@ const FinanceDashboard = () => {
 			{viewType === "PAID" && (
 			  <>
 				<SectionHeader
-				  title="Commission Paid Details"
+				  title={`Commission Paid (${dateRange.from} → ${dateRange.to})`}
 				  onBack={() => setViewType("CASHFLOW")}
 				/>
 				<FinanceDetailsTable
@@ -428,7 +450,7 @@ const FinanceDashboard = () => {
 			{viewType === "PAYABLE" && (
 				<>
 					<SectionHeader
-						title="Commission Payable Details"
+						title={`Commission Payable Details (${dateRange.from} → ${dateRange.to})`}
 						onBack={() => setViewType("CASHFLOW")}
 					/>
 					<CommissionPayableTable
@@ -441,38 +463,12 @@ const FinanceDashboard = () => {
 
 			{/* DEFAULT CASH FLOW VIEW */}
 			{viewType === "CASHFLOW" && (
-				<>
-					<FinanceFilters
-						onApply={(f) => {
-							setFilters(f);
-							loadCashFlow(f);
-						}}
-					/>
-
-					<CashFlowTable rows={rows} onAction={handleCashflowAction} />
-				</>
+			  <CashFlowTable
+				rows={rows}
+				onAction={handleCashflowAction}
+			  />
 			)}
 			
-			<Modal
-			  size="xl"
-			>
-			  <Modal.Header closeButton>
-				<Modal.Title>
-				  {viewType === "RECEIVED" && "Received Details"}
-				  {viewType === "PAID" && "Commission Paid Details"}
-				</Modal.Title>
-			  </Modal.Header>
-
-			  <Modal.Body>
-				<FinanceDetailsTable
-				  type={viewType}
-				  data={tableData}
-				/>
-			  </Modal.Body>
-			</Modal>
-
-
-
 			<PaymentDrawer
 				open={drawer.open}
 				row={drawer.row}
@@ -501,7 +497,10 @@ const FinanceDashboard = () => {
 			
 			<TransactionHistoryModal
 			  show={showTxnModal}
-			  onHide={() => setShowTxnModal(false)}
+			  onHide={() => {
+				  setShowTxnModal(false);
+				setViewType("CASHFLOW")
+			  }}
 			  saleId={saleId}
 			  txnType={txnType}
 			  agentId={agentId}

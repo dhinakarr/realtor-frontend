@@ -21,60 +21,58 @@ const SummaryCard = ({ title, value, onClick, variant = "dark" }) => (
 	</Card>
 );
 
-const FinanceSummaryCards = ({ data, onFilter }) => {
-	if (!data) return null;
+const FinanceSummaryCards = ({ data, dateRange, onFilter }) => {
+  const safeData = data ?? {};
 
-	return (
-		<Row className="mb-4 g-1">
-			<Col md={2}>
-				<SummaryCard
-					title="Total Sales"
-					value={data.totalSaleAmount}
-					variant="primary"
-					onClick={() => onFilter?.({ type: "SALE" })}
-				/>
-			</Col>
-			
-			<Col md={2}>
-				<SummaryCard
-					title="Total Receivable"
-					value={data.totalReceivable}
-					variant="warning"
-					onClick={() => onFilter?.({ type: "RECEIVABLE" })}
-				/>
-			</Col>
+  return (
+    <Row className="mb-4 g-1">
+      <Col md={2}>
+        <SummaryCard
+          title="Total Sales"
+          value={safeData.totalSaleAmount ?? 0}
+          variant="primary"
+          onClick={() => onFilter?.({ type: "SALE" })}
+        />
+      </Col>
 
-			<Col md={2}>
-				<SummaryCard
-					title="Received"
-					value={data.receivedThisMonth}
-					variant="success"
-					onClick={() => onFilter({ type: "RECEIVED" })}
-				/>
-			</Col>
+      <Col md={2}>
+        <SummaryCard
+          title="Total Receivable"
+          value={safeData.totalReceivable ?? 0}
+          variant="warning"
+          onClick={() => onFilter?.({ type: "RECEIVABLE" })}
+        />
+      </Col>
 
-			<Col md={2}>
-				<SummaryCard
-					title="Paid This Month"
-					value={data.commissionPaidThisMonth}
-					variant="info"
-					onClick={() => onFilter({ type: "PAID" })}
-					
-				/>
-			</Col>
+      <Col md={2}>
+        <SummaryCard
+          title="Received"
+          value={safeData.receivedThisMonth ?? 0}
+          variant="success"
+          onClick={() => onFilter?.({ type: "RECEIVED" })}
+        />
+      </Col>
 
-			<Col md={2}>
-				<SummaryCard
-					title="Payable"
-					value={data.commissionPayable}
-					variant="danger"
-					onClick={() => onFilter?.({ type: "PAYABLE" })}
-				/>
-			</Col>
-		</Row>
-		
+      <Col md={2}>
+        <SummaryCard
+          title="Commission Paid"
+          value={safeData.commissionPaidThisMonth ?? 0}
+          variant="info"
+          onClick={() => onFilter?.({ type: "PAID" })}
+        />
+      </Col>
 
-	);
+      <Col md={2}>
+        <SummaryCard
+          title="Payable"
+          value={safeData.commissionPayable ?? 0}
+          variant="danger"
+          onClick={() => onFilter?.({ type: "PAYABLE" })}
+        />
+      </Col>
+    </Row>
+  );
 };
+
 
 export default FinanceSummaryCards;
