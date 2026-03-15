@@ -7,10 +7,10 @@ import {
 } from "recharts";
 
 const COLORS = {
-  Available: "#4caf50",
-  Booked: "#ff9800",
-  Sold: "#2196f3",
-  Cancelled: "#9e9e9e"
+  Available: "lightblue",
+  Booked: "yellow",
+  Sold: "green",
+  Cancelled: "grey"
 };
 import React, { useEffect, useState } from "react";
 

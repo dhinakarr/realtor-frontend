@@ -1,0 +1,17 @@
+.compact-filters select,
+.compact-filters input {
+  height: 38px;
+  padding: 1px 6px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.compact-filters button {
+  height: 28px;
+  padding: 2px 8px;
+  font-size: 0.85rem;
+}
+
+.project-filter { width: 60px; }
+.plot-filter { width: 110px; }
+.agent-filter { width: 150px; }

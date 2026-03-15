@@ -75,7 +75,7 @@ function SalesTable({ sales }) {
             <th>Plot</th>
             <th>Customer</th>
             <th>Plot Price</th>
-            <th>Confirmed</th>
+            <th>Booked on</th>
           </tr>
         </thead>
         <tbody>

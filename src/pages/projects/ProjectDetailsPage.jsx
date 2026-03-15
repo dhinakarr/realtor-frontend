@@ -93,7 +93,7 @@ export default function ProjectDetailsPage() {
 
   const getPlotColor = (status) => {
     switch (status) {
-      case "AVAILABLE": return "#ffffff";
+      case "AVAILABLE": return "lightblue";
       case "BOOKED": return "yellow";
       case "SOLD": return "green";
       case "CANCELLED": return "grey";

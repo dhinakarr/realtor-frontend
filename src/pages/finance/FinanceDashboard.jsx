@@ -13,6 +13,7 @@ import { useToast } from "../../components/common/ToastProvider";
 import SaleDetailsTable from "../../components/finance/SaleDetailsTable";
 import TransactionHistoryModal from "../../components/finance/TransactionHistoryModal";
 import { Table, Modal } from "react-bootstrap";	
+import "./FinanceDashboard.css";
 
 const FinanceDashboard = () => {
 
@@ -39,6 +40,11 @@ const FinanceDashboard = () => {
 	const [saleId, setSaleId] = useState(null);
 	const [txnType, setTxnType] = useState(null);
 	const [agentId, setAgentId] = useState(null);
+	const [tableFilters, setTableFilters] = useState({
+												  project: "",
+												  plot: "",
+												  agent: ""
+												});
 	
 	const getDefaultDateRange = () => {
 	  const now = new Date();
@@ -100,6 +106,7 @@ const FinanceDashboard = () => {
 	};
 	
 	const handleFilter = async ({ type }) => {
+		console.log("handleFilter called:", type);
 	  setLoading(true);
 	  
 	  if (!dateRange?.from || !dateRange?.to) {
@@ -137,7 +144,7 @@ const FinanceDashboard = () => {
 			to: dateRange.to
 		  }
 		});
-
+console.log("API response:", res.data);
 		setTableData(res.data.data || []);
 		setViewType(type);
 
@@ -196,6 +203,75 @@ const FinanceDashboard = () => {
 		maximumFractionDigits: 2,
 	  });
 	};
+	
+	
+	
+	const TableFilters = ({ filters, onChange, projectOptions, plotOptions, agentOptions }) => {
+
+	  return (
+		<div className="d-flex gap-1 mb-2 align-items-center compact-filters">
+
+		  <select
+			className="form-select form-select-sm"
+			value={filters.project}
+			onChange={(e)=>
+			  onChange(f=>({
+				...f,
+				project:e.target.value,
+				plot:"",
+				agent:""
+			  }))
+			}
+		  >
+			<option value="">Project</option>
+			{projectOptions?.map((p,i)=>(
+			  <option key={i} value={p}>{p}</option>
+			))}
+		  </select>
+
+		  <select
+			className="form-select form-select-sm"
+			value={filters.plot}
+			onChange={(e)=>
+			  onChange(f=>({
+				...f,
+				plot:e.target.value,
+				agent:""
+			  }))
+			}
+		  >
+			<option value="">Plot</option>
+			{plotOptions?.map((p,i)=>(
+			  <option key={i} value={p}>{p}</option>
+			))}
+		  </select>
+
+		  <select
+			className="form-select form-select-sm"
+			value={filters.agent}
+			onChange={(e)=>
+			  onChange(f=>({
+				...f,
+				agent:e.target.value
+			  }))
+			}
+		  >
+			<option value="">Agent</option>
+			{agentOptions?.map((a,i)=>(
+			  <option key={i} value={a}>{a}</option>
+			))}
+		  </select>
+
+		  <button
+			className="btn btn-outline-secondary btn-sm"
+			onClick={()=>onChange({project:"",plot:"",agent:""})}
+		  >
+			Reset
+		  </button>
+
+		</div>
+	  );
+	};
 
 
 	const FinanceDetailsTable = ({ type, data, onAmountClick }) => {
@@ -246,11 +322,9 @@ const FinanceDashboard = () => {
 	  );
 	};
 
-
-
 	const SectionHeader = ({ title, onBack }) => (
-		<div className="d-flex justify-content-between align-items-center mb-3">
-			<h4 className="mb-0">{title}</h4>
+		<div className="d-flex justify-content-between align-items-center mb-1">
+			<h6 className="mb-0">{title}</h6>
 			<button
 				className="btn btn-outline-secondary btn-sm"
 				onClick={onBack}
@@ -371,11 +445,48 @@ const FinanceDashboard = () => {
 		showToast("Failed to save payment");
 	  }
 	};
+	
+	const projectFiltered = tableData.filter(row =>
+	  !tableFilters.project || row.projectName === tableFilters.project
+	);
+
+	const plotFiltered = projectFiltered.filter(row =>
+	  !tableFilters.plot || row.plotNumber === tableFilters.plot
+	);
+
+	const projectOptions = Array.from(
+	  new Set(tableData.map(r => r.projectName).filter(Boolean))
+	);
+
+	const plotOptions = Array.from(
+	  new Set(projectFiltered.map(r => r.plotNumber).filter(Boolean))
+	);
+
+	const agentOptions = Array.from(
+	  new Set(plotFiltered.map(r => r.agentName).filter(Boolean))
+	);
+		
+		console.log("tableData:", tableData);
+console.log("projectOptions:", projectOptions);
+		
+	const filteredTableData = tableData.filter(row => {
+
+	  const projectMatch =
+		!tableFilters.project || row.projectName === tableFilters.project;
+
+	  const plotMatch =
+		!tableFilters.plot || row.plotNumber === tableFilters.plot;
+
+	  const agentMatch =
+		!tableFilters.agent || row.agentName === tableFilters.agent;
+
+	  return projectMatch && plotMatch && agentMatch;
+	});
 
 	return (
-		<div className="p-2">
-			<h4 className="text-xl font-semibold mb-4">Finance Operations</h4>
-			<div className="sticky-top bg-white z-3 pb-2">
+		<div className="p-1">
+			<h6 className="text-xl font-semibold mb-2">Finance Operations</h6>
+			<div className="sticky-top bg-white z-1 pb-1">
 				<FinanceFilters
 					  value={dateRange}
 					  onApply={(range) => {
@@ -393,8 +504,17 @@ const FinanceDashboard = () => {
 				  title={`Sale Details (${dateRange.from} → ${dateRange.to})`}
 				  onBack={() => setViewType("CASHFLOW")}
 				/>
+				
+				<TableFilters
+				  filters={tableFilters}
+				  onChange={setTableFilters}
+				  projectOptions={projectOptions}
+				  plotOptions={plotOptions}
+				  agentOptions={agentOptions}
+				/>
+				
 				<SaleDetailsTable
-				  data={tableData}
+				  data={filteredTableData}
 				  loading={loading}
 				/>
 			  </>
@@ -407,8 +527,17 @@ const FinanceDashboard = () => {
 						title={`Receivable Details (${dateRange.from} → ${dateRange.to})`}
 						onBack={() => setViewType("CASHFLOW")}
 					/>
+					
+					<TableFilters
+					  filters={tableFilters}
+					  onChange={setTableFilters}
+					  projectOptions={projectOptions}
+					  plotOptions={plotOptions}
+					  agentOptions={agentOptions}
+					/>
+					
 					<ReceivableDetailsTable
-						data={tableData}
+						data={filteredTableData}
 						loading={loading}
 						onAction={handleTableAction}
 						
@@ -423,9 +552,18 @@ const FinanceDashboard = () => {
 				  title={`Received Details (${dateRange.from} → ${dateRange.to})`}
 				  onBack={() => setViewType("CASHFLOW")}
 				/>
+				
+				<TableFilters
+				  filters={tableFilters}
+				  onChange={setTableFilters}
+				  projectOptions={projectOptions}
+				  plotOptions={plotOptions}
+				  agentOptions={agentOptions}
+				/>
+				
 				<FinanceDetailsTable
 				  type="RECEIVED"
-				  data={tableData}
+				  data={filteredTableData}
 				  onAmountClick={handleAmountClick}
 				/>
 			  </>
@@ -438,9 +576,18 @@ const FinanceDashboard = () => {
 				  title={`Commission Paid (${dateRange.from} → ${dateRange.to})`}
 				  onBack={() => setViewType("CASHFLOW")}
 				/>
+				
+				<TableFilters
+				  filters={tableFilters}
+				  onChange={setTableFilters}
+				  projectOptions={projectOptions}
+				  plotOptions={plotOptions}
+				  agentOptions={agentOptions}
+				/>
+				
 				<FinanceDetailsTable
 				  type="PAID"
-				  data={tableData}
+				  data={filteredTableData}
 				  onAmountClick={handleAmountClick}
 				/>
 			  </>
@@ -453,8 +600,17 @@ const FinanceDashboard = () => {
 						title={`Commission Payable Details (${dateRange.from} → ${dateRange.to})`}
 						onBack={() => setViewType("CASHFLOW")}
 					/>
+					
+					<TableFilters
+					  filters={tableFilters}
+					  onChange={setTableFilters}
+					  projectOptions={projectOptions}
+					  plotOptions={plotOptions}
+					  agentOptions={agentOptions}
+					/>
+					
 					<CommissionPayableTable
-						data={tableData}
+						data={filteredTableData}
 						loading={loading}
 						onAction={handleTableAction}
 					/>
