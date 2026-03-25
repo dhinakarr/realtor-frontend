@@ -467,7 +467,7 @@ console.log("API response:", res.data);
 	);
 		
 		console.log("tableData:", tableData);
-console.log("projectOptions:", projectOptions);
+//console.log("projectOptions:", projectOptions);
 		
 	const filteredTableData = tableData.filter(row => {
 
@@ -486,13 +486,13 @@ console.log("projectOptions:", projectOptions);
 	return (
 		<div className="p-1">
 			<h6 className="text-xl font-semibold mb-2">Finance Operations</h6>
-			<div className="sticky-top bg-white z-1 pb-1">
+			<div className="z-1 pb-1 d-flex justify-content-center">
+			  <div style={{ width: "fit-content", minWidth: "500px" }}>
 				<FinanceFilters
-					  value={dateRange}
-					  onApply={(range) => {
-						setDateRange(range);
-					  }}
-					/>
+				  value={dateRange}
+				  onApply={(range) => setDateRange(range)}
+				/>
+			  </div>
 			</div>
 			<FinanceSummaryCards data={summary} dateRange={dateRange} onFilter={handleFilter} />
 

@@ -147,7 +147,7 @@ export default function ProjectPage() {
 					  }}
 					/>
 				  )}
-
+				  {canEdit && (
 				  <FaUpload
 					title="Upload Document"
 					className="project-icon"
@@ -157,6 +157,7 @@ export default function ProjectPage() {
 					  setShowUploadOverlay(true);
 					}}
 				  />
+				 )}
 				</div>
 
 

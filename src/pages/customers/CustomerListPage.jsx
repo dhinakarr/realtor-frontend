@@ -145,6 +145,7 @@ export default function CustomerListPage() {
               <th>Customer Name</th>
               <th>Email</th>
               <th>Mobile</th>
+			  <th>Member Name</th>
               <th style={{ width: "80px" }}>Action</th>
             </tr>
           </thead>
@@ -156,6 +157,7 @@ export default function CustomerListPage() {
                   <td>{c.customerName}</td>
                   <td>{c.email}</td>
                   <td>{c.mobile}</td>
+				  <td>{c.agentName}</td>
                   <td className="action-col">
 				   <div className="action-icons">
 					<FaEye 

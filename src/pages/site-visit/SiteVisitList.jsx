@@ -21,6 +21,12 @@ export default function SiteVisitList() {
   const [showPaymentDrawer, setShowPaymentDrawer] = useState(false);
   const [selectedVisit, setSelectedVisit] = useState(null);
   
+  const [filters, setFilters] = useState({
+					  visitDate: "",
+					  userName: "",
+					  projectName: ""
+					});
+  
   const featureUrl = "/api/site-visits";
   const module = useModule(featureUrl);
   const feature = module.features.find(f => f.url);
@@ -29,6 +35,26 @@ export default function SiteVisitList() {
   useEffect(() => {
     fetchVisits();
   }, []);	
+
+  const handleFilterChange = (e) => {
+	  setFilters(prev => ({
+		...prev,
+		[e.target.name]: e.target.value
+	  }));
+	};
+	
+  const filteredData = data.filter(row => {
+	  const dateMatch =
+		!filters.visitDate || row.visitDate?.includes(filters.visitDate);
+
+	  const userMatch =
+		!filters.userName || row.userName === filters.userName;
+
+	  const projectMatch =
+		!filters.projectName || row.projectName === filters.projectName;
+
+	  return dateMatch && userMatch && projectMatch;
+	});
 
   const fetchVisits = async () => {
 	  setLoading(true);
@@ -47,7 +73,7 @@ export default function SiteVisitList() {
 	  }
 	};
 
-  const truncate = (text, max = 15) =>
+  const truncate = (text, max = 20) =>
     text.length > max ? text.substring(0, max) + ".." : text;
 
   const renderWithTooltip = (text) => (
@@ -81,9 +107,41 @@ export default function SiteVisitList() {
       <Table bordered hover responsive size="sm">
         <thead className="table-light">
           <tr>
-            <th>Visit Date</th>
-            <th>User</th>
-            <th>Project</th>
+            <th>
+				<input
+					type="date"
+					name="visitDate"
+					className="form-control form-control-sm"
+					value={filters.visitDate}
+					onChange={handleFilterChange}
+				  />
+			</th>
+            <th>
+				<select
+					name="userName"
+					className="form-select form-select-sm"
+					value={filters.userName}
+					onChange={handleFilterChange}
+				  >
+					<option value="">User Name</option>
+					{[...new Set(data.map(d => d.userName))].map(u => (
+					  <option key={u} value={u}>{u}</option>
+					))}
+				  </select>
+			</th>
+            <th>
+				<select
+				  name="projectName"
+				  className="form-select form-select-sm"
+				  value={filters.projectName}
+				  onChange={handleFilterChange}
+				>
+				  <option value="">Project Name</option>
+				  {[...new Set(data.map(d => d.projectName))].map(p => (
+					<option key={p} value={p}>{p}</option>
+				  ))}
+				</select>
+			</th>
             <th>Customers</th>
             <th>Expense</th>
             <th>Balance</th>
@@ -100,7 +158,7 @@ export default function SiteVisitList() {
             </tr>
           )}
 
-          {data.map((row) => (
+          {filteredData.map((row) => (
             <tr key={row.siteVisitId}  className="align-middle">
               <td>{row.visitDate}</td>
 

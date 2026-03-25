@@ -54,8 +54,8 @@ const FinanceFilters = ({ value, onApply }) => {
   return (
     <Card className="mb-1">
       <Card.Body  className="py-2">
-        <Row className="align-items-end g-2">
-          <Col md={3}>
+        <Row className="align-items-end g-2 justify-content-center">
+          <Col md="auto">
             <Form.Group className="mb-1">
               <Form.Label className="mb-0 small text-muted">From</Form.Label>
               <Form.Control size="sm"
@@ -67,7 +67,7 @@ const FinanceFilters = ({ value, onApply }) => {
             </Form.Group>
           </Col>
 
-          <Col md={3}>
+          <Col md="auto">
             <Form.Group className="mb-1">
               <Form.Label className="mb-0 small text-muted">To</Form.Label>
               <Form.Control size="sm"
@@ -78,7 +78,7 @@ const FinanceFilters = ({ value, onApply }) => {
               />
             </Form.Group>
           </Col>
-
+		  {/*
           <Col md={2}>
             <Form.Group className="mb-1">
               <Form.Label className="mb-0 small text-muted">Type</Form.Label>
@@ -112,15 +112,23 @@ const FinanceFilters = ({ value, onApply }) => {
               </Form.Select>
             </Form.Group>
           </Col>
+		  */}
+          <Col md="auto">
+			  <Form.Group className="mb-1">
+				<Form.Label className="mb-0 small text-muted invisible">
+				  Actions
+				</Form.Label>
 
-          <Col md={2} className="d-flex gap-2 align-items-end">
-            <Button size="sm" variant="primary" onClick={apply}>
-              Apply
-            </Button>
-            <Button size="sm" variant="outline-secondary" onClick={reset}>
-              Reset
-            </Button>
-          </Col>
+				<div className="d-flex gap-2">
+				  <Button size="sm" variant="primary" onClick={apply}>
+					Apply
+				  </Button>
+				  <Button size="sm" variant="outline-secondary" onClick={reset}>
+					Reset
+				  </Button>
+				</div>
+			  </Form.Group>
+			</Col>
         </Row>
       </Card.Body>
     </Card>

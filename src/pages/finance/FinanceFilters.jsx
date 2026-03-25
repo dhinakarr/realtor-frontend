@@ -12,7 +12,7 @@ const FinanceFilters = ({ dateRange, onApply }) => {
     <Row className="align-items-end mb-3 g-2">
       <Col md={3}>
         <Form.Group>
-          <Form.Label className="fw-semibold">From Date</Form.Label>
+          <Form.Label className="fw-semibold">From</Form.Label>
           <Form.Control
             type="date"
             value={localRange.from}
@@ -25,7 +25,7 @@ const FinanceFilters = ({ dateRange, onApply }) => {
 
       <Col md={3}>
         <Form.Group>
-          <Form.Label className="fw-semibold">To Date</Form.Label>
+          <Form.Label className="fw-semibold">To</Form.Label>
           <Form.Control
             type="date"
             value={localRange.to}
