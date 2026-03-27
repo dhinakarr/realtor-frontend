@@ -7,6 +7,8 @@ import useNotifications from "../hooks/useNotifications";
 import NotificationBell from "./NotificationBell";
 import NotificationDropdown from "./NotificationDropdown";
 import listenForForegroundMessages from "../firebase/firebaseMessaging";
+import UserDrawer from "./UserDrawer";
+import { FaUserPlus, FaHome } from "react-icons/fa";
 
 export default function Navbar({ user, setUser }) {
   const navigate = useNavigate();
@@ -27,6 +29,10 @@ export default function Navbar({ user, setUser }) {
   const profileRef = useRef(null);
 
   const id = user?.token?.userId;
+  const [open, setOpen] = useState(false);
+  const currentUser = JSON.parse(localStorage.getItem("user"));
+  const userType = currentUser?.token?.userType;
+  const allowedRoles = ["FINANCE", "HR", "PM", "MD", "PH", "PM"];
 
     /* ---------------- Reset on Auth Change ---------------- */
 	useEffect(() => {
@@ -38,8 +44,6 @@ export default function Navbar({ user, setUser }) {
   /* ---------------- Click outside / ESC ---------------- */
   useEffect(() => {
 	  const handler = (e) => {
-		
-
 		if (
 		  notificationRef.current &&
 		  !notificationRef.current.contains(e.target)
@@ -52,9 +56,7 @@ export default function Navbar({ user, setUser }) {
 		  !profileRef.current.contains(e.target)
 		) {
 		  setShowProfile(false);
-		  
 		}
-
 	  };
 
 	  const esc = (e) => {
@@ -77,9 +79,7 @@ export default function Navbar({ user, setUser }) {
   /* ---------------- Firebase (optional) ---------------- */
   useEffect(() => {
     if (!user) return;
-
     listenForForegroundMessages(() => {
-
 	})
       .catch(() => setNotificationsEnabled(false));
   }, [user]);
@@ -110,13 +110,13 @@ export default function Navbar({ user, setUser }) {
   const email = user?.token?.email;
 
   return (
-    <RBNavbar expand="lg" className="px-4" style={{ backgroundColor: "#001F3F" }}>
+    <RBNavbar expand="lg" className="px-3" style={{ backgroundColor: "#001F3F" }}>
       <Container fluid>
         <RBNavbar.Brand className="text-white">
           <img src="/logo.png" height={60} className="me-2" />
         </RBNavbar.Brand>
 
-        <Nav className="ms-auto align-items-center gap-4">
+        <Nav className="ms-auto align-items-center gap-3">
 
           {/* -------- Logged OUT -------- */}
           {!user && (
@@ -126,16 +126,29 @@ export default function Navbar({ user, setUser }) {
               </Link>
             </>
           )}
-
           {/* -------- Logged IN -------- */}
           {user && (
             <>
-			<Link to="/dashboard" className="text-white text-decoration-none">
-                <strong>Dashboard</strong>
-			</Link> 
-			  
+			{allowedRoles.includes(userType) && (
+			  <span
+				  className="d-flex align-items-center gap-2 text-white"
+				  style={{
+					cursor: "pointer",
+					display: "flex",
+					alignItems: "center",
+					gap: "4px",
+					color: "#fff",          // 👈 white color
+					fontSize: "20px",       // 👈 increase size
+					fontWeight: "500"
+				  }}
+				  onClick={() => setOpen(true)}
+				>
+				  <FaUserPlus title="Add User" size={24} />
+			  </span>
+			)}
+		  
 			  <Link to="/" className="text-white text-decoration-none">
-                <strong>Home</strong>
+                <strong><FaHome title="Go to Home" size={24} />	</strong>
               </Link>
 
               {/* 🔔 Notifications */}
@@ -242,6 +255,9 @@ export default function Navbar({ user, setUser }) {
             </>
           )}
         </Nav>
+		
+		<UserDrawer open={open} onClose={() => setOpen(false)} />
+		
       </Container>
     </RBNavbar>
   );

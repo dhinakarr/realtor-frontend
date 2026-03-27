@@ -20,9 +20,10 @@ export default function SiteVisitList() {
   const [paymentDrawerOpen, setPaymentDrawerOpen] = useState(false);
   const [showPaymentDrawer, setShowPaymentDrawer] = useState(false);
   const [selectedVisit, setSelectedVisit] = useState(null);
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
   
   const [filters, setFilters] = useState({
-					  visitDate: "",
 					  userName: "",
 					  projectName: ""
 					});
@@ -44,24 +45,25 @@ export default function SiteVisitList() {
 	};
 	
   const filteredData = data.filter(row => {
-	  const dateMatch =
-		!filters.visitDate || row.visitDate?.includes(filters.visitDate);
-
 	  const userMatch =
 		!filters.userName || row.userName === filters.userName;
 
 	  const projectMatch =
 		!filters.projectName || row.projectName === filters.projectName;
 
-	  return dateMatch && userMatch && projectMatch;
+	  return userMatch && projectMatch;
 	});
 
-  const fetchVisits = async () => {
+  const fetchVisits = async (from, to) => {
 	  setLoading(true);
 	  try {
-		const res = await API.get("/api/site-visits");
+		const res = await API.get("/api/site-visits", {
+		  params: {
+			...(from && { fromDate: from }),
+			...(to && { toDate: to }),
+		  },
+		});
 
-		// 🔑 Normalize response
 		const list =
 		  Array.isArray(res.data)
 			? res.data
@@ -71,6 +73,15 @@ export default function SiteVisitList() {
 	  } finally {
 		setLoading(false);
 	  }
+	};
+	
+	const handleApplyFilter = () => {
+	  if (fromDate && toDate && fromDate > toDate) {
+		alert("Invalid date range");
+		return;
+	  }
+
+	  fetchVisits(fromDate, toDate);
 	};
 
   const truncate = (text, max = 20) =>
@@ -92,30 +103,79 @@ export default function SiteVisitList() {
   return (
     <div>
       {/* Header */}
-      <div className="d-flex justify-content-between align-items-center mb-3">
-		  <h4 className="mb-0">Site Visits</h4>
+      <div className="row align-items-center mb-3">
 
-		  <div className="flex-shrink-0">
-			<Button variant="primary" size="sm" className="px-3" 
-			onClick={() => setShowForm(true)}>
-			  <FaPlus className="me-1" /> New
-			</Button>
+		  {/* LEFT */}
+		  <div className="col-3">
+			<h4 className="mb-0">Site Visits</h4>
 		  </div>
+
+		  {/* CENTER (more space) */}
+		  <div className="col-6 d-flex justify-content-center">
+			<div className="d-flex gap-2 align-items-center flex-nowrap">
+
+			  <div className="d-flex align-items-center gap-1">
+				<label className="mb-0">From</label>
+				<input
+				  type="date"
+				  className="form-control form-control-sm"
+				  value={fromDate}
+				  onChange={(e) => setFromDate(e.target.value)}
+				  style={{ width: "130px" }}
+				/>
+			  </div>
+
+			  <div className="d-flex align-items-center gap-1">
+				<label className="mb-0">To</label>
+				<input
+				  type="date"
+				  className="form-control form-control-sm"
+				  value={toDate}
+				  onChange={(e) => setToDate(e.target.value)}
+				  style={{ width: "130px" }}
+				/>
+			  </div>
+
+			  <Button size="sm" onClick={handleApplyFilter}>
+				Apply
+			  </Button>
+
+			  <Button
+				size="sm"
+				variant="secondary"
+				onClick={() => {
+				  setFromDate("");
+				  setToDate("");
+				  fetchVisits();
+				}}
+			  >
+				Reset
+			  </Button>
+
+			</div>
+		  </div>
+
+		  {/* RIGHT */}
+		  <div className="col-3 text-end">
+			{feature?.canCreate && (
+			  <Button
+				variant="primary"
+				size="sm"
+				className="px-3"
+				onClick={() => setShowForm(true)}
+			  >
+				<FaPlus className="me-1" /> New
+			  </Button>
+			)}
+		  </div>
+
 		</div>
 
       {/* Table */}
       <Table bordered hover responsive size="sm">
         <thead className="table-light">
           <tr>
-            <th>
-				<input
-					type="date"
-					name="visitDate"
-					className="form-control form-control-sm"
-					value={filters.visitDate}
-					onChange={handleFilterChange}
-				  />
-			</th>
+            <th>Date</th>
             <th>
 				<select
 					name="userName"
@@ -161,11 +221,8 @@ export default function SiteVisitList() {
           {filteredData.map((row) => (
             <tr key={row.siteVisitId}  className="align-middle">
               <td>{row.visitDate}</td>
-
-              <td>{renderWithTooltip(row.userName)}</td>
-
+              <td>{row.userName}</td>
               <td>{renderWithTooltip(row.projectName)}</td>
-
               <td>
                 {row.customers?.map((c, idx) => (
                   <div key={idx}>
@@ -173,11 +230,8 @@ export default function SiteVisitList() {
                   </div>
                 ))}
               </td>
-
               <td className="text-end"> {row.expenseAmount}</td>
-
               <td className="text-end"> {row.balance}</td>
-
               <td className="text-center">
                 <FaEye
 				  className="me-2 text-success cursor-pointer"
@@ -188,6 +242,7 @@ export default function SiteVisitList() {
 					setShowViewDrawer(true);
 				  }}
 				/>
+			{feature?.canUpdate && (	
                 <FaEdit
                   className="me-2 text-success cursor-pointer"
 				  style={{ cursor: 'pointer' }}
@@ -197,6 +252,7 @@ export default function SiteVisitList() {
 					setShowEditDrawer(true);
 				  }}
                 />
+			)}	
 				{isFinance && (
                 <FaMoneyBillWave
                   className="text-success cursor-pointer"

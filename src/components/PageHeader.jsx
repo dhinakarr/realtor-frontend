@@ -16,9 +16,9 @@ console.log("features:", module.features);
 console.log("location.pathname:", pathname);
 */
   return (
-    <div className="d-flex align-items-center flex-wrap p-3">
-      <div className="me-4">
-        <h3 className="m-0">{module.moduleName}</h3>
+    <div className="d-flex align-items-center flex-wrap p-1">
+      <div className="me-2">
+        <h4 className="m-0">{module.moduleName}</h4>
       </div>
 
       <div className="d-flex flex-wrap gap-2 ms-auto">

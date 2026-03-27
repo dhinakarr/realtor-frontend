@@ -9,6 +9,7 @@ import useModule from "../../hooks/useModule";
 import PlotEditPanel from "../../components/PlotEditPanel";
 import PlotViewPanel from "../../components/PlotViewPanel";
 import ChartMount from "../../components/ChartMount";
+import { formatINRComma, formatINR } from "../../utils/numberFormatter";
 
 import SaleInitiationPanel from "../../components/SaleInitiationPanel";
 import PaymentModal from "../../components/PaymentModal";
@@ -164,7 +165,7 @@ export default function ProjectDetailsPage() {
       {/* HEADER */}
  
 		<div className="project-header">
-		  <h1 style={{ margin: 0 }}>Project Details</h1>
+		  <h4 style={{ margin: 0 }}>Project Details</h4>
 
 		  <div className="project-header-actions">
 			<button
@@ -224,15 +225,15 @@ export default function ProjectDetailsPage() {
 			  <h4 className="mb-3">{project.projectName}</h4>
 			  <p><small>Location:</small> {project.locationDetails}</p>
 			  <p><small>Survey Number:</small> {project.surveyNumber}</p>
-			  <p><small>Price / Sqft:</small> ₹{project.pricePerSqft}</p>
+			  <p><small>Price / Sqft:</small> ₹{formatINRComma(project.pricePerSqft)}</p>
 			</div>
 
 			{/* Column 2 */}
 			<div className="col-md-4">
-			  <p><small>Stamp Duty:</small> {project.regCharges}%</p>
-			  <p><small>Documentation Charges:</small> ₹{project.docCharges}</p>
-			  <p><small>Other Charges:</small> ₹{project.otherCharges}</p>
-			  <p><small>Guideline Value:</small> ₹{project.guidanceValue}</p>
+			  <p><small>Stamp Duty:</small> {formatINRComma(project.regCharges)}%</p>
+			  <p><small>Documentation Charges:</small> ₹{formatINRComma(project.docCharges)}</p>
+			  <p><small>Other Charges:</small> ₹{formatINRComma(project.otherCharges)}</p>
+			  <p><small>Guideline Value:</small> ₹{formatINRComma(project.guidanceValue)}</p>
 			</div>
 
 			{/* Column 3 : Chart */}
@@ -285,7 +286,7 @@ export default function ProjectDetailsPage() {
 						  <div>Facing: {plot.facing || ""}</div>
 						  <div>Survey: {plot.surveyNum}</div>
 						  {plot.status === "AVAILABLE" && (
-							  <div>Total: ₹{plot.totalPrice}</div>
+							  <div>Total: {formatINRComma(plot.totalPrice)}</div>
 							)}
 
 						</div>

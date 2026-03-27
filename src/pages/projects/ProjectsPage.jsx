@@ -53,8 +53,17 @@ export default function ProjectPage() {
 	
   };
   
+  const overallInventory = projects.reduce(
+	  (acc, p) => {
+		acc.total += p.totalPlots || 0;
+		acc.available += p.availablePlots || 0;
+		acc.booked += p.bookedPlots || 0;
+		acc.sold += p.soldPlots || 0;
+		return acc;
+	  },
+	  { total: 0, available: 0, booked: 0, sold: 0 }
+	);
   
-
   const handleNewProject = () => navigate("/projects/create");
 
   const handleEdit = (id) => navigate(`/projects/edit/${id}`);
@@ -96,21 +105,51 @@ export default function ProjectPage() {
     <div className="container-fluid  custom-container">
 
       {/* Header */}
-      <div className="projects-header-fix">
-		  <h3 className="projects-title">Projects</h3>
+	   <div className="projects-header-fix d-flex align-items-center">
 
-		  {canCreate && (
-			<button
-			  type="button"
-			  className="btn btn-primary projects-btn-fix"
-			  onClick={handleNewProject}
-			>
-			  <FaPlus className="me-2" />
-			  New Project
-			</button>
-		  )}
+		  {/* LEFT */}
+		  <h4 className="projects-title mb-0">Projects</h4>
+
+		  {/* CENTER (always centered) */}
+		  <div className="mx-auto d-flex gap-2 inventory-inline-cards">
+
+			<div className="inv-card total">
+			  <div className="inv-value">{overallInventory.total}</div>
+			  <div className="inv-label">Total</div>
+			</div>
+
+			<div className="inv-card available">
+			  <div className="inv-value">{overallInventory.available}</div>
+			  <div className="inv-label">Available</div>
+			</div>
+
+			<div className="inv-card booked">
+			  <div className="inv-value">{overallInventory.booked}</div>
+			  <div className="inv-label">Booked</div>
+			</div>
+
+			<div className="inv-card sold">
+			  <div className="inv-value">{overallInventory.sold}</div>
+			  <div className="inv-label">Sold</div>
+			</div>
+
+		  </div>
+
+		  {/* RIGHT */}
+		  <div className="ms-auto">
+			{canCreate && (
+			  <button
+				className="btn btn-primary projects-btn-fix"
+				onClick={handleNewProject}
+			  >
+				<FaPlus className="me-2" />
+				New Project
+			  </button>
+			)}
+		  </div>
+
 		</div>
-		<p />
+	<p />
 
       {/* Loading */}
       {loading && <p>Loading...</p>}
@@ -159,7 +198,6 @@ export default function ProjectPage() {
 				  />
 				 )}
 				</div>
-
 
                 {/* Image */}
                 {img && (

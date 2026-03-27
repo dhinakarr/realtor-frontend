@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Table, Spinner } from "react-bootstrap";
+import { formatINRComma, formatINR } from "../../utils/numberFormatter";
 
 const SaleDetailsTable = ({ data, loading, onAction }) => {
 	
@@ -29,10 +30,10 @@ const SaleDetailsTable = ({ data, loading, onAction }) => {
 						<td>{row.plotNumber}</td>
 						<td>{row.customerName}</td>
 						<td>{row.agentName}</td>
-						<td> {row.saleAmount.toLocaleString()}</td>
-						<td> {row.totalReceived.toLocaleString()}</td>
+						<td> {formatINRComma(row.saleAmount)}</td>
+						<td> {formatINRComma(row.totalReceived)}</td>
 						<td className="fw-bold text-danger">
-							 {row.outstandingAmount.toLocaleString()}
+							 {formatINRComma(row.outstandingAmount)}
 						</td>
 					</tr>
 				))}

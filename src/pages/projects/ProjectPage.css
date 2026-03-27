@@ -129,3 +129,78 @@
 .video-thumb:hover {
   opacity: 1;
 }
+.inventory-inline-cards {
+  align-items: center;
+}
+
+.inv-card {
+  min-width: 90px;
+  height: 60px; /* aligns with header */
+  border-radius: 10px;
+  padding: 6px 10px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+/* VALUE */
+.inv-value {
+  font-size: 16px;
+  font-weight: 700;
+  
+}
+
+/* LABEL */
+.inv-label {
+  font-size: 11px;
+  opacity: 0.8;
+  
+}
+
+/* COLORS */
+.inv-card.total {
+  background: #ffffff;
+  border: 1px solid #ddd;
+}
+
+.inv-card.available {
+  background: #e6f4ff; /* light blue */
+  color: #0d6efd;
+}
+
+.inv-card.booked {
+  background: yellow; 
+  color: #ffffff;
+}
+
+.inv-card.sold {
+  background: green; 
+  color: #198754;
+}
+/* BOOKED */
+.inv-card.booked {
+  background: yellow;
+}
+
+.inv-card.booked .inv-value {
+  color: #856404;   /* darker */
+}
+
+.inv-card.booked .inv-label {
+  color: #a67c00;   /* lighter/different */
+}
+
+/* SOLD */
+.inv-card.sold {
+  background: green;
+}
+
+.inv-card.sold .inv-value {
+  color: #fff;   /* strong green */
+}
+
+.inv-card.sold .inv-label {
+  color: #fff;   /* softer green */
+}

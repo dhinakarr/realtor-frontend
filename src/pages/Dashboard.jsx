@@ -4,6 +4,7 @@ import { Bar, Line, Doughnut } from "react-chartjs-2";
 import API from "../api/API";
 import { useNavigate } from "react-router-dom";
 import "./dashboard.css";
+import { formatINRComma, formatINR } from "../utils/numberFormatter";
 
 /* Chart.js registration */
 import {
@@ -31,26 +32,58 @@ ChartJS.register(
 
 export default function DashboardSummary() {
   const [data, setData] = useState(null);
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   
 
-  useEffect(() => {
-	  API.get("/api/dashboard/summary")
-		.then(res => setData(res.data))
-		.catch(() => setData({
-		  inventory: [],
+	const fetchDashboard = (from, to) => {
+	  setLoading(true);
+
+	  API.get("/api/dashboard/summary", {
+		params: {
+		  from: from || null,
+		  to: to || null,
+		},
+	  })
+		.then((res) => setData(res.data))
+		.catch(() =>
+		  setData({
+			inventory: [],
 			finance: [],
 			agents: [],
 			commissions: [],
 			siteVisits: [],
 			summaryKpis: {},
-			actionKpis: {}
-		}));
+			actionKpis: {},
+		  })
+		)
+		.finally(() => setLoading(false));
+	};
+
+	useEffect(() => {
+	  fetchDashboard();
 	}, []);
 
-
-  if (!data) return <Spinner animation="border" />;	
+  if (loading || !data) {
+	  return (
+		<div className="text-center mt-5">
+		  <Spinner animation="border" />
+		</div>
+	  );
+	}
+  
   const summary = data.summaryKpis ?? {};
+  
+  const handleApplyFilter = () => {
+	  if (fromDate && toDate && fromDate > toDate) {
+		alert("From date cannot be after To date");
+		return;
+	  }
+console.log("fromDate: "+fromDate+ ", toDate: "+toDate);
+	  fetchDashboard(fromDate, toDate);
+	};
    
 
   /* ================= KPIs ================= */
@@ -93,6 +126,7 @@ export default function DashboardSummary() {
   const hasAgents = data.agents?.length > 0;
   const hasCommissions = data.commissions?.length > 0 && totalCommission > 0;
   const hasVisits = data.siteVisits?.length > 0;
+  
  /* 
   const inventoryChart = data.inventory?.length
 						  ? {
@@ -161,6 +195,39 @@ export default function DashboardSummary() {
 		legend: {
 		  position: "bottom",
 		},
+		tooltip: {
+		  callbacks: {
+			label: function (context) {
+			  const dataset = context.dataset;
+			  const value = context.raw;
+			  const format = dataset.format;
+			  const label =
+				context.chart.data.labels?.[context.dataIndex] || // doughnut
+				dataset.label ||                                 // bar/line
+				"";
+
+			  switch (format) {
+				case "currency":
+				  return `${label}: ₹${formatINRComma(value)}`;
+				case "area":
+				  return `${label}: ${value.toLocaleString()} sqft`;
+				default:
+				  return `${label}: ${value}`;
+			  }
+			}
+		  }
+		}
+	  },
+	  scales: {
+		y1: {
+		  display: false,
+		},
+		y2: {
+		  display: false,
+		},
+		y3: {
+		  display: true,
+		},
 	  },
 	};
   
@@ -172,39 +239,59 @@ export default function DashboardSummary() {
 		  label: "Sales",
 		  data: data.finance.map(f => f.totalSales),
 		  backgroundColor: "#4dabf7",
+		  format: "currency",
 		},
 		{
 		  label: "Received",
 		  data: data.finance.map(f => f.totalReceived),
 		  backgroundColor: "#ffa94d",
+		  format: "currency",
 		},
 		{
 		  label: "Outstanding",
 		  data: data.finance.map(f => f.totalOutstanding),
 		  backgroundColor: "#ff6b6b",
+		  format: "currency",
 		},
 	  ],
 	};
 
 
   const agentChart = {
-    labels: data.agents.map(a => a.agentName),
-    datasets: [
-      {
-        label: "Sales Value",
-        data: data.agents.map(a => a.salesValue),
-        backgroundColor: "#9775fa",
-      },
-    ],
-  };
+	  labels: data.agents.map(a => a.agentName),
+	  datasets: [
+		{
+		  label: "Sales Value",
+		  data: data.agents.map(a => a.salesValue),
+		  backgroundColor: "#9775fa",
+		  yAxisID: "y1",
+		  format: "currency",
+		},
+		{
+		  label: "Total Area",
+		  data: data.agents.map(a => a.totalArea),
+		  backgroundColor: "#ffa94d",
+		  yAxisID: "y2",
+		  format: "area",
+		},
+		{
+		  label: "Total Sales",
+		  data: data.agents.map(a => a.totalSales),
+		  backgroundColor: "#51cf66",
+		  yAxisID: "y3",
+		  format: "count",
+		},
+	  ],
+	};
 
   const commissionChart = {
     labels: data.commissions.map(c => c.agentName),
     datasets: [
       {
-        data: data.commissions.map(c => c.totalCommission),
+		data: data.commissions.map(c => c.totalCommission),
         backgroundColor: ["#5c7cfa", "#ffa94d", "#9775fa", "#ff6b6b", 
 		"#20c997", "#4dabf7", "#339af0", "#845ef7", "#51cf66"],
+		format: "currency",
       },
     ],
   };
@@ -213,6 +300,50 @@ export default function DashboardSummary() {
     <>
 		<div className="d-flex justify-content-between align-items-center mb-3">
 		  <h3 className="mb-0">Dashboard</h3>
+		  
+		  <div className="d-flex gap-3 align-items-center mb-3 flex-wrap">
+
+			  <div className="d-flex align-items-center gap-2">
+				<label className="mb-0">From</label>
+				<input
+				  type="date"
+				  className="form-control form-control-sm"
+				  value={fromDate}
+				  onChange={(e) => setFromDate(e.target.value)}
+				  style={{ width: "150px" }}
+				/>
+			  </div>
+
+			  <div className="d-flex align-items-center gap-2">
+				<label className="mb-0">To</label>
+				<input
+				  type="date"
+				  className="form-control form-control-sm"
+				  value={toDate}
+				  onChange={(e) => setToDate(e.target.value)}
+				  style={{ width: "150px" }}
+				/>
+			  </div>
+
+			  <button
+				className="btn btn-primary btn-sm"
+				onClick={handleApplyFilter}
+			  >
+				Apply
+			  </button>
+
+			  <button
+				className="btn btn-outline-secondary btn-sm"
+				onClick={() => {
+				  setFromDate("");
+				  setToDate("");
+				  fetchDashboard();
+				}}
+			  >
+				Reset
+			  </button>
+
+			</div>
 
 		  <button
 			className="btn btn-outline-primary btn-sm"
@@ -224,6 +355,7 @@ export default function DashboardSummary() {
 
       {/* ================= KPI CARDS ================= */}
       <Row className="mb-4 g-4">
+	  {/*
 		  {hasInventory && (
 		  <>
 			<StatCard title="Total Plots" value={totalPlots} 
@@ -232,22 +364,22 @@ export default function DashboardSummary() {
 			<StatCard title="Booked" value={bookedPlots} bg="#ffa94d" />
 		  </>	
 		  )}
-		  {/* <StatCard title="Total Plots" value={totalPlots} bg="#4dabf7" />
+		   <StatCard title="Total Plots" value={totalPlots} bg="#4dabf7" />
 			   <StatCard title="Available" value={availablePlots} bg="#51cf66" />
 		  <StatCard title="Booked" value={bookedPlots} bg="#ffa94d" />
 		  <StatCard title="Sold" value={soldPlots} bg="#ff6b6b" />*/}
 		  {hasFinance && (
 			<>
-			  <StatCard title="Sales Value" value={`₹${totalSales.toLocaleString()}`} bg="#339af0" />
-			  <StatCard title="Received" value={`₹${totalReceived.toLocaleString()}`} bg="#20c997" />
-			  <StatCard title="Outstanding" value={`₹${totalOutstanding.toLocaleString()}`} bg="#845ef7" />
+			  <StatCard title="Sales Value" value={`₹${formatINRComma(totalSales)}`} bg="#339af0" />
+			  <StatCard title="Received" value={`₹${formatINRComma(totalReceived)}`} bg="#20c997" />
+			  <StatCard title="Outstanding" value={`₹${formatINRComma(totalOutstanding)}`} bg="#845ef7" />
 			</>
 		  )}
 		  {hasCommissions && (
 			  <StatCard
-				title="Total Commission"
-				value={`₹${totalCommission.toLocaleString("en-IN")}`}
-				bg="#845ef7"
+				title="Total Payout"
+				value={`₹${formatINRComma(totalCommission)}`}
+				bg="#51cf66"
 			  />
 			)}
 		  {hasVisits && (
@@ -294,7 +426,7 @@ export default function DashboardSummary() {
 
 	  {hasCommissions && (
 		
-		  <DashboardCard className="grid-item" title="Commission Distribution">
+		  <DashboardCard className="grid-item" title="Payout Distribution">
 			<ChartBox>
 			  <Doughnut data={commissionChart} options={chartOptions} />
 			</ChartBox>

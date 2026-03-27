@@ -1,5 +1,6 @@
 import React, { useEffect, useState, memo } from "react";
 import API from "../api/api";
+import { formatINRComma, formatINR, formatDate } from "../utils/numberFormatter";
 
 /* =========================
    API FUNCTIONS
@@ -32,8 +33,15 @@ const fetchUserPerformance = async (userId, filters) => {
   return res.data;
 };
 
+
+
 function SiteVisitsTable({ visits }) {
   if (!visits?.length) return null;
+  
+const totalExpense = visits.reduce(
+  (sum, v) => sum + Number(v.expenseAmount || 0),
+  0
+);
 
   return (
     <>
@@ -50,13 +58,19 @@ function SiteVisitsTable({ visits }) {
         <tbody>
           {visits.map(v => (
             <tr key={v.siteVisitId}>
-              <td>{v.visitDate}</td>
+              <td>{formatDate(v.visitDate)}</td>
               <td>{v.projectName}</td>
               <td>{v.customerName}</td>
-              <td>₹{v.expenseAmount}</td>
+              <td>₹{formatINRComma(v.expenseAmount)}</td>
             </tr>
           ))}
         </tbody>
+		<tfoot>
+		  <tr>
+			<th colSpan="3" className="text-end">Total</th>
+			<th>₹{formatINRComma(totalExpense)}</th>
+		  </tr>
+		</tfoot>
       </table>
     </>
   );
@@ -64,6 +78,11 @@ function SiteVisitsTable({ visits }) {
 
 function SalesTable({ sales }) {
   if (!sales?.length) return null;
+
+const totalSales = sales.reduce(
+  (sum, s) => sum + Number(s.saleAmount || 0),
+  0
+);  
 
   return (
     <>
@@ -84,11 +103,20 @@ function SalesTable({ sales }) {
 			  <td>{s.projectName}</td>
               <td>{s.plotNumber}</td>
               <td>{s.customerName}</td>
-              <td>₹{s.baseAmount}</td>
-              <td>{s.confirmedAt}</td>
+              <td>₹{formatINRComma(s.saleAmount)}</td>
+              <td>{formatDate(s.confirmedAt)}</td>
             </tr>
           ))}
         </tbody>
+		
+		<tfoot>
+			  <tr>
+				<th colSpan="3" className="text-end">Total</th>
+				<th>₹{formatINRComma(totalSales)}</th>
+				<th></th>
+			  </tr>
+			</tfoot>
+		
       </table>
     </>
   );
@@ -101,6 +129,7 @@ function ReceivableTable({ receivable }) {
     receivable.reduce((acc, r) => {
       const key = r.plotNumber;
       acc[key] = acc[key] || {
+		projectName: r.projectName,  
         plotNumber: r.plotNumber,
         customerName: r.customerName,
         saleAmount: r.saleAmount,
@@ -111,6 +140,16 @@ function ReceivableTable({ receivable }) {
       return acc;
     }, {})
   );
+  
+  const totals = grouped.reduce(
+	  (acc, r) => {
+		acc.saleAmount += Number(r.saleAmount || 0);
+		acc.received += Number(r.received || 0);
+		acc.outstanding += Number((r.saleAmount - r.received) || 0);
+		return acc;
+	  },
+	  { saleAmount: 0, received: 0, outstanding: 0 }
+	);
 
   return (
     <>
@@ -118,6 +157,7 @@ function ReceivableTable({ receivable }) {
       <table className="table table-sm table-bordered">
         <thead>
           <tr>
+		    <th>Project</th>
             <th>Plot</th>
             <th>Customer</th>
             <th>Plot Price</th>
@@ -128,14 +168,23 @@ function ReceivableTable({ receivable }) {
         <tbody>
           {grouped.map(r => (
             <tr key={r.plotNumber}>
+			  <td>{r.projectName}</td>
               <td>{r.plotNumber}</td>
               <td>{r.customerName}</td>
-              <td>₹{r.baseAmount}</td>
-              <td>₹{r.received}</td>
-              <td>₹{r.saleAmount - r.received}</td>
+              <td>₹{formatINRComma(r.saleAmount)}</td>
+              <td>₹{formatINRComma(r.received)}</td>
+              <td>₹{formatINRComma(r.saleAmount - r.received)}</td>
             </tr>
           ))}
         </tbody>
+		<tfoot>
+		  <tr>
+			<th colSpan="3" className="text-end">Total</th>
+			<th>₹{formatINRComma(totals.baseAmount)}</th>
+			<th>₹{formatINRComma(totals.received)}</th>
+			<th>₹{formatINRComma(totals.outstanding)}</th>
+		  </tr>
+		</tfoot>
       </table>
     </>
   );
@@ -144,15 +193,25 @@ function ReceivableTable({ receivable }) {
 function CommissionTable({ commission }) {
   if (!commission?.length) return null;
 
+const payables = commission.reduce(
+  (acc, c) => {
+    acc.saleAmount += Number(c.saleAmount || 0);
+    acc.total += Number(c.totalCommission || 0);
+    acc.paid += Number(c.commissionPaid || 0);
+    return acc;
+  },
+  { saleAmount: 0, total: 0, paid: 0 }
+);  
   return (
     <>
-      <h6 className="mt-4">Commission</h6>
+      <h6 className="mt-4">Payout</h6>
       <table className="table table-sm table-bordered">
         <thead>
           <tr>
             <th>Project</th>
+			<th>Plot Number</th>
             <th>Plot Price</th>
-            <th>Total</th>
+            <th>Total Payout</th>
             <th>Paid</th>
           </tr>
         </thead>
@@ -160,12 +219,23 @@ function CommissionTable({ commission }) {
           {commission.map(c => (
             <tr key={c.commissionId}>
               <td>{c.projectName}</td>
-              <td>₹{c.baseAmount}</td>
-              <td>₹{c.totalCommission}</td>
-              <td className="text-success">₹{c.commissionPaid}</td>
+			  <td>{c.plotNumber}</td>
+              <td>₹{formatINRComma(c.saleAmount)}</td>
+              <td>₹{formatINRComma(c.totalCommission)}</td>
+              <td className="text-success">₹{formatINRComma(c.commissionPaid)}</td>
             </tr>
           ))}
         </tbody>
+		
+		<tfoot>
+		  <tr>
+			<th colSpan="2" className="text-end">Total</th>
+			<th>₹{formatINRComma(payables.saleAmount)}</th>
+			<th>₹{formatINRComma(payables.total)}</th>
+			<th>₹{formatINRComma(payables.paid)}</th>
+		  </tr>
+		</tfoot>
+		
       </table>
     </>
   );

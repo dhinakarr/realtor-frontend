@@ -14,6 +14,7 @@ import SaleDetailsTable from "../../components/finance/SaleDetailsTable";
 import TransactionHistoryModal from "../../components/finance/TransactionHistoryModal";
 import { Table, Modal } from "react-bootstrap";	
 import "./FinanceDashboard.css";
+import { formatINRComma, formatINR, formatDate } from "../../utils/numberFormatter";
 
 const FinanceDashboard = () => {
 
@@ -60,7 +61,7 @@ const FinanceDashboard = () => {
 	
 	useEffect(() => {
 		loadSummary(dateRange);
-		loadCashFlow(filters, dateRange);
+		//loadCashFlow(filters, dateRange);
 	}, [dateRange, filters]);
 	
 	const handleAmountClick = (saleId, txnType, agentId = null) => {
@@ -106,7 +107,7 @@ const FinanceDashboard = () => {
 	};
 	
 	const handleFilter = async ({ type }) => {
-		console.log("handleFilter called:", type);
+		//console.log("handleFilter called:", type);
 	  setLoading(true);
 	  
 	  if (!dateRange?.from || !dateRange?.to) {
@@ -144,7 +145,7 @@ const FinanceDashboard = () => {
 			to: dateRange.to
 		  }
 		});
-console.log("API response:", res.data);
+//console.log("API response:", res.data);
 		setTableData(res.data.data || []);
 		setViewType(type);
 
@@ -161,7 +162,7 @@ console.log("API response:", res.data);
 		{ key: "plotNumber", label: "Plot" },
 		{ key: "customerName", label: "Customer" },
 		{ key: "agentName", label: "Agent" },
-		{ key: "saleAmount", label: "Sale Amount" },
+		{ key: "saleAmount", label: "Sale Amount", isAmount: true },
 		{
 		  key: "totalReceived",
 		  label: "Received",
@@ -169,16 +170,16 @@ console.log("API response:", res.data);
 		  clickable: true,
 		  txnType: "RECEIVED"
 		},
-		{ key: "outstandingAmount", label: "Outstanding" }
+		{ key: "outstandingAmount", label: "Outstanding", isAmount: true }
 	  ],
 
 	  PAID: [
 		{ key: "projectName", label: "Project" },
 		{ key: "plotNumber", label: "Plot" },
 		{ key: "agentName", label: "Agent" },
-		{ key: "saleAmount", label: "Sale Amount" },
-		{ key: "paymentDate", label: "Paid Date" },
-		{ key: "totalCommission", label: "Commission" },
+		{ key: "saleAmount", label: "Sale Amount", isAmount: true },
+		
+		{ key: "commissionEligible", label: "Payout", isAmount: true },
 		{
 		  key: "commissionPaid",
 		  label: "Paid",
@@ -194,17 +195,6 @@ console.log("API response:", res.data);
 		}
 	  ]
 	};
-	
-	const formatAmount = (value) => {
-	  if (value == null || isNaN(value)) return "₹0.00";
-
-	  return Number(value).toLocaleString("en-IN", {
-		minimumFractionDigits: 2,
-		maximumFractionDigits: 2,
-	  });
-	};
-	
-	
 	
 	const TableFilters = ({ filters, onChange, projectOptions, plotOptions, agentOptions }) => {
 
@@ -303,10 +293,10 @@ console.log("API response:", res.data);
 						  onAmountClick(row.saleId, col.txnType, row.agentId)
 						}
 					  >
-						{formatAmount(row[col.key])}
+						{formatINRComma(Number(row[col.key] || 0))}
 					  </span>
 					) : col.isAmount ? (
-					  formatAmount(row[col.key])
+					  formatINRComma(Number(row[col.key] || 0))
 					) : (
 					  row[col.key] ?? "-"
 					)}
@@ -325,12 +315,7 @@ console.log("API response:", res.data);
 	const SectionHeader = ({ title, onBack }) => (
 		<div className="d-flex justify-content-between align-items-center mb-1">
 			<h6 className="mb-0">{title}</h6>
-			<button
-				className="btn btn-outline-secondary btn-sm"
-				onClick={onBack}
-			>
-				← Back to Cash Flow
-			</button>
+			
 		</div>
 	);
 
@@ -366,15 +351,7 @@ console.log("API response:", res.data);
 		}
 	};
 	
-	const submitReceivablePayment = async (payload) => {
-		
-	  const json = buildPaymentPayload(payload, "RECEIVABLE");
-	  await API.post("/api/payments", json);
-	  setShowPaymentModal(false);
-	  showToast("Payment saved successfully");
-	  loadSummary();
-	  loadCashFlow();
-	};
+	
 	
 	const submitCommissionPayment = async (row, form) => {
 	  const json = buildPaymentPayload(
@@ -438,8 +415,7 @@ console.log("API response:", res.data);
 		await API.post("/api/payments", jsonData);
 		showToast("Payment saved successfully");
 		setShowPaymentModal(false);	
-		loadSummary();
-		loadCashFlow();
+		await refreshCurrentView(); // ✅ FIX
 		// optionally refresh payments list
 	  } catch (err) {
 		showToast("Failed to save payment");
@@ -482,18 +458,52 @@ console.log("API response:", res.data);
 
 	  return projectMatch && plotMatch && agentMatch;
 	});
+	
+	const refreshCurrentView = async () => {
+	  await loadSummary();
+	  await loadCashFlow();
 
+	  if (viewType && viewType !== "CASHFLOW") {
+		await handleFilter({ type: viewType });
+	  }
+	};
+	
+	const submitReceivablePayment = async (payload) => {
+		
+	  const json = buildPaymentPayload(payload, "RECEIVABLE");
+	  await API.post("/api/payments", json);
+	  setShowPaymentModal(false);
+	  showToast("Payment saved successfully");
+	  await refreshCurrentView();
+	};
+	
 	return (
 		<div className="p-1">
-			<h6 className="text-xl font-semibold mb-2">Finance Operations</h6>
-			<div className="z-1 pb-1 d-flex justify-content-center">
-			  <div style={{ width: "fit-content", minWidth: "500px" }}>
-				<FinanceFilters
-				  value={dateRange}
-				  onApply={(range) => setDateRange(range)}
-				/>
+			
+			<div className="d-flex align-items-center mb-2">
+
+			  {/* LEFT: Title */}
+			  <div>
+				<h5 className="text-xl font-semibold mb-0">
+				  Finance Operations
+				</h5>
 			  </div>
+
+			  {/* CENTER: Filters */}
+			  <div className="flex-grow-1 d-flex justify-content-center">
+				<div style={{ minWidth: "400px" }}>
+				  <FinanceFilters
+					value={dateRange}
+					onApply={(range) => setDateRange(range)}
+				  />
+				</div>
+			  </div>
+
+			  {/* RIGHT: Empty spacer (keeps center truly centered) */}
+			  <div style={{ width: "150px" }}></div>
+
 			</div>
+			
 			<FinanceSummaryCards data={summary} dateRange={dateRange} onFilter={handleFilter} />
 
 			
@@ -501,7 +511,7 @@ console.log("API response:", res.data);
 			{viewType === "SALE"  && tableData?.[0]?.saleId && (
 			  <>
 				<SectionHeader
-				  title={`Sale Details (${dateRange.from} → ${dateRange.to})`}
+				  title={`Sale Details (${formatDate(dateRange.from)} → ${formatDate(dateRange.to)})`}
 				  onBack={() => setViewType("CASHFLOW")}
 				/>
 				
@@ -524,7 +534,7 @@ console.log("API response:", res.data);
 			{viewType === "RECEIVABLE" && (
 				<>
 					<SectionHeader
-						title={`Receivable Details (${dateRange.from} → ${dateRange.to})`}
+						title={`Receivable Details (${formatDate(dateRange.from)} → ${formatDate(dateRange.to)})`}
 						onBack={() => setViewType("CASHFLOW")}
 					/>
 					
@@ -549,7 +559,7 @@ console.log("API response:", res.data);
 			{viewType === "RECEIVED" && (
 			  <>
 				<SectionHeader
-				  title={`Received Details (${dateRange.from} → ${dateRange.to})`}
+				  title={`Received Details (${formatDate(dateRange.from)} → ${formatDate(dateRange.to)})`}
 				  onBack={() => setViewType("CASHFLOW")}
 				/>
 				
@@ -573,7 +583,7 @@ console.log("API response:", res.data);
 			{viewType === "PAID" && (
 			  <>
 				<SectionHeader
-				  title={`Commission Paid (${dateRange.from} → ${dateRange.to})`}
+				  title={`Payout Done (${formatDate(dateRange.from)} → ${formatDate(dateRange.to)})`}
 				  onBack={() => setViewType("CASHFLOW")}
 				/>
 				
@@ -597,7 +607,7 @@ console.log("API response:", res.data);
 			{viewType === "PAYABLE" && (
 				<>
 					<SectionHeader
-						title={`Commission Payable Details (${dateRange.from} → ${dateRange.to})`}
+						title={`Commission Payable Details (${formatDate(dateRange.from)} → ${formatDate(dateRange.to)})`}
 						onBack={() => setViewType("CASHFLOW")}
 					/>
 					
@@ -630,10 +640,9 @@ console.log("API response:", res.data);
 				row={drawer.row}
 				action={drawer.action}
 				onClose={() => setDrawer(d => ({ ...d, open: false }))}
-				onSuccess={() => {
-					loadSummary();
-					loadCashFlow();
-					setDrawer({ open: false });
+				onSuccess={async () => {
+				  await refreshCurrentView(); // ✅ FIX
+				  setDrawer({ open: false });
 				}}
 			/>
 			

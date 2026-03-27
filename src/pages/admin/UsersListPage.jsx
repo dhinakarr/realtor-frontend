@@ -21,12 +21,13 @@ export default function UsersListPage() {
   const [showCreate, setShowCreate] = useState(false);
   const [showEditOverlay, setShowEditOverlay] = useState(false);
   const [showUploadOverlay, setShowUploadOverlay] = useState(false);
-    
+  const [roleFilter, setRoleFilter] = useState("");
+  const [managerFilter, setManagerFilter] = useState("");
   
   const featureUrl = "/api/users";
   const mapApiToRoute = (url) => url.replace("/api", "/admin");
   const module = useModule(featureUrl);
-  const moduleName = useModule(featureUrl).moduleName;
+  //const moduleName = useModule(featureUrl).moduleName;
   
   const normalizeUrl = (url) => "/" + url.replace(/^\/+/, "").trim().toLowerCase();
   const feature = module?.features?.find(
@@ -54,6 +55,16 @@ export default function UsersListPage() {
 		loadData();
 	  }
   }, [page, search, loadData]);
+  
+  const roleOptions = [...new Set(list.map(u => u.roleName).filter(Boolean))];
+  const managerOptions = [...new Set(list.map(u => u.managerName).filter(Boolean))];
+  
+  const filteredList = list.filter(u => {
+	  return (
+		(!roleFilter || u.roleName === roleFilter) &&
+		(!managerFilter || u.managerName === managerFilter)
+	  );
+	});
   
   
   const handleDeleteClick = (userId) => {
@@ -110,11 +121,11 @@ export default function UsersListPage() {
 	};
 	
   return (
-    <div className="container-fluid">
+    <div>
 		{module && (
         <PageHeader module={module} mapApiToRoute={mapApiToRoute} />
       )}
-      <p></p>
+
       {/* Search Bar */}
       <div className="row mb-3 align-items-center">
 
@@ -154,14 +165,35 @@ export default function UsersListPage() {
 
       {/* Table */}
       <table className="table table-bordered table-hover">
-        <thead className="table-light">
+        <thead className="table-light text-center">
           <tr>
             <th>Name</th>
-            <th>Role Name</th>
+            <th>
+				<select
+				className="form-select form-select-sm"
+				value={roleFilter}
+				onChange={(e) => setRoleFilter(e.target.value)}
+			  >
+				<option value="">Role Name</option>
+				{roleOptions.map((role, i) => (
+				  <option key={i} value={role}>{role}</option>
+				))}
+			  </select>
+			</th>
             <th>Email</th>
-            <th>Reporting Manager</th>
+            <th>
+				<select
+					className="form-select form-select-sm"
+					value={managerFilter}
+					onChange={(e) => setManagerFilter(e.target.value)}
+				  >
+					<option value="">Reporting Manager</option>
+					{managerOptions.map((m, i) => (
+					  <option key={i} value={m}>{m}</option>
+					))}
+				  </select>
+			</th>
 			<th>Mobile</th>
-            <th>Status</th>
             <th style={{ width: "100px" }}>Actions</th>
           </tr>
         </thead>
@@ -173,18 +205,13 @@ export default function UsersListPage() {
               </td>
             </tr>
           ) : (
-            list.map((u) => (
+            filteredList.map((u) => (
               <tr key={u.userId} title={`Employee ID: ${u.employeeId}`}>
                 <td>{u.fullName}</td>
                 <td>{u.roleName}</td>
                 <td>{u.email}</td>
                 <td>{u.managerName}</td>
 				<td>{u.mobile}</td>
-                <td>
-                  <span className={`badge ${u.status === "ACTIVE" ? "bg-success" : "bg-secondary"}`}>
-                    {u.status}
-                  </span>
-                </td>
                 <td>
 				  <div className="d-flex align-items-center gap-1">
 					{feature?.canRead && (

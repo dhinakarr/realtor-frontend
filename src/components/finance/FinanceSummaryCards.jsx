@@ -1,6 +1,7 @@
 import React from "react";
 import { Card, Row, Col } from "react-bootstrap";
 import "./SummaryCards.css";
+import { formatINRComma, formatINR } from "../../utils/numberFormatter";
 
 
 
@@ -29,7 +30,7 @@ const FinanceSummaryCards = ({ data, dateRange, onFilter }) => {
       <Col md={2}>
         <SummaryCard
           title="Total Sales"
-          value={safeData.totalSaleAmount ?? 0}
+          value={formatINRComma(safeData.totalSaleAmount ?? 0)}
           variant="primary"
           onClick={() => onFilter?.({ type: "SALE" })}
         />
@@ -38,7 +39,7 @@ const FinanceSummaryCards = ({ data, dateRange, onFilter }) => {
       <Col md={2}>
         <SummaryCard
           title="Total Receivable"
-          value={safeData.totalReceivable ?? 0}
+          value={formatINRComma(safeData.totalReceivable ?? 0)}
           variant="warning"
           onClick={() => onFilter?.({ type: "RECEIVABLE" })}
         />
@@ -47,7 +48,7 @@ const FinanceSummaryCards = ({ data, dateRange, onFilter }) => {
       <Col md={2}>
         <SummaryCard
           title="Received"
-          value={safeData.receivedThisMonth ?? 0}
+          value={formatINRComma(safeData.receivedThisMonth ?? 0)}
           variant="success"
           onClick={() => onFilter?.({ type: "RECEIVED" })}
         />
@@ -55,8 +56,8 @@ const FinanceSummaryCards = ({ data, dateRange, onFilter }) => {
 
       <Col md={2}>
         <SummaryCard
-          title="Commission Paid"
-          value={safeData.commissionPaidThisMonth ?? 0}
+          title="Payout Done"
+          value={formatINRComma(safeData.commissionPaidThisMonth ?? 0)}
           variant="info"
           onClick={() => onFilter?.({ type: "PAID" })}
         />
@@ -65,7 +66,7 @@ const FinanceSummaryCards = ({ data, dateRange, onFilter }) => {
       <Col md={2}>
         <SummaryCard
           title="Payable"
-          value={safeData.commissionPayable ?? 0}
+          value={formatINRComma(safeData.commissionPayable ?? 0)}
           variant="danger"
           onClick={() => onFilter?.({ type: "PAYABLE" })}
         />

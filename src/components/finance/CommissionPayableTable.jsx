@@ -2,6 +2,7 @@ import React from "react";
 import { Table, Spinner } from "react-bootstrap";
 import { FaMoneyBillWave, FaCommentDots } from "react-icons/fa";
 import useModule from "../../hooks/useModule";
+import { formatINRComma, formatINR } from "../../utils/numberFormatter";
 
 const CommissionPayableTable = ({ data, loading, onAction }) => {
 	
@@ -16,15 +17,6 @@ const CommissionPayableTable = ({ data, loading, onAction }) => {
 		return <div className="text-muted">No payable commissions found</div>;
 	}
 	
-	const formatAmount = (value) => {
-	  if (value == null || isNaN(value)) return "₹0.00";
-
-	  return Number(value).toLocaleString("en-IN", {
-		minimumFractionDigits: 2,
-		maximumFractionDigits: 2,
-	  });
-	};
-
 	return (
 		<Table striped bordered hover size="sm">
 			<thead>
@@ -32,7 +24,7 @@ const CommissionPayableTable = ({ data, loading, onAction }) => {
 					<th>Project</th>
 					<th>Plot</th>
 					<th>Agent</th>
-					<th className="text-end">Commission</th>
+					<th className="text-end">Payout</th>
 					<th className="text-end">Paid</th>
 					<th className="text-end">Payable</th>
 					<th className="text-center">Action</th>
@@ -47,13 +39,13 @@ const CommissionPayableTable = ({ data, loading, onAction }) => {
 						<td>{row.agentName}</td>
 
 						<td className="text-end">
-							 {formatAmount(row.commissionEligible ?? 0).toLocaleString()}
+							 {formatINRComma(row.commissionEligible ?? 0)}
 						</td>
 						<td className="text-end">
-							 {formatAmount(row.commissionPaid ?? 0).toLocaleString()}
+							 {formatINRComma(row.commissionPaid ?? 0)}
 						</td>
 						<td className="text-end fw-bold text-danger">
-							 {formatAmount(row.commissionPayable ?? 0)}
+							 {formatINRComma(row.commissionPayable ?? 0)}
 						</td>
 
 						<td className="text-center">
@@ -65,7 +57,7 @@ const CommissionPayableTable = ({ data, loading, onAction }) => {
 											? "text-success"
 											: "text-muted"
 									}`}
-									title="Pay Commission"
+									title="Payout"
 									style={{ cursor: "pointer" }}
 									onClick={() =>
 										row.commissionPayable > 0 &&

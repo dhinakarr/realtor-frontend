@@ -5,6 +5,7 @@ import { useReactToPrint } from "react-to-print";
 import { FaPrint } from "react-icons/fa";
 import logo from "../assets/logo.png";
 import CancelBookingPanel from "./CancelBookingPanel"
+import { formatINRComma, formatINR } from "../utils/numberFormatter";
 
 export default function PlotViewPanel({ plotId, onClose, onBook, onCancel }) {
   const [plot, setPlot] = useState(null);
@@ -45,6 +46,15 @@ export default function PlotViewPanel({ plotId, onClose, onBook, onCancel }) {
 
 
   if (!plotId) return null;
+  
+  const amountFields = [
+	  "ratePerSqft",
+	  "basePrice",
+	  "registrationCharges",
+	  "documentationCharges",
+	  "otherCharges",
+	  "totalPrice"
+	];
 
   const labelMap = {
     plotNumber: "Plot Number",
@@ -146,7 +156,12 @@ export default function PlotViewPanel({ plotId, onClose, onBook, onCancel }) {
 				<div className="plot-detail-row" key={key}>
 				  <div className="detail-label">{labelMap[key]}</div>
 				  <div className="detail-value">
-					{plot[key] === null || plot[key] === "" ? "-" : String(plot[key])}
+					{plot[key] === null || plot[key] === ""
+					  ? "-"
+					  : amountFields.includes(key)
+						? formatINRComma(Math.round(Number(plot[key])))
+						: String(plot[key])
+					}
 				  </div>
 				</div>
 			  );

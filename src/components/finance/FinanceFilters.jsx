@@ -53,85 +53,54 @@ const FinanceFilters = ({ value, onApply }) => {
 
   return (
     <Card className="mb-1">
-      <Card.Body  className="py-2">
-        <Row className="align-items-end g-2 justify-content-center">
-          <Col md="auto">
-            <Form.Group className="mb-1">
-              <Form.Label className="mb-0 small text-muted">From</Form.Label>
-              <Form.Control size="sm"
-                type="date"
-                name="from"
-                value={filters.from || ""}
-                onChange={update}
-              />
-            </Form.Group>
-          </Col>
+	  <Card.Body className="py-2">
+		<Row className="align-items-center g-3 justify-content-center">
 
-          <Col md="auto">
-            <Form.Group className="mb-1">
-              <Form.Label className="mb-0 small text-muted">To</Form.Label>
-              <Form.Control size="sm"
-                type="date"
-                name="to"
-                value={filters.to || ""}
-                onChange={update}
-              />
-            </Form.Group>
-          </Col>
-		  {/*
-          <Col md={2}>
-            <Form.Group className="mb-1">
-              <Form.Label className="mb-0 small text-muted">Type</Form.Label>
-              <Form.Select size="sm"
-                name="type"
-                value={filters.type || ""}
-                onChange={update}
-              >
-                {CASHFLOW_TYPES.map((t) => (
-                  <option key={t.value} value={t.value}>
-                    {t.label}
-                  </option>
-                ))}
-              </Form.Select>
-            </Form.Group>
-          </Col>
+		  {/* FROM */}
+		  <Col md="auto">
+			<div className="d-flex align-items-center gap-2">
+			  <Form.Label className="mb-0 small text-muted">From</Form.Label>
+			  <Form.Control
+				size="sm"
+				type="date"
+				name="from"
+				value={filters.from || ""}
+				onChange={update}
+				style={{ width: "150px" }}
+			  />
+			</div>
+		  </Col>
 
-          <Col md={2}>
-            <Form.Group className="mb-1">
-              <Form.Label className="mb-0 small text-muted">Status</Form.Label>
-              <Form.Select size="sm"
-                name="status"
-                value={filters.status || ""}
-                onChange={update}
-              >
-                {CASHFLOW_STATUS.map((s) => (
-                  <option key={s.value} value={s.value}>
-                    {s.label}
-                  </option>
-                ))}
-              </Form.Select>
-            </Form.Group>
-          </Col>
-		  */}
-          <Col md="auto">
-			  <Form.Group className="mb-1">
-				<Form.Label className="mb-0 small text-muted invisible">
-				  Actions
-				</Form.Label>
+		  {/* TO */}
+		  <Col md="auto">
+			<div className="d-flex align-items-center gap-2">
+			  <Form.Label className="mb-0 small text-muted">To</Form.Label>
+			  <Form.Control
+				size="sm"
+				type="date"
+				name="to"
+				value={filters.to || ""}
+				onChange={update}
+				style={{ width: "150px" }}
+			  />
+			</div>
+		  </Col>
 
-				<div className="d-flex gap-2">
-				  <Button size="sm" variant="primary" onClick={apply}>
-					Apply
-				  </Button>
-				  <Button size="sm" variant="outline-secondary" onClick={reset}>
-					Reset
-				  </Button>
-				</div>
-			  </Form.Group>
-			</Col>
-        </Row>
-      </Card.Body>
-    </Card>
+		  {/* ACTIONS */}
+		  <Col md="auto">
+			<div className="d-flex gap-2">
+			  <Button size="sm" variant="primary" onClick={apply}>
+				Apply
+			  </Button>
+			  <Button size="sm" variant="outline-secondary" onClick={reset}>
+				Reset
+			  </Button>
+			</div>
+		  </Col>
+
+		</Row>
+	  </Card.Body>
+	</Card>
   );
 };
 
