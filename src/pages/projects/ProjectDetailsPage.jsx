@@ -14,6 +14,7 @@ import { formatINRComma, formatINR } from "../../utils/numberFormatter";
 import SaleInitiationPanel from "../../components/SaleInitiationPanel";
 import PaymentModal from "../../components/PaymentModal";
 import CancelBookingPanel from "../../components/CancelBookingPanel";
+import ProjectDetailsContent from "../../components/projects/ProjectDetailsContent";
 
 export default function ProjectDetailsPage() {
   const { id } = useParams();
@@ -171,7 +172,7 @@ export default function ProjectDetailsPage() {
 			<button
 			  type="button"
 			  className="btn btn-primary"
-			  onClick={() => navigate("/projects/list")}
+			  onClick={() => navigate(-1)}
 			>
 			  Back
 			</button>
@@ -181,7 +182,7 @@ export default function ProjectDetailsPage() {
 			  className="btn btn-primary"
 			  onClick={() => navigate(`/projects/${id}/commission-rules`)}
 			>
-			  Commission Rules
+			  Payout Rules
 			</button>
 			)}
 			{pCreate && (
@@ -199,7 +200,7 @@ export default function ProjectDetailsPage() {
       {/* PROJECT INFO */}
       <div className="project-card p-3 mb-3">
 
-		  {/* ================= ROW 1 : IMAGE ================= */}
+		  
 		  {project.files?.length > 0 && (
 			<div className="row mb-3">
 			  <div className="col-12">
@@ -217,26 +218,20 @@ export default function ProjectDetailsPage() {
 			</div>
 		  )}
 
-		  {/* ================= ROW 2 : DATA + CHART ================= */}
+		  
 		  <div className="row g-3 align-items-stretch">
-
-			{/* Column 1 */}
 			<div className="col-md-4">
 			  <h4 className="mb-3">{project.projectName}</h4>
 			  <p><small>Location:</small> {project.locationDetails}</p>
 			  <p><small>Survey Number:</small> {project.surveyNumber}</p>
 			  <p><small>Price / Sqft:</small> ₹{formatINRComma(project.pricePerSqft)}</p>
 			</div>
-
-			{/* Column 2 */}
 			<div className="col-md-4">
 			  <p><small>Stamp Duty:</small> {formatINRComma(project.regCharges)}%</p>
 			  <p><small>Documentation Charges:</small> ₹{formatINRComma(project.docCharges)}</p>
 			  <p><small>Other Charges:</small> ₹{formatINRComma(project.otherCharges)}</p>
 			  <p><small>Guideline Value:</small> ₹{formatINRComma(project.guidanceValue)}</p>
 			</div>
-
-			{/* Column 3 : Chart */}
 			<div className="col-md-4 d-flex flex-column align-items-center"
 			 style={{ minWidth: 0 }}
 			>
@@ -258,10 +253,6 @@ export default function ProjectDetailsPage() {
 		  </div>
 		</div>
 
-
-
-
-      {/* PLOT GRID */}
 			  <div className="project-grid">
 				  {plots
 					  .filter((plot) => {
@@ -291,7 +282,6 @@ export default function ProjectDetailsPage() {
 
 						</div>
 
-						{/* Edit Icon */}
 					{canEdit && (	
 						<FaEdit
 						  className="plot-edit-icon"
@@ -301,21 +291,9 @@ export default function ProjectDetailsPage() {
 						  }}
 						/>
 					)}
-						{/* Bottom Icons */}
 
 						{plot.status !== "CANCELLED" && (
 						  <div className="bottom-icons">
-						  {/*isFinance && (
-							<FaMoneyBill
-							  className="plot-icon finance"
-							  size={24}
-							  onClick={(e) => {
-								e.stopPropagation();
-								setSelectedSale(plot.plotId);
-								setShowPaymentModal(true);
-							  }}
-							/>
-						  )*/}
 						  {canDelete && (
 							<FaTrash
 							  className="plot-icon delete"
@@ -335,13 +313,13 @@ export default function ProjectDetailsPage() {
 				  ))}
 				</div>
 				
-				{/* ================= PROJECT GALLERY (SEPARATE SECTION) ==============*/}
+
 				{(galleryImages.length > 0 || galleryVideos.length > 0) && (
 				<section className="project-media-section">
 				 <h5 className="mb-3">Project Media</h5>
 				  <div className="project-gallery mt-1">
 
-					{/* Images */}
+
 					{galleryImages.map(doc => (
 					  <div
 						key={doc.documentId}
@@ -359,7 +337,6 @@ export default function ProjectDetailsPage() {
 					))}
 
 
-					{/* Videos */}
 					{galleryVideos.map(doc => (
 					  <div
 						key={doc.documentId}
@@ -382,6 +359,7 @@ export default function ProjectDetailsPage() {
 				  </div>
 				</section>  
 				)}
+				
 
 		{salePlotId && (
 		  <SaleInitiationPanel

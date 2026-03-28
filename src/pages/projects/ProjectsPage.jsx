@@ -7,6 +7,7 @@ import useModule from "../../hooks/useModule";
 import "./ProjectPage.css";
 import UploadDocumentOverlay from "./UploadDocumentOverlay";
 import { FaUpload } from "react-icons/fa";
+import ProjectCards from "../../components/projects/ProjectCards"
 
 export default function ProjectPage() {
   const [projects, setProjects] = useState([]);
@@ -159,6 +160,7 @@ export default function ProjectPage() {
       )}
 
       {/* Project Cards */}
+		  {/*
       <div className="row">
         {projects.map((project) => {
           const img =
@@ -166,7 +168,7 @@ export default function ProjectPage() {
               ? `${BASE_URL}/api/projects/file/${project.files[0].projectFileId}`
               : null;
 		  const videoDoc = project.documents?.find(d => d.documentType === "VIDEO");
-//console.log("ProjectsPage videoDoc: "+videoDoc);
+
           return (
             <div
 				  key={project.projectId}
@@ -199,7 +201,6 @@ export default function ProjectPage() {
 				 )}
 				</div>
 
-                {/* Image */}
                 {img && (
                   <img
                     src={img}
@@ -216,8 +217,6 @@ export default function ProjectPage() {
                 )}
 
                 <div className="card-body d-flex align-items-center gap-3">
-  
-				  {/* LEFT SIDE – project details */}
 				  <div className="flex-grow-1">
 					<h5 className="fw-bold mb-1">{project.projectName}</h5>
 
@@ -240,7 +239,6 @@ export default function ProjectPage() {
 					</div>
 				  </div>
 
-				  {/* RIGHT SIDE – video thumbnail */}
 				  {videoDoc && (
 				  <div className="video-thumb-container">
 					<div
@@ -257,8 +255,6 @@ export default function ProjectPage() {
 				  )}
 				</div>
 
-
-                {/* Card Footer */}
                 <div className="card-footer bg-white position-relative" style={{ minHeight: "30px" }}>
 				  {canDelete && (
 					<FaTrash
@@ -277,13 +273,38 @@ export default function ProjectPage() {
 					/>
 				  )}
 				</div>
-
-              </div>
+			  </div>	
             </div>
           );
         })}
       </div>
-	  
+		  */}
+	  <ProjectCards
+		  projects={projects}
+		  BASE_URL={BASE_URL}
+		  canEdit={canEdit}
+		  canDelete={canDelete}
+		  onView={handleView}
+		  onEdit={handleEdit}
+		  onDelete={handleDelete}
+		  onUpload={(id) => {
+			setSelectedProjectId(id);
+			setShowUploadOverlay(true);
+		  }}
+		  setActiveVideo={setActiveVideo}
+		  setShowVideoModal={setShowVideoModal}
+		/>
+		
+		<UploadDocumentOverlay
+		  show={showUploadOverlay}
+		  projectId={selectedProjectId}
+		  onClose={() => setShowUploadOverlay(false)}
+		  onSuccess={() => {
+			setShowUploadOverlay(false);
+			loadProjects(); // ✅ THIS is what you're missing
+		  }}
+		/>
+		
 	  {/* DELETE PROJECT CONFIRM MODAL */}
 		{deleteProjectId && (
 		  <div
@@ -320,7 +341,7 @@ export default function ProjectPage() {
 			</div>
 		  </div>
 		)}
-		
+
 		{/* PLAYING VIDEO MODAL */}
 		{showVideoModal && activeVideo && (
 		  <div
@@ -355,18 +376,6 @@ export default function ProjectPage() {
 			</div>
 		  </div>
 		)}
-
-		
-		<UploadDocumentOverlay
-		  show={showUploadOverlay}
-		  projectId={selectedProjectId}
-		  onClose={() => setShowUploadOverlay(false)}
-		  onSuccess={() => {
-			setShowUploadOverlay(false);
-			// optional: reload user list or show toast
-		  }}
-		/>
-	  
     </div>
   );
 }

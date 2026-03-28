@@ -14,11 +14,14 @@ function UserDrawer({ open, onClose }) {
   const { showToast } = useToast();
   
   useEffect(() => {
+	  if (!currentUser?.token?.userId) 
+		  return;
+	  
     API.get("/api/users/form").then(res => {
       const requiredFields = res.data.data.fields
         .filter(f => f.required && !f.hidden)
         .sort((a, b) => a.sortOrder - b.sortOrder);
-
+//console.log("requiredFields: "+JSON.stringify(requiredFields));
       setFields(requiredFields);
 	  const managerField = requiredFields.find(
 		  f => f.apiField === "managerId"

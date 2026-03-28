@@ -71,12 +71,12 @@ export default function UploadDocumentOverlay({ show, projectId, onClose, onSucc
 	  if (!window.confirm("Delete this document?")) return;
 
 	  try {
-		await API.delete(`/api/projects/documents/${docId}`);
+		const res = await API.delete(`/api/projects/documents/${docId}`);
 
 		setDocuments(prev =>
 		  prev.filter(d => d.documentId !== docId)
 		);
-
+		onSuccess();
 		showToast("Document deleted successfully", "success");
 	  } catch (err) {
 		console.error(err);
@@ -117,14 +117,14 @@ export default function UploadDocumentOverlay({ show, projectId, onClose, onSucc
           },
         }
       );
-	  
+	  onSuccess();
 	  // 🔥 reload documents to get filePath + documentId
 		await loadDocuments();
 
 		setDocumentType("");
 		setDocumentNumber("");
 		setFile(null);
-
+		
 		showToast("Document uploaded successfully", "success");
     } catch (err) {
       console.error(err);

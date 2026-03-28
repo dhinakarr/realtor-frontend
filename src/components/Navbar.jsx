@@ -121,7 +121,11 @@ export default function Navbar({ user, setUser }) {
           {/* -------- Logged OUT -------- */}
           {!user && (
             <>
-              <Link to="/login" className="text-white text-decoration-none">
+              <Link to="/" className="text-white text-decoration-none">
+                <strong><FaHome title="Go to Home" size={24} />	</strong>
+              </Link>
+			  
+			  <Link to="/login" className="text-white text-decoration-none">
                 Sign In
               </Link>
             </>

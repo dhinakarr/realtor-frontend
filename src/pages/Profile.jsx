@@ -1,17 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import API from "../api/api.js";
+import UserEditOverlay from "./admin/UserEditOverlay";
 
 export default function Profile() {
   const { userId } = useParams();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showEditOverlay, setShowEditOverlay] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState(null);
 
   const fetchUser = async () => {
     try {
 		const id = userId;
-		console.log("Calling API with userId:", id);
+		
       const res = await API.get(`/api/users/${id}`);
       setUser(res.data.data);
     } catch (err) {
@@ -56,15 +59,26 @@ export default function Profile() {
               {user.mobile && <p className="mb-1"><strong>Phone:</strong> {user.mobile}</p>}
               {user.address && <p className="mb-1"><strong>Address:</strong> {user.address}</p>}
               <button
-                className="btn btn-primary mt-3"
-                onClick={() => navigate(`/profile/edit/${userId}`)}
-              >
-                Edit Profile
-              </button>
+				  className="btn btn-primary mt-3"
+				  onClick={() => {
+						  setSelectedUserId(userId);
+						  setShowEditOverlay(true);
+						}}
+				>
+				  Edit Profile
+				</button>
             </div>
           </div>			
         </div>
       </div>
+	  
+	  <UserEditOverlay
+		  show={showEditOverlay}
+		  userId={selectedUserId}
+		  onClose={() => setShowEditOverlay(false)}
+		  onSuccess={fetchUser}
+		/>
+	  
     </div>
   );
 }

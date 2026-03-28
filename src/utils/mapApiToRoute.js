@@ -19,3 +19,20 @@ export function mapApiToRoute(apiUrl) {
   return "/";
   */
 }
+
+export const getFullUrl = (path, baseUrl) => {
+  if (!path) return "";
+
+  // already full URL
+  if (path.startsWith("http")) return path;
+
+  const cleanBase = baseUrl?.endsWith("/")
+    ? baseUrl.slice(0, -1)
+    : baseUrl;
+
+  const cleanPath = path.startsWith("/")
+    ? path
+    : `/${path}`;
+
+  return `${cleanBase}${cleanPath}`;
+};
