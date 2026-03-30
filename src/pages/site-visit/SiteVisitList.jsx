@@ -7,6 +7,7 @@ import SiteVisitViewDrawer from "./SiteVisitViewDrawer";
 import SiteVisitEditDrawer from "./SiteVisitEditDrawer";
 import SitePaymentDrawer from "./SitePaymentDrawer";
 import useModule from "../../hooks/useModule";
+import { formatINRComma, formatINR, formatDate } from "../../utils/numberFormatter";
 
 export default function SiteVisitList() {
   const [data, setData] = useState([]);
@@ -220,7 +221,7 @@ export default function SiteVisitList() {
 
           {filteredData.map((row) => (
             <tr key={row.siteVisitId}  className="align-middle">
-              <td>{row.visitDate}</td>
+              <td>{formatDate(row.visitDate)}</td>
               <td>{row.userName}</td>
               <td>{renderWithTooltip(row.projectName)}</td>
               <td>
@@ -230,8 +231,8 @@ export default function SiteVisitList() {
                   </div>
                 ))}
               </td>
-              <td className="text-end"> {row.expenseAmount}</td>
-              <td className="text-end"> {row.balance}</td>
+              <td className="text-end"> {formatINRComma(row.expenseAmount)}</td>
+              <td className="text-end"> {formatINRComma(row.balance)}</td>
               <td className="text-center">
                 <FaEye
 				  className="me-2 text-success cursor-pointer"

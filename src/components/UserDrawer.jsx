@@ -9,35 +9,34 @@ function UserDrawer({ open, onClose }) {
   const [fields, setFields] = useState([]);
   const [formData, setFormData] = useState({});
   const [file, setFile] = useState(null);
-  const currentUser = JSON.parse(localStorage.getItem("user"));
   const [errors, setErrors] = useState({});
   const { showToast } = useToast();
   
   useEffect(() => {
-	  if (!currentUser?.token?.userId) 
-		  return;
-	  
-    API.get("/api/users/form").then(res => {
-      const requiredFields = res.data.data.fields
-        .filter(f => f.required && !f.hidden)
-        .sort((a, b) => a.sortOrder - b.sortOrder);
-//console.log("requiredFields: "+JSON.stringify(requiredFields));
-      setFields(requiredFields);
-	  const managerField = requiredFields.find(
-		  f => f.apiField === "managerId"
-		);
-	  const managerId = currentUser?.token?.userId || currentUser?.userId || currentUser?.i || currentUser?.user_id;
-	  //console.log("FULL currentUser:", JSON.stringify(currentUser));
-//console.log("Resolved managerId:", managerId);
-	  
-	  if (managerField && managerId) {
-		  setFormData(prev => ({
-			...prev,
-			managerId: managerId
-		  }));
-		}
-    });
-  }, []);
+	  if (!open) return;
+
+	  const currentUser = JSON.parse(localStorage.getItem("user"));
+	  const userId =
+		currentUser?.token?.userId ||
+		currentUser?.userId ||
+		currentUser?.i ||
+		currentUser?.user_id;
+
+	  if (!userId) return;
+
+	  API.get("/api/users/form").then(res => {
+		const requiredFields = res.data.data.fields
+		  .filter(f => f.required && !f.hidden)
+		  .sort((a, b) => a.sortOrder - b.sortOrder);
+
+		setFields(requiredFields);
+
+		setFormData(prev => ({
+		  ...prev,
+		  managerId: userId
+		}));
+	  });
+	}, [open]);
 
   
   const validate = () => {
@@ -47,7 +46,6 @@ function UserDrawer({ open, onClose }) {
 		  newErrors[field.apiField] = `${field.displayLabel} is required`;
 		}
 	  });
-
 	  setErrors(newErrors);
 	  return Object.keys(newErrors).length === 0;
 	};
@@ -59,41 +57,52 @@ function UserDrawer({ open, onClose }) {
   };
 
   const renderField = field => {
-	const isManager = field.apiField === "managerId";
-    const commonProps = {
-      className: "form-control",
-      placeholder: field.extraSettings?.placeholder || "",
-      value: formData[field.apiField] || "",
-      onChange: e => handleChange(field.apiField, e.target.value),
-	  disabled: isManager
-    };
-	
+	  const currentUser = JSON.parse(localStorage.getItem("user"));
 
-    switch (field.fieldType) {
-      case "text":
-      case "email":
-      case "number":
-        return <input type={field.fieldType} {...commonProps} />;
+	  const userId =
+		currentUser?.token?.userId ||
+		currentUser?.userId ||
+		currentUser?.i ||
+		currentUser?.user_id;
 
-      case "textarea":
-        return <textarea {...commonProps} />;
+	  const isManager = field.apiField === "managerId";
 
-      case "select":
-        return (
-          <select {...commonProps}>
-            <option value="">Select</option>
-            {field.lookupData?.map(opt => (
-              <option key={opt.key} value={opt.key}>
-                {opt.value}
-              </option>
-            ))}
-          </select>
-        );
+	  const value =
+		formData[field.apiField] ??
+		(isManager ? userId : "");
 
-      default:
-        return <input type={field.fieldType} {...commonProps} />;
-    }
-  };
+	  const commonProps = {
+		className: "form-control",
+		value,
+		onChange: e => handleChange(field.apiField, e.target.value),
+		disabled: isManager
+	  };
+
+	  switch (field.fieldType) {
+		case "text":
+		case "email":
+		case "number":
+		  return <input type={field.fieldType} {...commonProps} />;
+
+		case "textarea":
+		  return <textarea {...commonProps} />;
+
+		case "select":
+		  return (
+			<select {...commonProps}>
+			  <option value="">Select</option>
+			  {field.lookupData?.map(opt => (
+				<option key={opt.key} value={opt.key}>
+				  {opt.value}
+				</option>
+			  ))}
+			</select>
+		  );
+
+		default:
+		  return <input type="text" {...commonProps} />;
+	  }
+	};
 
   const handleSubmit = async () => {
 	  try {

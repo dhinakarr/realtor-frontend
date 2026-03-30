@@ -24,6 +24,7 @@ const FinanceDashboard = () => {
 	const [drawer, setDrawer] = useState({ open: false });
 	const { showToast } = useToast();
 	const [viewType, setViewType] = useState("CASHFLOW"); 
+	const totals = {};
 	
 	//const [showTable, setShowTable] = useState(false);
 // SUMMARY | RECEIVABLE | PAYABLE
@@ -270,6 +271,15 @@ const FinanceDashboard = () => {
 	  if (!columns) {
 		return <div className="text-muted">No table configuration</div>;
 	  }
+	  
+	  columns?.forEach(col => {
+		  if (col.isAmount) {
+			totals[col.key] = data.reduce(
+			  (sum, row) => sum + Number(row[col.key] || 0),
+			  0
+			);
+		  }
+		});
 
 	  return (
 		<Table striped bordered hover size="sm">
@@ -284,7 +294,7 @@ const FinanceDashboard = () => {
 			{data.map((row, idx) => (
 			  <tr key={idx}>
 				{columns.map(col => (
-				  <td key={col.key}>
+				  <td key={col.key} className={col.isAmount ? "text-end" : ""}>
 				  {col.clickable && col.isAmount && onAmountClick ? (
 					  <span
 						className="fw-semibold text-primary"
@@ -300,14 +310,27 @@ const FinanceDashboard = () => {
 					) : (
 					  row[col.key] ?? "-"
 					)}
-
 				</td>
-
-
 				))}
 			  </tr>
 			))}
 		  </tbody>
+		  <tfoot>
+		  <tr>
+			{columns.map(col => (
+			  <td
+				key={col.key}
+				className={col.isAmount ? "text-end fw-bold" : "fw-bold"}
+			  >
+				{col.isAmount
+				  ? `₹${formatINRComma(totals[col.key] || 0)}`
+				  : col.key === columns[0].key
+				  ? "Total"
+				  : ""}
+			  </td>
+			))}
+		  </tr>
+		</tfoot>
 		</Table>
 	  );
 	};
@@ -442,7 +465,7 @@ const FinanceDashboard = () => {
 	  new Set(plotFiltered.map(r => r.agentName).filter(Boolean))
 	);
 		
-		console.log("tableData:", tableData);
+		//console.log("tableData:", tableData);
 //console.log("projectOptions:", projectOptions);
 		
 	const filteredTableData = tableData.filter(row => {

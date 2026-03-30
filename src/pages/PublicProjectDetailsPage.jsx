@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import API from "../api/api";
 import "./PublicProjectDetailsPage.css";
+import ProjectDetailsContent from "../components/projects/ProjectDetailsContent";
+import PlotViewPanel from "../components/PlotViewPanel";
 
 export default function PublicProjectDetailsPage() {
   const { id } = useParams();
@@ -9,11 +11,17 @@ export default function PublicProjectDetailsPage() {
   const [projectData, setProjectData] = useState(null);
   const [selectedPlot, setSelectedPlot] = useState(null);
   const BASE_URL = API.defaults.baseURL;
+  const [viewPlotId, setViewPlotId] = useState(null);
+  const [activeMedia, setActiveMedia] = useState(null);
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [showVideoModal, setShowVideoModal] = useState(false);
 
   useEffect(() => {
     API.get(`/public/projects/details/${id}`)
       .then((res) => {
-        if (res.data.success) setProjectData(res.data.data);
+        if (res.data.success) {
+			setProjectData(res.data.data);
+		}
       })
       .catch(console.error);
   }, [id]);
@@ -21,8 +29,16 @@ export default function PublicProjectDetailsPage() {
   const openPlotOverlay = (plotId) => {
     API.get(`/public/plots/${plotId}`)
       .then((res) => {
-        if (res.data.success) setSelectedPlot(res.data.data);
+        if (res.data.success) {
+			setSelectedPlot({
+			  ...res.data.data.plotData,
+			  documentationCharges: res.data.data.documentationCharges,
+			  otherCharges: res.data.data.otherCharges
+			});
+			setViewPlotId(plotId);
+		}
       })
+	  
       .catch(console.error);
   };
 
@@ -52,63 +68,109 @@ export default function PublicProjectDetailsPage() {
         <button className="btn btn-secondary" onClick={() => navigate("/")}>Back</button>
       </div>
 
-      {/* Project Card */}
-      <div className="card p-3 mb-3">
-        {project.files?.length > 0 && (
-          <img
-            src={`${BASE_URL}/api/projects/file/${project.files[0].projectFileId}`}
-            alt={project.projectName}
-            style={{ width: "100%", borderRadius: "6px", height: "350px", objectFit: "cover" }}
-          />
-        )}
+      <ProjectDetailsContent
+		  projectData={projectData}
+		  plots={plots || []}
+		  BASE_URL={BASE_URL}
 
-        <p><strong>Location:</strong> {project.locationDetails}</p>
-        <p><strong>Survey Number:</strong> {project.surveyNumber}</p>
-        <p><strong>Start Date:</strong> {project.startDate}</p>
-        <p><strong>Price/Sqft:</strong> {project.pricePerSqft}</p>
-      </div>
+		  // PUBLIC → only view, no edit/delete
+		  onPlotClick={openPlotOverlay}
 
-      {/* Plots */}
-      <div className="project-grid">
-        {plots.map((plot) => (
-          <div
-            key={plot.plotId}
-            className="plot-square"
-            style={{ backgroundColor: getPlotColor(plot.status), cursor: "pointer" }}
-            onClick={() => openPlotOverlay(plot.plotId)}
-          >
-            <div className="plot-number">{plot.plotNumber}</div>
-            <div className="plot-data">
-              <div>Area: {plot.width || "-"} × {plot.breath || "-"}</div>
-              <div>Facing: {plot.facing || "-"}</div>
-              <div>Road: {plot.roadWidth || "-"}</div>
-            </div>
-          </div>
-        ))}
-      </div>
+		  // ❌ No actions
+		  renderPlotActions={() => ({})}
 
-      {/* Sliding Overlay */}
-      {selectedPlot && (
-        <>
-          {/* Dark semi-transparent background */}
-          <div className="overlay-backdrop" onClick={closeOverlay}></div>
+		  // ✅ Gallery click handling
+		  onMediaClick={(doc, type) => {
+			setActiveMedia(doc);
+			if (type === "IMAGE") setShowImageModal(true);
+			if (type === "VIDEO") setShowVideoModal(true);
+		  }}
+		/>
 
-          <div className="plot-overlay slide-in">
-            <div className="plot-overlay-content">
-              <button className="close-overlay btn btn-secondary" onClick={closeOverlay}>X Close</button>
-              <h5>Plot {selectedPlot.plotNumber} Details</h5>
-              <p><strong>Status:</strong> {selectedPlot.status}</p>
-              <p><strong>Area:</strong> {selectedPlot.width && selectedPlot.breath ? `${selectedPlot.width}×${selectedPlot.breath}` : "-"}</p>
-              <p><strong>Facing:</strong> {selectedPlot.facing || "-"}</p>
-              <p><strong>Road Width:</strong> {selectedPlot.roadWidth || "-"}</p>
-              <p><strong>Base Price:</strong> {selectedPlot.basePrice || "-"}</p>
-              <p><strong>Total Price:</strong> {selectedPlot.totalPrice || "-"}</p>
-              <p><strong>Prime Plot:</strong> {selectedPlot.isPrime ? "Yes" : "No"}</p>
-            </div>
-          </div>
-        </>
-      )}
+		{showImageModal && activeMedia && (
+		  <div
+			style={{
+			  position: "fixed",
+			  inset: 0,
+			  background: "rgba(0,0,0,0.85)",
+			  zIndex: 1050,
+			  display: "flex",
+			  alignItems: "center",
+			  justifyContent: "center",
+			}}
+			onClick={() => setShowImageModal(false)}
+		  >
+			<div
+			  style={{ position: "relative", maxWidth: "90%", maxHeight: "90%" }}
+			  onClick={(e) => e.stopPropagation()}
+			>
+			  <button
+				onClick={() => setShowImageModal(false)}
+				style={{
+				  position: "absolute",
+				  top: "-10px",
+				  right: "-10px",
+				  background: "white",
+				  borderRadius: "50%",
+				  width: "30px",
+				  height: "30px",
+				  border: "none",
+				}}
+			  >
+				×
+			  </button>
 
+			  <img
+				src={`${BASE_URL}${activeMedia.filePath}`}
+				style={{ maxWidth: "100%", maxHeight: "100%" }}
+			  />
+			</div>
+		  </div>
+		)}
+		
+		{showVideoModal && activeMedia && (
+			  <div
+				className="modal fade show"
+				style={{ display: "block", background: "rgba(0,0,0,0.6)" }}
+				onClick={() => setShowVideoModal(false)}
+			  >
+				<div
+				  className="modal-dialog modal-lg modal-dialog-centered"
+				  onClick={(e) => e.stopPropagation()}
+				>
+				  <div className="modal-content">
+					<div className="modal-header">
+					  <h5>Project Video</h5>
+					  <button className="btn-close" onClick={() => setShowVideoModal(false)} />
+					</div>
+
+					<div className="modal-body p-0">
+					  <video
+						src={`${BASE_URL}${activeMedia.filePath}`}
+						controls
+						autoPlay
+						style={{ width: "100%", maxHeight: "70vh" }}
+					  />
+					</div>
+				  </div>
+				</div>
+			  </div>
+			)}
+
+		{/* Sliding Overlay */}
+			
+			{viewPlotId && (
+				<PlotViewPanel
+				  plotId={viewPlotId}
+				  plotData={selectedPlot}
+				  onClose={() => setViewPlotId(null)}
+				  onBook={null}
+				  onCancel={(plotId) => {
+					  setViewPlotId(null);      // close plot view
+					  setCancelPlotId(plotId);  // open cancel panel
+					}}
+				/>
+			  )}
     </div>
   );
 }

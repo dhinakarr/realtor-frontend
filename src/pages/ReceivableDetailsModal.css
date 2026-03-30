@@ -1,0 +1,75 @@
+.rd-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.rd-modal {
+  width: 80%;
+  max-width: 900px;
+  height: 80vh;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.rd-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: #f5f5f5;
+  border-bottom: 1px solid #ddd;
+}
+
+.rd-close {
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.rd-body {
+  padding: 8px;
+  max-height: 600px;
+  overflow-y: auto;
+  flex: 1; 
+}
+
+
+.rd-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.rd-table th,
+.rd-table td {
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+}
+
+.rd-table th {
+  background: #000;
+  color: #fff;
+}
+.rd-total-row {
+  background: #f1f3f5;
+  border-top: 2px solid #ccc;
+}
+.rd-total-row {
+  position: sticky;
+  bottom: 0;
+  background: #fff;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}

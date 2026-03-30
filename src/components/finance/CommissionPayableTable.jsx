@@ -17,6 +17,20 @@ const CommissionPayableTable = ({ data, loading, onAction }) => {
 		return <div className="text-muted">No payable commissions found</div>;
 	}
 	
+	const totals = data.reduce(
+	  (acc, row) => {
+		acc.commissionEligible += Number(row.commissionEligible || 0);
+		acc.commissionPaid += Number(row.commissionPaid || 0);
+		acc.commissionPayable += Number(row.commissionPayable || 0);
+		return acc;
+	  },
+	  {
+		commissionEligible: 0,
+		commissionPaid: 0,
+		commissionPayable: 0,
+	  }
+	);
+	
 	return (
 		<Table striped bordered hover size="sm">
 			<thead>
@@ -24,7 +38,7 @@ const CommissionPayableTable = ({ data, loading, onAction }) => {
 					<th>Project</th>
 					<th>Plot</th>
 					<th>Agent</th>
-					<th className="text-end">Payout</th>
+					<th className="text-end">Payout Eligible</th>
 					<th className="text-end">Paid</th>
 					<th className="text-end">Payable</th>
 					<th className="text-center">Action</th>
@@ -78,6 +92,25 @@ const CommissionPayableTable = ({ data, loading, onAction }) => {
 					</tr>
 				))}
 			</tbody>
+			<tfoot>
+			  <tr className="fw-bold">
+				<td colSpan={3} className="text-end">Total</td>
+
+				<td className="text-end">
+				  {formatINRComma(Math.round(totals.commissionEligible))}
+				</td>
+
+				<td className="text-end">
+				  {formatINRComma(Math.round(totals.commissionPaid))}
+				</td>
+
+				<td className="text-end text-danger">
+				  {formatINRComma(Math.round(totals.commissionPayable))}
+				</td>
+
+				<td></td>
+			  </tr>
+			</tfoot>
 		</Table>
 	);
 };

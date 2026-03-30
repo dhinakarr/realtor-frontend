@@ -5,9 +5,9 @@ import { useReactToPrint } from "react-to-print";
 import { FaPrint } from "react-icons/fa";
 import logo from "../assets/logo.png";
 import CancelBookingPanel from "./CancelBookingPanel"
-import { formatINRComma, formatINR } from "../utils/numberFormatter";
+import { formatINRComma, formatINR, formatDate } from "../utils/numberFormatter";
 
-export default function PlotViewPanel({ plotId, onClose, onBook, onCancel }) {
+export default function PlotViewPanel({ plotId, plotData, onClose, onBook, onCancel }) {
   const [plot, setPlot] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -15,8 +15,16 @@ export default function PlotViewPanel({ plotId, onClose, onBook, onCancel }) {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
   const [cancelPlotId, setCancelPlotId] = useState(null);
-
+  const isPublic = !!plotData;
+  
   useEffect(() => {
+	  
+	  if (plotData) {
+		setPlot(plotData);
+		setLoading(false);
+		return;
+	  }
+	  
 	  if (!plotId) return;
 
 	  setLoading(true);
@@ -42,7 +50,7 @@ export default function PlotViewPanel({ plotId, onClose, onBook, onCancel }) {
 		.finally(() => {
 		  setLoading(false);
 		});
-	}, [plotId]); // ✅ IMPORTANT
+	}, [plotId, plotData]); // ✅ IMPORTANT
 
 
   if (!plotId) return null;
@@ -131,14 +139,11 @@ export default function PlotViewPanel({ plotId, onClose, onBook, onCancel }) {
 				  height="50"
 				  className="print-logo"
 				/>
-				<div className="company-name">
-				  <strong>Diamon Realty</strong>
-				</div>
 			  </div>
 
 			  <div className="print-center">
 				<h5>Plot Details</h5>
-				<small>Generated on: {new Date().toLocaleDateString()}</small>
+				<small>Generated on: {formatDate(new Date())}</small>
 			  </div>
 			</div>
 
@@ -159,7 +164,7 @@ export default function PlotViewPanel({ plotId, onClose, onBook, onCancel }) {
 					{plot[key] === null || plot[key] === ""
 					  ? "-"
 					  : amountFields.includes(key)
-						? formatINRComma(Math.round(Number(plot[key])))
+						? `₹${formatINRComma(Math.round(Number(plot[key])))}`
 						: String(plot[key])
 					}
 				  </div>
@@ -173,18 +178,16 @@ export default function PlotViewPanel({ plotId, onClose, onBook, onCancel }) {
         {/* Footer Buttons */}
         <div className="d-flex justify-content-end gap-2 mt-4">
           <button className="btn btn-secondary" onClick={onClose}>Back</button>
-          <button
-			  className="btn btn-success"
-			  disabled={!canBook}
-			  onClick={() => {
-				if (!canBook) return;
-				onClose();
-				onBook(plotId, plot?.projectId);
-			  }}
-			>
-			  Book
-			</button>
-			{plot?.status === "BOOKED" && (
+          {onBook && (
+			  <button
+				className="btn btn-success"
+				disabled={!canBook}
+				onClick={() => onBook(plotId, plot?.projectId)}
+			  >
+				Book
+			  </button>
+			)}
+			{onCancel && plot?.status === "BOOKED" && !isPublic && (
 			  <button
 				className="btn btn-danger"
 				onClick={() => onCancel(plotId)}

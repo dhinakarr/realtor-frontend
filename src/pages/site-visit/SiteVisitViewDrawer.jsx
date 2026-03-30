@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Offcanvas, Spinner, Table } from "react-bootstrap";
 import API from "../../api/API";
+import { formatINRComma, formatINR, formatDate } from "../../utils/numberFormatter";
 
 export default function SiteVisitViewDrawer({ show, siteVisitId, onClose }) {
   const [loading, setLoading] = useState(false);
@@ -17,6 +18,7 @@ export default function SiteVisitViewDrawer({ show, siteVisitId, onClose }) {
     try {
       const res = await API.get(`/api/site-visits/${siteVisitId}`);
       setVisit(res.data.data);
+	  console.log(visit);
     } finally {
       setLoading(false);
     }
@@ -44,7 +46,7 @@ export default function SiteVisitViewDrawer({ show, siteVisitId, onClose }) {
               <tbody>
                 <tr>
                   <th>Date of Visit</th>
-                  <td>{visit.visitDate}</td>
+                  <td>{formatDate(visit.visitDate)}</td>
                 </tr>
                 <tr>
                   <th>PA/PM</th>
@@ -60,15 +62,15 @@ export default function SiteVisitViewDrawer({ show, siteVisitId, onClose }) {
                 </tr>
                 <tr>
                   <th>Expense Amount</th>
-                  <td className="text-end">₹ {visit.expenseAmount}</td>
+                  <td className="text-end">₹ {formatINRComma(visit.expenseAmount)}</td>
                 </tr>
                 <tr>
                   <th>Total Paid</th>
-                  <td className="text-end">₹ {visit.totalPaid}</td>
+                  <td className="text-end">₹ {formatINRComma(visit.totalPaid)}</td>
                 </tr>
                 <tr>
                   <th>Balance</th>
-                  <td className="text-end">₹ {visit.balance}</td>
+                  <td className="text-end">₹ {formatINRComma(visit.balance)}</td>
                 </tr>
                 <tr>
                   <th>Status</th>
@@ -85,7 +87,7 @@ export default function SiteVisitViewDrawer({ show, siteVisitId, onClose }) {
                       <div key={idx} className="mb-2">
                         <strong>{c.customerName}</strong> <br />
                         Mobile: {c.mobile} <br />
-                        Sold By: {c.soldBy || "-"}
+                        Sold By: {c.agentName || "-"}
                       </div>
                     ))}
                   </td>

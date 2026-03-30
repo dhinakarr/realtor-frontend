@@ -227,7 +227,7 @@ export default function CommissionRuleCreate() {
   return (
     <div className="commission-rule-create">
       <div className="page-header">
-		<h4>Create Commission Rule</h4>
+		<h4>Create Payout Rule</h4>
 		  <button
 			type="button"
 			className="btn-link"
@@ -276,7 +276,7 @@ export default function CommissionRuleCreate() {
 
 		  {/* Commission Type */}
 		  <div className="form-field">
-			<label>Commission Type</label>
+			<label>Payout Type</label>
 			<select
 			  name="commissionType"			
 			  value={form.commissionType}
@@ -290,7 +290,7 @@ export default function CommissionRuleCreate() {
 
 		  {/* Commission Value */}
 		  <div className="form-field">
-			<label>Commission Value</label>
+			<label>Payout Value</label>
 			<input
 			  type="number"
 			  name="commissionValue"
@@ -363,7 +363,7 @@ export default function CommissionRuleCreate() {
 
 		<hr style={{ margin: "32px 0" }} />
 
-		<h5>Existing Commission Rules</h5>
+		<h5>Existing Payout Rules</h5>
 
 		{loadingRules ? (
 		  <p>Loading rules...</p>

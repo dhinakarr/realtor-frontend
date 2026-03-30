@@ -40,49 +40,7 @@ export default function HomePage() {
       {!loading && projects.length === 0 && (
         <p className="text-muted">No projects available</p>
       )}
-	  {/*
-      <div className="row">
-        {projects.map((project) => {
-          const img =
-            project.files?.length > 0
-              ? `${BASE_URL}/api/projects/file/${project.files[0].projectFileId}`
-              : null;
-
-          return (
-            <div key={project.projectId} className="col-md-4 mb-4">
-              <div
-                className="card shadow-sm h-100 position-relative cursor-pointer"
-                onClick={() => openProject(project.projectId)}
-              >
-                {img && (
-                  <img
-                    src={img}
-                    alt={project.projectName}
-                    className="card-img-top"
-                    style={{ height: "180px", objectFit: "cover" }}
-                  />
-                )}
-
-                <div className="card-body">
-                  <h5 className="fw-bold mb-1">{project.projectName}</h5>
-
-                  <small className="text-muted">
-                    {project.locationDetails}
-                  </small>
-
-                  <div className="mt-2 text-secondary">
-                    Plots: {project.noOfPlots}
-                  </div>
-                </div>
-
-              </div>
-            </div>
-          );
-        })}
-      </div>
-	  
-	  */}
-	  
+	  	  
 	  <ProjectCards
 		  projects={projects}
 		  BASE_URL={BASE_URL}

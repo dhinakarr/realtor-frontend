@@ -5,6 +5,9 @@ import API from "../api/API";
 import { useNavigate } from "react-router-dom";
 import "./dashboard.css";
 import { formatINRComma, formatINR } from "../utils/numberFormatter";
+import ReceivableDetailsModal from "./ReceivableDetailsModal";
+import CommissionDetailsModal from "./CommissionDetailsModal";
+import SiteVisitDetailsModal from "./SiteVisitDetailsModal";
 
 /* Chart.js registration */
 import {
@@ -36,7 +39,12 @@ export default function DashboardSummary() {
   const [toDate, setToDate] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  
+  const [open, setOpen] = useState(false);
+  const [type, setType] = useState(null);
+  const [commissionModalOpen, setCommissionModalOpen] = useState(false);
+  const [visitModalOpen, setVisitModalOpen] = useState(false);
+  const [visitDetails, setVisitDetails] = useState([]);
+  const [visitLoading, setVisitLoading] = useState(false);
 
 	const fetchDashboard = (from, to) => {
 	  setLoading(true);
@@ -47,7 +55,7 @@ export default function DashboardSummary() {
 		  to: to || null,
 		},
 	  })
-		.then((res) => setData(res.data))
+		.then((res) => setData(res.data.data))
 		.catch(() =>
 		  setData({
 			inventory: [],
@@ -74,14 +82,41 @@ export default function DashboardSummary() {
 	  );
 	}
   
+  const fetchVisitDetails = () => {
+	  setVisitLoading(true);
+
+	  API.get("/api/dashboard/visit/details", {
+		params: {
+		  from: fromDate || null,
+		  to: toDate || null,
+		},
+	  })
+		.then((res) => {
+		  setVisitDetails(res.data.data || []);
+		  setVisitModalOpen(true);
+		  //console.log("data: "+JSON.stringify(res.data.data));
+		})
+		.catch(() => {
+		  setVisitDetails([]);
+		  setVisitModalOpen(true);
+		})
+		.finally(() => setVisitLoading(false));
+	};
+  
   const summary = data.summaryKpis ?? {};
+  
+  const inventory = data.inventory || [];
+  const finance = data.finance || [];
+  const agents = data.agents || [];
+  const commissions = data.commissions || [];
+  const siteVisits = data.siteVisits || [];
   
   const handleApplyFilter = () => {
 	  if (fromDate && toDate && fromDate > toDate) {
 		alert("From date cannot be after To date");
 		return;
 	  }
-console.log("fromDate: "+fromDate+ ", toDate: "+toDate);
+//console.log("fromDate: "+fromDate+ ", toDate: "+toDate);
 	  fetchDashboard(fromDate, toDate);
 	};
    
@@ -121,11 +156,11 @@ console.log("fromDate: "+fromDate+ ", toDate: "+toDate);
 	} = summary;
 
 /* ================= VISIBILITY FLAGS ================= */
-  const hasInventory = data.inventory?.length > 0;
-  const hasFinance = data.finance?.length > 0 && totalSales > 0;
-  const hasAgents = data.agents?.length > 0;
-  const hasCommissions = data.commissions?.length > 0 && totalCommission > 0;
-  const hasVisits = data.siteVisits?.length > 0;
+  const hasInventory = inventory?.length > 0;
+  const hasFinance = finance?.length > 0 && totalSales > 0;
+  const hasAgents = agents?.length > 0;
+  const hasCommissions = commissions?.length > 0 && totalCommission > 0;
+  const hasVisits = siteVisits?.length > 0;
   
  /* 
   const inventoryChart = data.inventory?.length
@@ -162,21 +197,21 @@ console.log("fromDate: "+fromDate+ ", toDate: "+toDate);
   /* ================= Charts ================= */
 
   const inventoryChart = {
-    labels: data.inventory.map(p => p.projectName),
+    labels: inventory.map(p => p.projectName),
     datasets: [
       {
         label: "Available",
-        data: data.inventory.map(p => p.available),
+        data: inventory.map(p => p.available),
         backgroundColor: "#4dabf7",
       },
       {
         label: "Booked",
-        data: data.inventory.map(p => p.booked),
+        data: inventory.map(p => p.booked),
         backgroundColor: "#ffa94d",
       },
       {
         label: "Sold",
-        data: data.inventory.map(p => p.sold),
+        data: inventory.map(p => p.sold),
         backgroundColor: "#ff6b6b",	
       },
     ],
@@ -233,23 +268,23 @@ console.log("fromDate: "+fromDate+ ", toDate: "+toDate);
   
 
   const financeChart = {
-	  labels: data.finance.map(f => f.projectName),
+	  labels: finance.map(f => f.projectName),
 	  datasets: [
 		{
 		  label: "Sales",
-		  data: data.finance.map(f => f.totalSales),
+		  data: finance.map(f => f.totalSales),
 		  backgroundColor: "#4dabf7",
 		  format: "currency",
 		},
 		{
 		  label: "Received",
-		  data: data.finance.map(f => f.totalReceived),
+		  data: finance.map(f => f.totalReceived),
 		  backgroundColor: "#ffa94d",
 		  format: "currency",
 		},
 		{
 		  label: "Outstanding",
-		  data: data.finance.map(f => f.totalOutstanding),
+		  data: finance.map(f => f.totalOutstanding),
 		  backgroundColor: "#ff6b6b",
 		  format: "currency",
 		},
@@ -258,25 +293,25 @@ console.log("fromDate: "+fromDate+ ", toDate: "+toDate);
 
 
   const agentChart = {
-	  labels: data.agents.map(a => a.agentName),
+	  labels: agents.map(a => a.agentName),
 	  datasets: [
 		{
 		  label: "Sales Value",
-		  data: data.agents.map(a => a.salesValue),
+		  data: agents.map(a => a.salesValue),
 		  backgroundColor: "#9775fa",
 		  yAxisID: "y1",
 		  format: "currency",
 		},
 		{
 		  label: "Total Area",
-		  data: data.agents.map(a => a.totalArea),
+		  data: agents.map(a => a.totalArea),
 		  backgroundColor: "#ffa94d",
 		  yAxisID: "y2",
 		  format: "area",
 		},
 		{
 		  label: "Total Sales",
-		  data: data.agents.map(a => a.totalSales),
+		  data: agents.map(a => a.totalSales),
 		  backgroundColor: "#51cf66",
 		  yAxisID: "y3",
 		  format: "count",
@@ -285,10 +320,10 @@ console.log("fromDate: "+fromDate+ ", toDate: "+toDate);
 	};
 
   const commissionChart = {
-    labels: data.commissions.map(c => c.agentName),
+    labels: commissions.map(c => c.agentName),
     datasets: [
       {
-		data: data.commissions.map(c => c.totalCommission),
+		data: commissions.map(c => c.totalCommission),
         backgroundColor: ["#5c7cfa", "#ffa94d", "#9775fa", "#ff6b6b", 
 		"#20c997", "#4dabf7", "#339af0", "#845ef7", "#51cf66"],
 		format: "currency",
@@ -370,9 +405,32 @@ console.log("fromDate: "+fromDate+ ", toDate: "+toDate);
 		  <StatCard title="Sold" value={soldPlots} bg="#ff6b6b" />*/}
 		  {hasFinance && (
 			<>
-			  <StatCard title="Sales Value" value={`₹${formatINRComma(totalSales)}`} bg="#339af0" />
-			  <StatCard title="Received" value={`₹${formatINRComma(totalReceived)}`} bg="#20c997" />
-			  <StatCard title="Outstanding" value={`₹${formatINRComma(totalOutstanding)}`} bg="#845ef7" />
+			  <StatCard title="Sales Value" 
+				value={`₹${formatINRComma(totalSales)}`} 
+				bg="#339af0" 
+				onClick={() => {
+					setType("sales");
+					setOpen(true);
+				  }}
+			  />
+			  <StatCard 
+				title="Received" 
+				value={`₹${formatINRComma(totalReceived)}`} 
+				bg="#20c997" 
+				onClick={() => {
+					setType("received");
+					setOpen(true)
+				}
+					} />
+			  <StatCard 
+				title="Outstanding" 
+				value={`₹${formatINRComma(totalOutstanding)}`} 
+				bg="#845ef7" 
+				onClick={() => {
+					setType("outstanding");
+					setOpen(true);
+				  }}
+			  />
 			</>
 		  )}
 		  {hasCommissions && (
@@ -380,11 +438,17 @@ console.log("fromDate: "+fromDate+ ", toDate: "+toDate);
 				title="Total Payout"
 				value={`₹${formatINRComma(totalCommission)}`}
 				bg="#51cf66"
+				onClick={() => setCommissionModalOpen(true)}
 			  />
 			)}
 		  {hasVisits && (
 			<>
-			  <StatCard title="Site Visits" value={totalSiteVisits} bg="#5c7cfa" />
+			  <StatCard
+				  title="Site Visits"
+				  value={totalSiteVisits}
+				  bg="#5c7cfa"
+				  onClick={fetchVisitDetails}
+				/>
 			  <StatCard title="Conversion %" value={`${avgConversionRatio}%`} bg="#15aabf" />
 			</>
 		  )}
@@ -434,6 +498,28 @@ console.log("fromDate: "+fromDate+ ", toDate: "+toDate);
 		
 	  )}
 	  
+	  <ReceivableDetailsModal
+		  open={open}
+		  onClose={() => setOpen(false)}
+		  from={fromDate}
+		  to={toDate}
+		  type={type}
+		/>
+		
+		<CommissionDetailsModal
+		  open={commissionModalOpen}
+		  onClose={() => setCommissionModalOpen(false)}
+		  from={fromDate}
+		  to={toDate}
+		/>
+		
+		<SiteVisitDetailsModal
+		  open={visitModalOpen}
+		  onClose={() => setVisitModalOpen(false)}
+		  data={visitDetails}
+		  loading={visitLoading}
+		/>
+	  
       </div>
     </>
   );
@@ -464,4 +550,5 @@ const Kpi = ({ title, value }) => (
 );
 
 const sum = (arr, key) =>
-  arr.reduce((a, b) => a + (b[key] || 0), 0);
+  (arr || []).reduce((a, b) => a + (b[key] || 0), 0);
+

@@ -45,3 +45,56 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Ensure sticky elements stay put within the scroll container */
+.sticky-top {
+  position: sticky;
+  top: 0;
+  background-color: #212529; /* Matches table-dark */
+  box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);
+}
+
+.sticky-bottom {
+  position: sticky;
+  bottom: 0;
+  background-color: #f8f9fa !important; /* Matches table-light */
+  box-shadow: 0 -2px 2px -1px rgba(0, 0, 0, 0.2);
+}
+
+.smaller {
+    font-size: 0.8rem;
+}
+/* Adjust the Width */
+.custom-modal-width {
+    max-width: 100%; /* Occupy 90% of the screen width */
+    width: 1200px;  /* Or set a fixed max-width */
+}
+
+/* Adjust the Height of the content area */
+.custom-modal-width .modal-content {
+    height: 95vh; /* Set height to 85% of the viewport height */
+}
+
+/* Ensure the scrollable body takes up the remaining space */
+.custom-modal-width .modal-body {
+    overflow-y: auto;
+}
+
+/* Match your existing sticky table container to this new height */
+.custom-modal-width .modal-body > div {
+    max-height: calc(95vh - 120px) !important; /* Subtract header/footer height */
+}
+.visit-modal-fixed .modal-dialog {
+  max-width: 1200px;   /* fixed width */
+}
+
+.visit-modal-fixed .modal-content {
+  height: 500px;      /* fixed height */
+  display: flex;
+}
+
+.visit-modal-fixed .modal-body {
+  overflow: hidden;   /* prevent modal from growing */
+  display: flex;
+  flex-direction: column;
+}

@@ -38,12 +38,12 @@ export default function ProjectDetailsPage() {
 
   const featureUrl = "/api/plots";
   const module = useModule(featureUrl);
-  const feature = module.features.find(f => f.url);
+  const feature = module?.features?.find(f => f.url);
 
-  const canCreate = feature.canCreate;
-  const canEdit   = feature.canUpdate;
-  const canDelete = feature.canDelete;
-  const isFinance = (feature.financeRole == "FINANCE") ? true : false;
+  const canCreate = feature?.canCreate;
+  const canEdit   = feature?.canUpdate;
+  const canDelete = feature?.canDelete;
+  const isFinance = (feature?.financeRole == "FINANCE") ? true : false;
   
   
   const projectsUrl = "/api/projects";
@@ -198,168 +198,45 @@ export default function ProjectDetailsPage() {
 		</div>
 		
       {/* PROJECT INFO */}
-      <div className="project-card p-3 mb-3">
-
-		  
-		  {project.files?.length > 0 && (
-			<div className="row mb-3">
-			  <div className="col-12">
-				<img
-				  src={`${BASE_URL}/api/projects/file/${project.files[0].projectFileId}`}
-				  alt={project.projectName}
-				  className="img-fluid rounded"
-				  style={{
-					width: "100%",
-					height: "300px",
-					objectFit: "cover"
+	  
+	  <ProjectDetailsContent
+		  projectData={projectData}
+		  plots={plots || []}
+		  BASE_URL={BASE_URL}
+		  onPlotClick={openViewPanel}
+		  pCreate={pCreate}
+		  canEdit={canEdit}
+		  canDelete={canDelete}
+		  // 🔥 Inject EDIT / DELETE UI ONLY HERE
+		  renderPlotActions={(plot) => ({
+			  edit: canEdit && (
+				<FaEdit
+				  className="plot-edit-icon"
+				  onClick={(e) => {
+					e.stopPropagation();
+					setEditPlotId(plot.plotId);
 				  }}
 				/>
-			  </div>
-			</div>
-		  )}
+			  ),
 
+			  bottom: canDelete && (
+				<FaTrash
+				  className="plot-icon delete"
+				  size={20}
+				  onClick={(e) => {
+					e.stopPropagation();
+					setDeletePlotId(plot.plotId);
+				  }}
+				/>
+			  )
+			})}
 		  
-		  <div className="row g-3 align-items-stretch">
-			<div className="col-md-4">
-			  <h4 className="mb-3">{project.projectName}</h4>
-			  <p><small>Location:</small> {project.locationDetails}</p>
-			  <p><small>Survey Number:</small> {project.surveyNumber}</p>
-			  <p><small>Price / Sqft:</small> ₹{formatINRComma(project.pricePerSqft)}</p>
-			</div>
-			<div className="col-md-4">
-			  <p><small>Stamp Duty:</small> {formatINRComma(project.regCharges)}%</p>
-			  <p><small>Documentation Charges:</small> ₹{formatINRComma(project.docCharges)}</p>
-			  <p><small>Other Charges:</small> ₹{formatINRComma(project.otherCharges)}</p>
-			  <p><small>Guideline Value:</small> ₹{formatINRComma(project.guidanceValue)}</p>
-			</div>
-			<div className="col-md-4 d-flex flex-column align-items-center"
-			 style={{ minWidth: 0 }}
-			>
-			  <h6 className="mb-2">Inventory Status</h6>
-
-			  <div
-				style={{
-				  width: "100%",
-				  maxWidth: 260,
-				  height: 180
-				}}
-			  >
-				<ChartMount>
-				  <PlotStatusDonut stat={projectData.stat} />
-				</ChartMount>
-			  </div>
-			</div>
-
-		  </div>
-		</div>
-
-			  <div className="project-grid">
-				  {plots
-					  .filter((plot) => {
-						// Management users see everything
-						if (pCreate) return true;
-
-						// Other users should NOT see cancelled plots
-						return plot.status !== "CANCELLED";
-					  })
-					  .map((plot) => (
-					<div
-					  key={plot.plotId}
-					  className={`plot-square ${plot._animate ? "fade-anim" : ""}`}
-					  style={{ backgroundColor: getPlotColor(plot.status) }}
-					  onClick={() => openViewPanel(plot.plotId)}
-					>
-					  <div className="plot-content-wrapper">
-						<div className="plot-number">Plot {plot.plotNumber}</div>
-
-						<div className="plot-data">
-						  <div>Area: {plot.area} sft</div>
-						  <div>Facing: {plot.facing || ""}</div>
-						  <div>Survey: {plot.surveyNum}</div>
-						  {plot.status === "AVAILABLE" && (
-							  <div>Total: {formatINRComma(plot.totalPrice)}</div>
-							)}
-
-						</div>
-
-					{canEdit && (	
-						<FaEdit
-						  className="plot-edit-icon"
-						  onClick={(e) => {
-							e.stopPropagation();
-							setEditPlotId(plot.plotId);
-						  }}
-						/>
-					)}
-
-						{plot.status !== "CANCELLED" && (
-						  <div className="bottom-icons">
-						  {canDelete && (
-							<FaTrash
-							  className="plot-icon delete"
-							  size={20}
-							  onClick={(e) => {
-								e.stopPropagation();
-								setDeletePlotId(plot.plotId);
-							  }}
-							/>
-							)}
-							
-						  </div>
-						)}
-
-					  </div>
-					</div>
-				  ))}
-				</div>
-				
-
-				{(galleryImages.length > 0 || galleryVideos.length > 0) && (
-				<section className="project-media-section">
-				 <h5 className="mb-3">Project Media</h5>
-				  <div className="project-gallery mt-1">
-
-
-					{galleryImages.map(doc => (
-					  <div
-						key={doc.documentId}
-						className="gallery-item"
-						onClick={() => {
-						  setActiveMedia(doc);
-						  setShowImageModal(true);
-						}}
-					  >
-						<img
-						  src={`${BASE_URL}${doc.filePath}`}
-						  alt={doc.documentNumber}
-						/>
-					  </div>
-					))}
-
-
-					{galleryVideos.map(doc => (
-					  <div
-						key={doc.documentId}
-						className="video-thumb-wrapper"
-						onClick={() => {
-						  setActiveMedia(doc);
-						  setShowVideoModal(true);
-						}}
-					  >
-						<video
-						  src={`${BASE_URL}${doc.filePath}`}
-						  muted
-						  preload="metadata"
-						/>
-						<span className="play-icon">▶</span>
-					  </div>
-					))}
-
-					
-				  </div>
-				</section>  
-				)}
-				
+		  onMediaClick={(doc, type) => {
+			setActiveMedia(doc);
+			if (type === "IMAGE") setShowImageModal(true);
+			if (type === "VIDEO") setShowVideoModal(true);
+		  }}
+		/>
 
 		{salePlotId && (
 		  <SaleInitiationPanel

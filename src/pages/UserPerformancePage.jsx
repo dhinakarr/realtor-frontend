@@ -61,7 +61,7 @@ const totalExpense = visits.reduce(
               <td>{formatDate(v.visitDate)}</td>
               <td>{v.projectName}</td>
               <td>{v.customerName}</td>
-              <td>₹{formatINRComma(v.expenseAmount)}</td>
+              <td className="text-end">₹{formatINRComma(v.expenseAmount)}</td>
             </tr>
           ))}
         </tbody>
@@ -103,7 +103,7 @@ const totalSales = sales.reduce(
 			  <td>{s.projectName}</td>
               <td>{s.plotNumber}</td>
               <td>{s.customerName}</td>
-              <td>₹{formatINRComma(s.saleAmount)}</td>
+              <td className="text-end">₹{formatINRComma(s.saleAmount)}</td>
               <td>{formatDate(s.confirmedAt)}</td>
             </tr>
           ))}
@@ -112,7 +112,7 @@ const totalSales = sales.reduce(
 		<tfoot>
 			  <tr>
 				<th colSpan="3" className="text-end">Total</th>
-				<th>₹{formatINRComma(totalSales)}</th>
+				<th className="text-end">₹{formatINRComma(totalSales)}</th>
 				<th></th>
 			  </tr>
 			</tfoot>
@@ -171,18 +171,18 @@ function ReceivableTable({ receivable }) {
 			  <td>{r.projectName}</td>
               <td>{r.plotNumber}</td>
               <td>{r.customerName}</td>
-              <td>₹{formatINRComma(r.saleAmount)}</td>
-              <td>₹{formatINRComma(r.received)}</td>
-              <td>₹{formatINRComma(r.saleAmount - r.received)}</td>
+              <td className="text-end">₹{formatINRComma(r.saleAmount)}</td>
+              <td className="text-end">₹{formatINRComma(r.received)}</td>
+              <td className="text-end">₹{formatINRComma(r.saleAmount - r.received)}</td>
             </tr>
           ))}
         </tbody>
 		<tfoot>
 		  <tr>
 			<th colSpan="3" className="text-end">Total</th>
-			<th>₹{formatINRComma(totals.baseAmount)}</th>
-			<th>₹{formatINRComma(totals.received)}</th>
-			<th>₹{formatINRComma(totals.outstanding)}</th>
+			<th className="text-end">₹{formatINRComma(totals.saleAmount)}</th>
+			<th className="text-end">₹{formatINRComma(totals.received)}</th>
+			<th className="text-end">₹{formatINRComma(totals.outstanding)}</th>
 		  </tr>
 		</tfoot>
       </table>
@@ -220,9 +220,9 @@ const payables = commission.reduce(
             <tr key={c.commissionId}>
               <td>{c.projectName}</td>
 			  <td>{c.plotNumber}</td>
-              <td>₹{formatINRComma(c.saleAmount)}</td>
-              <td>₹{formatINRComma(c.totalCommission)}</td>
-              <td className="text-success">₹{formatINRComma(c.commissionPaid)}</td>
+              <td className="text-end">₹{formatINRComma(c.saleAmount)}</td>
+              <td className="text-end">₹{formatINRComma(c.totalCommission)}</td>
+              <td className="text-success text-end">{formatINRComma(c.commissionPaid)}</td>
             </tr>
           ))}
         </tbody>
@@ -230,9 +230,9 @@ const payables = commission.reduce(
 		<tfoot>
 		  <tr>
 			<th colSpan="2" className="text-end">Total</th>
-			<th>₹{formatINRComma(payables.saleAmount)}</th>
-			<th>₹{formatINRComma(payables.total)}</th>
-			<th>₹{formatINRComma(payables.paid)}</th>
+			<th className="text-end">₹{formatINRComma(payables.saleAmount)}</th>
+			<th className="text-end">₹{formatINRComma(payables.total)}</th>
+			<th className="text-end">₹{formatINRComma(payables.paid)}</th>
 		  </tr>
 		</tfoot>
 		
@@ -460,9 +460,9 @@ function UserPerformancePanel({ user, filters, onFilterChange }) {
 			</div>
 
 			<SiteVisitsTable visits={data.siteVisits} />
-			<SalesTable sales={data.sales} />
-			<ReceivableTable receivable={data.receivable} />
-			<CommissionTable commission={data.commission} />
+			<SalesTable sales={formatINRComma(data.sales)} />
+			<ReceivableTable receivable={formatINRComma(data.receivable)} />
+			<CommissionTable commission={formatINRComma(data.commission)} />
 		  </>
 		)
 
