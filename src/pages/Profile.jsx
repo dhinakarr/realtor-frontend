@@ -61,7 +61,7 @@ export default function Profile() {
               <button
 				  className="btn btn-primary mt-3"
 				  onClick={() => {
-						  setSelectedUserId(userId);
+						  setSelectedUserId(String(userId));
 						  setShowEditOverlay(true);
 						}}
 				>

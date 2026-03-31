@@ -77,12 +77,12 @@ const totalExpense = visits.reduce(
 }
 
 function SalesTable({ sales }) {
-  if (!sales?.length) return null;
+  if (!Array.isArray(sales) || sales.length === 0) return null;
 
-const totalSales = sales.reduce(
-  (sum, s) => sum + Number(s.saleAmount || 0),
-  0
-);  
+	const totalSales = sales.reduce(
+	  (sum, s) => sum + Number(s.saleAmount || 0),
+	  0
+	);  
 
   return (
     <>
@@ -460,9 +460,9 @@ function UserPerformancePanel({ user, filters, onFilterChange }) {
 			</div>
 
 			<SiteVisitsTable visits={data.siteVisits} />
-			<SalesTable sales={formatINRComma(data.sales)} />
-			<ReceivableTable receivable={formatINRComma(data.receivable)} />
-			<CommissionTable commission={formatINRComma(data.commission)} />
+			<SalesTable sales={data.sales} />
+			<ReceivableTable receivable={data.receivable} />
+			<CommissionTable commission={data.commission} />
 		  </>
 		)
 

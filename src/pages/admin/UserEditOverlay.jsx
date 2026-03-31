@@ -14,7 +14,7 @@ export default function UserEditOverlay({ show, onClose, userId, onSuccess }) {
   const [imageFile, setImageFile] = useState(null);
 
   useEffect(() => {
-    if (!show) return;
+    if (!show || !userId) return;
     setLoading(true);
     API.get(`/api/users/editForm/${userId}`, {
       headers: { Authorization: `Bearer ${token}` }
@@ -117,7 +117,7 @@ export default function UserEditOverlay({ show, onClose, userId, onSuccess }) {
   };
 
   const renderField = (f) => {
-    const value = record[f.apiField] ?? "";
+    const value = record[f.apiField] != null ? String(record[f.apiField]) : "";
     const extra = f.extraSettings || {};
     const hasError = !!errors[f.apiField];
     const colClass = f.fieldType === "textarea" ? "col-md-12" : "col-md-6";
@@ -133,16 +133,37 @@ export default function UserEditOverlay({ show, onClose, userId, onSuccess }) {
     };
 
     if (f.fieldType === "select") {
-      return (
-        <div className={`${colClass} mb-2`} key={f.apiField}>
-          <label className="form-label">{f.displayLabel}</label>
-          <select {...commonProps} className="form-select">
-            <option value="">Select {f.displayLabel}</option>
-            {f.lookupData?.map(opt => <option key={opt.key} value={opt.key}>{opt.value}</option>)}
-          </select>
-        </div>
-      );
-    }
+	  const value = record[f.apiField] ?? "";
+	  const options = f.lookupData || [];
+	  const exists = options.some(opt => String(opt.key) === String(value));
+	  const finalOptions = exists
+		? options
+		: [
+			...options,
+			{
+			  key: value,
+			  value: record[f.apiField.replace("Id", "Name")] || "Current Value"
+			}
+		  ];
+
+	  return (
+		<div className={`${colClass} mb-2`} key={f.apiField}>
+		  <label className="form-label">{f.displayLabel}</label>
+		  <select
+			className={`form-select ${hasError ? "is-invalid" : ""}`}
+			value={String(value)}
+			onChange={(e) => updateField(f.apiField, e.target.value)}
+		  >
+			<option value="">Select {f.displayLabel}</option>
+			{finalOptions.map(opt => (
+			  <option key={opt.key} value={String(opt.key)}>
+				{opt.value}
+			  </option>
+			))}
+		  </select>
+		</div>
+	  );
+	}
 
     if (f.fieldType === "textarea") {
       return (
@@ -161,7 +182,7 @@ export default function UserEditOverlay({ show, onClose, userId, onSuccess }) {
     );
   };
 
-  if (!show || loading) return null;
+  if (!show || loading || !form || !record) return null;
 
   return (
     <div className="overlay-slide">

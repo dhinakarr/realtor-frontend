@@ -73,3 +73,41 @@
   from { opacity: 0; transform: scale(0.95); }
   to { opacity: 1; transform: scale(1); }
 }
+.rd-table-header th {
+  background-color: #000 !important;
+  color: #fff !important;
+  vertical-align: middle;
+  padding: 8px 8px !important;
+}
+
+/* 🔥 Fix input inside header */
+.rd-table-header th input {
+  background-color: #000;
+  color: #fff;
+  border: 1px solid #555;
+}
+
+.rd-table-header th input::placeholder {
+  color: #ccc;
+  
+}
+
+/* Optional: remove white focus glow */
+.rd-table-header th input:focus {
+  background-color: #000;
+  color: #fff;
+  box-shadow: none;
+}
+.rd-table-header th select {
+  background-color: #000;
+  color: #fff;
+  height: 28px;          /* smaller height */
+  padding: 2px 6px;      /* reduce inner spacing */
+  font-size: 14px;
+  margin-top: 2px; 
+}
+
+.rd-table-header th select option {
+  background-color: #000;
+  color: #fff;
+}

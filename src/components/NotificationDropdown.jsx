@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 export default function NotificationDropdown({ notifications, onRead, onClose  }) {
 	const navigate = useNavigate();
+	const safeNotifications = Array.isArray(notifications) ? notifications : [];
 	//console.log("NotificationDropdown notifications: "+JSON.stringify(notifications));
   const handleClick = (n) => {
     onRead(n.id);
@@ -14,13 +15,13 @@ export default function NotificationDropdown({ notifications, onRead, onClose  }
 
   return (
     <>
-      {notifications.length === 0 && (
+      {safeNotifications.length === 0 && (
         <div className="text-muted text-center py-2">
           No notifications
         </div>
       )}
 
-      {notifications.map((n) => (
+      {safeNotifications.map((n) => (
         <div
           key={n.id}
           className={`dropdown-item ${!n.read ? "fw-bold" : ""}`}

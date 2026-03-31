@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { formatINRComma, formatINR } from "../../utils/numberFormatter";
 import ChartMount from "../../components/ChartMount";
 import PlotStatusDonut from "../../pages/projects/PlotStatusDonut";
@@ -16,6 +16,8 @@ export default function ProjectDetailsContent({
   onMediaClick,
 }) {
   if (!projectData) return null;
+  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [facingFilter, setFacingFilter] = useState("ALL");
 
   const { project } = projectData;
 
@@ -28,6 +30,16 @@ export default function ProjectDetailsContent({
       default: return "#ffffff";
     }
   };
+  
+  const filteredPlots = (plots || []).filter(plot => {
+	  const statusMatch =
+		statusFilter === "ALL" || plot.status === statusFilter;
+
+	  const facingMatch =
+		facingFilter === "ALL" || plot.facing === facingFilter;
+
+	  return statusMatch && facingMatch;
+	});
   
   const galleryImages =
     project.documents?.filter(d => d.documentType === "IMAGE") || [];
@@ -93,9 +105,48 @@ export default function ProjectDetailsContent({
       </div>
 
       {/* ================= PLOT GRID ================= */}
+		<div className="d-flex gap-3 mb-3 align-items-center">
+  
+		  {/* Status Filter */}
+		  <select style={{ width: "clamp(140px, 15vw, 200px)" }}
+			className="form-select"
+			value={statusFilter}
+			onChange={(e) => setStatusFilter(e.target.value)}
+		  >
+			<option value="ALL">All Status</option>
+			<option value="AVAILABLE">Available</option>
+			<option value="BOOKED">Booked</option>
+			<option value="SOLD">Sold</option>
+			<option value="CANCELLED">Cancelled</option>
+		  </select>
+
+		  {/* Facing Filter */}
+		  <select style={{ width: "clamp(140px, 15vw, 200px)" }}
+			className="form-select"
+			value={facingFilter}
+			onChange={(e) => setFacingFilter(e.target.value)}
+		  >
+			<option value="ALL">All Facing</option>
+			<option value="North">North</option>
+			<option value="South">South</option>
+			<option value="East">East</option>
+			<option value="West">West</option>
+		  </select>
+		
+			<button
+			  className="btn btn-secondary"
+			  onClick={() => {
+				setStatusFilter("ALL");
+				setFacingFilter("ALL");
+			  }}
+			>
+			  Clear Filters
+			</button>
+		</div>
+	  
 	  
 	     <div className="project-grid">
-			  {plots
+			  {filteredPlots
 				  .filter((plot) => {
 					// Management users see everything
 					if (pCreate) return true;

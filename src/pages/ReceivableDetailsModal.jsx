@@ -8,6 +8,9 @@ import { formatINRComma, formatINR, formatDate } from "../utils/numberFormatter"
 function ReceivableDetailsModal({ open, onClose, from, to }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [projectFilter, setProjectFilter] = useState("");
+  const [plotFilter, setPlotFilter] = useState("");
+  const [customerFilter, setCustomerFilter] = useState("");
 
   useEffect(() => {
     if (open) {
@@ -30,12 +33,24 @@ function ReceivableDetailsModal({ open, onClose, from, to }) {
       setLoading(false);
     }
   };
+  
+  const filteredData = data.filter(item => {
+	  return (
+		item.projectName?.toLowerCase().includes(projectFilter.toLowerCase()) &&
+		item.plotNumber?.toLowerCase().includes(plotFilter.toLowerCase()) &&
+		item.customerName?.toLowerCase().includes(customerFilter.toLowerCase())
+	  );
+	});
 
   if (!open) return null;
   
-  const totalSales = data.reduce((sum, item) => sum + (item.saleAmount || 0), 0);
-  const totalReceived = data.reduce((sum, item) => sum + (item.totalReceived || 0), 0);
-  const totalOutstanding = data.reduce((sum, item) => sum + (item.outstandingAmount || 0), 0);
+  const totalSales = filteredData.reduce((sum, item) => sum + (item.saleAmount || 0), 0);
+  const totalReceived = filteredData.reduce((sum, item) => sum + (item.totalReceived || 0), 0);
+  const totalOutstanding = filteredData.reduce((sum, item) => sum + (item.outstandingAmount || 0), 0);
+  
+  const projectOptions = [...new Set(data.map(d => d.projectName))];
+  const plotOptions = [...new Set(data.map(d => d.plotNumber))];
+  const customerOptions = [...new Set(data.map(d => d.customerName))];
 
   return (
     <div className="rd-modal-overlay">
@@ -52,18 +67,39 @@ function ReceivableDetailsModal({ open, onClose, from, to }) {
             <div className="text-center">Loading...</div>
           ) : (
             <table responsive striped bordered hover className="rd-table">
-              <thead>
+              <thead className="rd-table-header">
                 <tr>
-                  <th>Project</th>
-                  <th>Plot</th>
-                  <th>Customer</th>
+                  <th>
+				  <select onChange={(e) => setProjectFilter(e.target.value)}>
+					  <option value="">All Projects</option>
+					  {projectOptions.map((p, i) => (
+						<option key={i} value={p}>{p}</option>
+					  ))}
+					</select>
+				  </th>
+                  <th>
+				  <select onChange={(e) => setPlotFilter(e.target.value)}>
+					  <option value="">All Plots</option>
+					  {plotOptions.map((p, i) => (
+						<option key={i} value={p}>{p}</option>
+					  ))}
+					</select>
+				  </th>
+                  <th>
+				  <select onChange={(e) => setCustomerFilter(e.target.value)}>
+					  <option value="">All Customers</option>
+					  {customerOptions.map((p, i) => (
+						<option key={i} value={p}>{p}</option>
+					  ))}
+					</select>
+				  </th>
                   <th>Sales Value</th>
                   <th>Received</th>
                   <th>Outstanding</th>
                 </tr>
               </thead>
               <tbody>
-			  {data.length === 0 ? (
+			  {filteredData.length === 0 ? (
 				<tr>
 				  <td colSpan="6" className="text-center">
 					No data found
@@ -71,7 +107,7 @@ function ReceivableDetailsModal({ open, onClose, from, to }) {
 				</tr>
 			  ) : (
 				<>
-				  {data.map((item) => (
+				  {filteredData.map((item) => (
 					<tr key={item.saleId}>
 					  <td>{item.projectName}</td>
 					  <td>{item.plotNumber}</td>

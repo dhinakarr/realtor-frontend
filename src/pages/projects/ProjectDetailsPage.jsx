@@ -33,7 +33,6 @@ export default function ProjectDetailsPage() {
   const [activeMedia, setActiveMedia] = useState(null);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
-
   const BASE_URL = API.defaults.baseURL;
 
   const featureUrl = "/api/plots";
@@ -160,7 +159,7 @@ export default function ProjectDetailsPage() {
 		toast.error("Failed to save payment");
 	  }
 	};
-
+	
   return (
     <div className="project-details-container">
       {/* HEADER */}
@@ -198,10 +197,9 @@ export default function ProjectDetailsPage() {
 		</div>
 		
       {/* PROJECT INFO */}
-	  
 	  <ProjectDetailsContent
 		  projectData={projectData}
-		  plots={plots || []}
+		  plots={plots}
 		  BASE_URL={BASE_URL}
 		  onPlotClick={openViewPanel}
 		  pCreate={pCreate}
@@ -356,10 +354,10 @@ export default function ProjectDetailsPage() {
 		  </div>
 		)}
 
-
-
-
       {viewPlotId && (
+	  
+	  
+	  
         <PlotViewPanel
           plotId={viewPlotId}
           onClose={() => setViewPlotId(null)}

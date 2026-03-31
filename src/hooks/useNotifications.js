@@ -22,7 +22,7 @@ export default function useNotifications(user) {
 
   const loadNotifications = async () => {
     const res = await API.get("/api/alerts");
-    setNotifications(res.data);
+    setNotifications(res.data?.data || []);
   };
 
   const markAsRead = async (id) => {
