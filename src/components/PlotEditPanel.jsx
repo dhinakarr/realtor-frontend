@@ -57,6 +57,14 @@ export default function PlotEditPanel({ plotId, onClose, onSaved }) {
     let val;
     if (fieldType === "checkbox") {
       val = e.target.checked;
+	  if (apiField === "isPrime" && !val) {
+		  setValues((s) => ({
+			...s,
+			[apiField]: val,
+			ratePerSqft: ""
+		  }));
+		  return;
+		}
     } else if (fieldType === "number") {
       // keep as string while typing but convert to number on save
       val = e.target.value;
@@ -177,6 +185,8 @@ export default function PlotEditPanel({ plotId, onClose, onSaved }) {
     }
 
     if (f.fieldType === "number") {
+	  const isRateField = f.apiField === "ratePerSqft";
+	  const isPrimeChecked = values["isPrime"]; // read checkbox value
       return (
         <>
           <label className="form-label" htmlFor={key}>
@@ -191,6 +201,7 @@ export default function PlotEditPanel({ plotId, onClose, onSaved }) {
             value={val === null || typeof val === "undefined" ? "" : val}
 			maxLength={maxLength}
             onChange={handleChange(key, f.fieldType)}
+			disabled={isRateField && !isPrimeChecked} 
           />
           {errors[key] && <div className="text-danger small">{errors[key]}</div>}
         </>

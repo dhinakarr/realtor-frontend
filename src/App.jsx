@@ -7,6 +7,8 @@ import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
 import PublicProjectDetailsPage from "./pages/PublicProjectDetailsPage";
 import Login from './pages/Login';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import Dashboard from './pages/Dashboard';
 import UserPerformancePage from './pages/UserPerformancePage';
 import InventoryDetails from './pages/InventoryDetails';
@@ -72,6 +74,8 @@ function App() {
 			<Route path="/public/projects/details/:id" element={<PublicProjectDetailsPage />} />
             <Route path="/login" element={<Login setUser={setUser} />} />
             <Route path="/dashboard" element={user ? <Dashboard /> : <Login setUser={setUser} />} />
+			<Route path="/forgot-password" element={<ForgotPassword />} />
+			<Route path="/reset-password" element={<ResetPassword />} />
 			<Route path="/dashboard/inventory" element={<InventoryDetails />} />
 			<Route path="/performance/users" element={<UserPerformancePage />} />
 			

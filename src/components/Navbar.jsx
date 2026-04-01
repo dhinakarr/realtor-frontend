@@ -6,9 +6,10 @@ import API from "../api/api";
 import useNotifications from "../hooks/useNotifications";
 import NotificationBell from "./NotificationBell";
 import NotificationDropdown from "./NotificationDropdown";
+import ChangePasswordModal from "./ChangePasswordModal";
 import listenForForegroundMessages from "../firebase/firebaseMessaging";
 import UserDrawer from "./UserDrawer";
-import { FaUserPlus, FaHome } from "react-icons/fa";
+import { FaUserPlus, FaHome, FaUser, FaLock, FaSignOutAlt } from "react-icons/fa";
 
 export default function Navbar({ user, setUser }) {
   const navigate = useNavigate();
@@ -33,6 +34,7 @@ export default function Navbar({ user, setUser }) {
   const currentUser = JSON.parse(localStorage.getItem("user"));
   const userType = currentUser?.token?.userType;
   const allowedRoles = ["FINANCE", "HR", "PM", "MD", "PH", "PM"];
+  const [showChangePassword, setShowChangePassword] = useState(false);
 
     /* ---------------- Reset on Auth Change ---------------- */
 	useEffect(() => {
@@ -102,7 +104,7 @@ export default function Navbar({ user, setUser }) {
 		sessionStorage.clear(); // optional, if you store anything in sessionStorage
 
 		// Redirect to login
-		navigate("/login");
+		navigate("/");
 	  }
 	};
 
@@ -213,16 +215,12 @@ export default function Navbar({ user, setUser }) {
               {/* 👤 Profile */}
               <div ref={profileRef} className="position-relative">
                 <button
-                  className="btn btn-secondary"
+                  className="profile-trigger d-flex align-items-center gap-2"
                   onClick={() => {
                     setShowProfile((p) => !p);
                     setShowNotifications(false);
                   }}
                 >
-                  <span className="text-truncate" style={{ maxWidth: 160 }}>
-					{email}
-				  </span>
-
 				  <img
 					src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
 					  email || "user"
@@ -232,26 +230,40 @@ export default function Navbar({ user, setUser }) {
 					width={32}
 					height={32}
 				  />
+				  <div className="text-start d-none d-md-block">
+					<div className="profile-name">{email?.split("@")[0]}</div>
+				  </div>
                 </button>
 
                 {showProfile && (
 				  <Fade in={showProfile} mountOnEnter unmountOnExit appear={false}>
-					<ul className="profile-menu" hidden={!showProfile}>
-					  <li>
-						<Link className="profile-item" to={`/profile/${id}`}>
-						  Profile
-						</Link>
-					  </li>
-					  <li><hr className="profile-divider" />Change Password</li>
-					  <li>
-						<button
-						  className="profile-item danger"
-						  onClick={handleLogout}
-						>
-						  Logout
-						</button>
-					  </li>
-					</ul>
+						<ul className="profile-menu shadow-lg">
+						  <li>
+							<Link className="profile-item" to={`/profile/${id}`}>
+							  👤 My Profile
+							</Link>
+						  </li>
+
+						  <li>
+							<button
+							  className="profile-item"
+							  onClick={() => {
+								setShowProfile(false);
+								setShowChangePassword(true);
+							  }}
+							>
+							  🔒 Change Password
+							</button>
+						  </li>
+
+						  <li><hr className="profile-divider" /></li>
+
+						  <li>
+							<button className="profile-item danger" onClick={handleLogout}>
+							  🚪 Logout
+							</button>
+						  </li>
+						</ul>
 				  </Fade>
 				)}
 
@@ -261,6 +273,11 @@ export default function Navbar({ user, setUser }) {
         </Nav>
 		
 		<UserDrawer open={open} onClose={() => setOpen(false)} />
+		
+		<ChangePasswordModal
+		  show={showChangePassword}
+		  onClose={() => setShowChangePassword(false)}
+		/>
 		
       </Container>
     </RBNavbar>

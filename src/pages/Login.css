@@ -1,0 +1,32 @@
+.login-page {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #001F3F, #6f42c1);
+}
+
+.login-card {
+  width: 360px;
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.login-btn {
+  background: #6f42c1;
+  border: none;
+}
+
+.login-btn:hover {
+  background: #5a32a3;
+}
+
+.pwd-toggle {
+  position: absolute;
+  right: 12px;
+  top: 10px;
+  cursor: pointer;
+  color: #888;
+}
