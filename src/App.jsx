@@ -48,21 +48,39 @@ import { Tooltip, Popover } from 'bootstrap';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 function App() {
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
+  const [user, setUser] = useState(null);
+  const [loadingAuth, setLoadingAuth] = useState(true);
   
+  const isTokenValid = () => {
+	  const token =
+		localStorage.getItem("accessToken") ||
+		sessionStorage.getItem("accessToken");
+
+	  return !!token; // later you can decode & validate expiry
+	};
+
   useEffect(() => {
+	  const storedUser = localStorage.getItem("user") || sessionStorage.getItem("user");
+
+	  if (storedUser && isTokenValid()) {
+		setUser(JSON.parse(storedUser));
+	  } 
+	  
+	  setLoadingAuth(false);
+
 	  const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
 	  tooltipTriggerList.map(function (tooltipTriggerEl) {
 		return new Tooltip(tooltipTriggerEl);
 	  });
 	}, []);
-
+	
+	if (loadingAuth) return null;
   return (
     <Router>
 	  <ToastProvider>
       <Navbar user={user}  setUser={setUser} />
       <div className="d-flex">
-        {user && <Sidebar />}
+        {user && <Sidebar user={user} />}
         <div className="flex-grow-1 p-3">
           <Routes>
 			

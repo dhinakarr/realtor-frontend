@@ -44,7 +44,6 @@ export default function ProjectDetailsPage() {
   const canDelete = feature?.canDelete;
   const isFinance = (feature?.financeRole == "FINANCE") ? true : false;
   
-  
   const projectsUrl = "/api/projects";
   const projectsModule = useModule(projectsUrl);
   const projs = projectsModule?.features?.find(p => p.url === projectsUrl);
@@ -55,7 +54,14 @@ export default function ProjectDetailsPage() {
   const rulesModule = useModule(rulesUrl);
   const rules = rulesModule?.features?.find(r => r.url === rulesUrl);
   const rCreate = rules?.canCreate ?? false;
-
+  
+  const saleUrl = "/api/sales";
+  const salesModule = useModule(saleUrl);
+  const sales = salesModule?.features?.find(s => s.url === saleUrl)
+  const sCreate = sales?.canCreate ?? false;
+  const sUpdate = sales?.canUpdate ?? false;
+  const sDelete = sales?.canDelete ?? false;
+//console.log("commission-rules rCreate: "+rCreate);
   const loadProject = () => {
     API.get(`/api/projects/details/${id}`)
       .then((res) => {
@@ -244,7 +250,13 @@ export default function ProjectDetailsPage() {
 				setSalePlotId(null);
 				setSaleProjectId(null);
 			}}
-			onSuccess={refreshProjectDetails}
+			onSuccess={() => {
+			  refreshProjectDetails();
+
+			  setSalePlotId(null);
+			  setSaleProjectId(null);
+			  setViewPlotId(null); // 🔥 key fix
+			}}
 		  />
 		)}
 		
@@ -366,6 +378,7 @@ export default function ProjectDetailsPage() {
 			  setViewPlotId(null);      // close plot view
 			  setCancelPlotId(plotId);  // open cancel panel
 			}}
+		  canCancel={sDelete}
         />
       )}
 	  

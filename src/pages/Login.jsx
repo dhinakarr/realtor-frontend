@@ -14,29 +14,36 @@ export default function Login({ setUser }) {
   const [error, setError] = useState("");
 
   const navigate = useNavigate();
-
+  
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
-
     try {
       setLoading(true);
-
       const res = await API.post("/api/auth/login", {
         email: username,
         password,
       });
 
       const data = res.data.data;
+	  
+	  if (remember) {
+		  sessionStorage.removeItem("accessToken");
+		  sessionStorage.removeItem("refreshToken");
+		  sessionStorage.removeItem("user");
 
-      if (remember) {
-        localStorage.setItem("accessToken", data.token.accessToken);
-        localStorage.setItem("refreshToken", data.token.refreshToken);
-        localStorage.setItem("user", JSON.stringify(data));
-      } else {
-        sessionStorage.setItem("accessToken", data.token.accessToken);
-        sessionStorage.setItem("user", JSON.stringify(data));
-      }
+		  localStorage.setItem("accessToken", data.token.accessToken);
+		  localStorage.setItem("refreshToken", data.token.refreshToken);
+		  localStorage.setItem("user", JSON.stringify(data));
+		} else {
+		  localStorage.removeItem("accessToken");
+		  localStorage.removeItem("refreshToken");
+		  localStorage.removeItem("user");
+
+		  sessionStorage.setItem("accessToken", data.token.accessToken);
+		  sessionStorage.setItem("refreshToken", data.token.refreshToken);
+		  sessionStorage.setItem("user", JSON.stringify(data));
+		}
 
       setUser(data);
       navigate("/dashboard");

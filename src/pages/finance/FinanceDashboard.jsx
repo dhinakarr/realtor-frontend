@@ -24,7 +24,7 @@ const FinanceDashboard = () => {
 	const [drawer, setDrawer] = useState({ open: false });
 	const { showToast } = useToast();
 	const [viewType, setViewType] = useState("CASHFLOW"); 
-	const totals = {};
+	//const totals = {};
 	
 	//const [showTable, setShowTable] = useState(false);
 // SUMMARY | RECEIVABLE | PAYABLE
@@ -267,6 +267,19 @@ const FinanceDashboard = () => {
 
 	const FinanceDetailsTable = ({ type, data, onAmountClick }) => {
 	  const columns = columnsByType[type];
+	  
+	  const totals = React.useMemo(() => {
+	  const t = {};
+	  columns?.forEach(col => {
+		if (col.isAmount) {
+		  t[col.key] = data.reduce(
+			(sum, row) => sum + Number(row[col.key] || 0),
+			0
+		  );
+		}
+	  });
+	  return t;
+	}, [data, columns]);
 
 	  if (!columns) {
 		return <div className="text-muted">No table configuration</div>;
@@ -482,12 +495,14 @@ const FinanceDashboard = () => {
 	  return projectMatch && plotMatch && agentMatch;
 	});
 	
-	const refreshCurrentView = async () => {
-	  await loadSummary();
-	  await loadCashFlow();
+	const refreshCurrentView = async (typeOverride) => {
+	  await loadSummary(dateRange);
+	  await loadCashFlow(filters, dateRange);
+	  
+	  const typeToUse = typeOverride || viewType;
 
-	  if (viewType && viewType !== "CASHFLOW") {
-		await handleFilter({ type: viewType });
+	  if (typeToUse && typeToUse !== "CASHFLOW") {
+		await handleFilter({ type: typeToUse });
 	  }
 	};
 	
@@ -497,7 +512,7 @@ const FinanceDashboard = () => {
 	  await API.post("/api/payments", json);
 	  setShowPaymentModal(false);
 	  showToast("Payment saved successfully");
-	  await refreshCurrentView();
+	  await refreshCurrentView(viewType);
 	};
 	
 	return (
@@ -603,8 +618,7 @@ const FinanceDashboard = () => {
 			)}
 
 			{/* PAID VIEW */}
-			{viewType === "PAID" && (
-			  <>
+			{viewType === "PAID" && (<>
 				<SectionHeader
 				  title={`Payout Done (${formatDate(dateRange.from)} → ${formatDate(dateRange.to)})`}
 				  onBack={() => setViewType("CASHFLOW")}
@@ -687,7 +701,7 @@ const FinanceDashboard = () => {
 			  show={showTxnModal}
 			  onHide={() => {
 				  setShowTxnModal(false);
-				setViewType("CASHFLOW")
+
 			  }}
 			  saleId={saleId}
 			  txnType={txnType}

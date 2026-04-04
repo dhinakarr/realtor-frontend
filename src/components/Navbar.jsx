@@ -31,12 +31,12 @@ export default function Navbar({ user, setUser }) {
 
   const id = user?.token?.userId;
   const [open, setOpen] = useState(false);
-  const currentUser = JSON.parse(localStorage.getItem("user"));
-  const userType = currentUser?.token?.userType;
-  const allowedRoles = ["FINANCE", "HR", "PM", "MD", "PH", "PM"];
+  
+  const userType = user?.token?.userType;
+  const allowedRoles = ["FINANCE", "HR", "PM", "MD", "PH"];
   const [showChangePassword, setShowChangePassword] = useState(false);
-
-    /* ---------------- Reset on Auth Change ---------------- */
+  
+   /* ---------------- Reset on Auth Change ---------------- */
 	useEffect(() => {
 	  // Ensure menus are closed when user logs in or out
 	  setShowProfile(false);

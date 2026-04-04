@@ -7,7 +7,7 @@ import logo from "../assets/logo.png";
 import CancelBookingPanel from "./CancelBookingPanel"
 import { formatINRComma, formatINR, formatDate } from "../utils/numberFormatter";
 
-export default function PlotViewPanel({ plotId, plotData, onClose, onBook, onCancel }) {
+export default function PlotViewPanel({ plotId, plotData, onClose, onBook, onCancel, canCancel }) {
   const [plot, setPlot] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -187,7 +187,7 @@ export default function PlotViewPanel({ plotId, plotData, onClose, onBook, onCan
 				Book
 			  </button>
 			)}
-			{onCancel && plot?.status === "BOOKED" && !isPublic && (
+			{onCancel && canCancel && plot?.status === "BOOKED" && !isPublic && (
 			  <button
 				className="btn btn-danger"
 				onClick={() => onCancel(plotId)}

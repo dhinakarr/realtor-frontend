@@ -24,11 +24,10 @@ const moduleRouteMap = {
 	sitevisits: '/site-visits/list'
 };
 
-export default function Sidebar() {
+export default function Sidebar({user}) {
   const location = useLocation();
-  const user = JSON.parse(localStorage.getItem('user'));
   const permissions = user?.permission || []; // fixed access
-  //console.log("Sidebar Data Received: "+JSON.stringify(user));
+  //console.log("Sidebar Data Received: "+JSON.stringify(storedUser));
   //console.log("Sidebar permissions: "+JSON.stringify(permissions));
   //const isActive = (route) => location.pathname.startsWith(route);
   //console.log("Sidebar isActive: "+isActive);

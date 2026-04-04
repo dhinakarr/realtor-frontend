@@ -25,7 +25,7 @@ const processQueue = (error, token = null) => {
 //
 API.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("accessToken");
+    const token = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -48,6 +48,10 @@ API.interceptors.response.use(
     if (error.response?.status !== 401 || originalRequest._retry) {
       return Promise.reject(error);
     }
+	
+	if (originalRequest.url.includes("/api/auth/refresh")) {
+      return Promise.reject(error);
+    }
 
     if (isRefreshing) {
       // queue requests
@@ -55,7 +59,10 @@ API.interceptors.response.use(
         failedQueue.push({ resolve, reject });
       })
       .then((token) => {
-        originalRequest.headers.Authorization = "Bearer " + token;
+        originalRequest.headers = {
+            ...originalRequest.headers,
+            Authorization: "Bearer " + token
+          };
         return API(originalRequest);
       })
       .catch(err => Promise.reject(err));
@@ -65,8 +72,14 @@ API.interceptors.response.use(
     isRefreshing = true;
 
     try {
-
-      const refreshToken = localStorage.getItem("refreshToken");
+      const refreshToken = localStorage.getItem("refreshToken") || sessionStorage.getItem("refreshToken");
+	  
+	  if (!refreshToken) {
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.href = "/login";
+        return Promise.reject(error);
+      }
 
       const response = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/api/auth/refresh`,
@@ -76,28 +89,28 @@ API.interceptors.response.use(
         }
       );
 
-      const { accessToken } = response.data;
+	  const { accessToken } = response.data?.accessToken || response.data?.data?.accessToken;
+      const isRemember = !!localStorage.getItem("refreshToken");
 
-      localStorage.setItem("accessToken", accessToken);
-
+		if (isRemember) {
+		  localStorage.setItem("accessToken", accessToken);
+		} else {
+		  sessionStorage.setItem("accessToken", accessToken);
+		}
+	  
       processQueue(null, accessToken);
-
-      originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-
+      originalRequest.headers = {
+		  ...originalRequest.headers,
+		  Authorization: `Bearer ${accessToken}`
+		};
       return API(originalRequest);
-
     } catch (err) {
-
       processQueue(err, null);
-
       // logout
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-
-      window.location.href = "/login";
-
-      return Promise.reject(err);
-
+	  localStorage.clear();
+	  sessionStorage.clear();
+	  window.location.href = "/login";
+	  return Promise.reject(error);
     } finally {
       isRefreshing = false;
     }

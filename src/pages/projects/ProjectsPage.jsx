@@ -20,7 +20,7 @@ export default function ProjectPage() {
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [activeVideo, setActiveVideo] = useState(null);
   
-  const feature = module.features.find(f => f.url  === featureUrl);
+  const feature = module?.features?.find(f => f.url  === featureUrl);
   //console.log("ProjectsPage feature.canCreate: "+JSON.stringify(feature.canCreate));
   const BASE_URL = API.defaults.baseURL; 
 
@@ -29,9 +29,9 @@ export default function ProjectPage() {
   const [deleteProjectId, setDeleteProjectId] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const canCreate = feature.canCreate;
-  const canEdit   = feature.canUpdate;
-  const canDelete = feature.canDelete;
+  const canCreate = feature?.canCreate;
+  const canEdit   = feature?.canUpdate;
+  const canDelete = feature?.canDelete;
   //console.log("ProjectsPage canCreate: "+canCreate+ " canEdit: "+canEdit+" canDelete: "+canDelete);
   
   useEffect(() => {

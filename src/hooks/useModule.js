@@ -1,6 +1,7 @@
 export default function useModule(featureUrl = "") {
   // Always parse safely
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const user = JSON.parse(localStorage.getItem("user")) ||
+  JSON.parse(sessionStorage.getItem("user"));
   const permissions = user?.permission || [];
 
   // Ensure permissions is always an array
