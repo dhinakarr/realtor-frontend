@@ -33,7 +33,7 @@ export default function Navbar({ user, setUser }) {
   const [open, setOpen] = useState(false);
   
   const userType = user?.token?.userType;
-  const allowedRoles = ["FINANCE", "HR", "PM", "MD", "PH"];
+  const allowedRoles = ["HR", "PM", "MD", "PH"];
   const [showChangePassword, setShowChangePassword] = useState(false);
   
    /* ---------------- Reset on Auth Change ---------------- */

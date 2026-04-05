@@ -96,7 +96,7 @@ const ReceivableDetailsTable = ({ data, loading, onAction }) => {
 				<td colSpan={4} className="text-end">Total</td>
 
 				<td className="text-end">
-				  {formatINRComma(Math.round(totals.saleAmount))}
+				  
 				</td>
 
 				<td className="text-end">

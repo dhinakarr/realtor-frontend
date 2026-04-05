@@ -55,13 +55,6 @@ export default function ProjectDetailsPage() {
   const rules = rulesModule?.features?.find(r => r.url === rulesUrl);
   const rCreate = rules?.canCreate ?? false;
   
-  const saleUrl = "/api/sales";
-  const salesModule = useModule(saleUrl);
-  const sales = salesModule?.features?.find(s => s.url === saleUrl)
-  const sCreate = sales?.canCreate ?? false;
-  const sUpdate = sales?.canUpdate ?? false;
-  const sDelete = sales?.canDelete ?? false;
-//console.log("commission-rules rCreate: "+rCreate);
   const loadProject = () => {
     API.get(`/api/projects/details/${id}`)
       .then((res) => {
@@ -378,7 +371,6 @@ export default function ProjectDetailsPage() {
 			  setViewPlotId(null);      // close plot view
 			  setCancelPlotId(plotId);  // open cancel panel
 			}}
-		  canCancel={sDelete}
         />
       )}
 	  

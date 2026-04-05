@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./PaymentModal.css";
 import API from "../api/api";
+import { formatINRComma, formatDate } from "../utils/numberFormatter";
 
 export default function PaymentModal({ open, onClose, plotId, outstandingAmount, onSubmit }) {
 	const [errors, setErrors] = useState({});
@@ -127,10 +128,10 @@ export default function PaymentModal({ open, onClose, plotId, outstandingAmount,
 		<div className="payment-body grid-2">
 		
 		  <div className="text-muted mt-1">
-			  Total received: {totalReceived}
+			  Total received: {formatINRComma(totalReceived)}
 		  </div>
 		  <div className="text-muted mt-1">
-			  OutStanding: {outstandingAmount}
+			  OutStanding: {formatINRComma(outstandingAmount)}
 		  </div>
 
           <div>

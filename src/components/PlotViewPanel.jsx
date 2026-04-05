@@ -6,8 +6,9 @@ import { FaPrint } from "react-icons/fa";
 import logo from "../assets/logo.png";
 import CancelBookingPanel from "./CancelBookingPanel"
 import { formatINRComma, formatINR, formatDate } from "../utils/numberFormatter";
+import useModule from "../hooks/useModule";
 
-export default function PlotViewPanel({ plotId, plotData, onClose, onBook, onCancel, canCancel }) {
+export default function PlotViewPanel({ plotId, plotData, onClose, onBook, onCancel }) {
   const [plot, setPlot] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -16,6 +17,14 @@ export default function PlotViewPanel({ plotId, plotData, onClose, onBook, onCan
   const [cancelReason, setCancelReason] = useState("");
   const [cancelPlotId, setCancelPlotId] = useState(null);
   const isPublic = !!plotData;
+  
+  const saleUrl = "/api/sales";
+  const salesModule = useModule(saleUrl);
+  const sales = salesModule?.features?.find(s => s.url === saleUrl)
+  const sCreate = sales?.canCreate ?? false;
+  const sUpdate = sales?.canUpdate ?? false;
+  const sDelete = sales?.canDelete ?? false;
+//console.log("@PlotViewPanel sCreate: "+sCreate);
   
   useEffect(() => {
 	  
@@ -178,7 +187,7 @@ export default function PlotViewPanel({ plotId, plotData, onClose, onBook, onCan
         {/* Footer Buttons */}
         <div className="d-flex justify-content-end gap-2 mt-4">
           <button className="btn btn-secondary" onClick={onClose}>Back</button>
-          {onBook && (
+          {onBook && sCreate && (
 			  <button
 				className="btn btn-success"
 				disabled={!canBook}
@@ -187,7 +196,7 @@ export default function PlotViewPanel({ plotId, plotData, onClose, onBook, onCan
 				Book
 			  </button>
 			)}
-			{onCancel && canCancel && plot?.status === "BOOKED" && !isPublic && (
+			{onCancel && sDelete && plot?.status === "BOOKED" && !isPublic && (
 			  <button
 				className="btn btn-danger"
 				onClick={() => onCancel(plotId)}

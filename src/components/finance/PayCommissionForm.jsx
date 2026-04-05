@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Form, Button, Alert, Row, Col, Table } from "react-bootstrap";
 import API from "../../api/api";
 import { useToast } from "../common/ToastProvider";
+import { formatINRComma, formatDate } from "../../utils/numberFormatter";
 
 const PayCommissionForm = ({ row, onCancel, onSuccess }) => {
 	const [amount, setAmount] = useState(row.amount || "");
@@ -105,7 +106,7 @@ const PayCommissionForm = ({ row, onCancel, onSuccess }) => {
 		  <strong>Agent:</strong> {row.agentName}
 		  <div className="text-muted small mt-1 d-flex justify-content-between align-items-center text-nowrap">
 			  <span>
-				Commission Paid: <strong>₹{totalPaid}</strong>
+				Paid Amount: <strong>₹{totalPaid}</strong>
 			  </span>
 			  <span>
 				Outstanding: <strong>{formatted}</strong>

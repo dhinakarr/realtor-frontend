@@ -24,10 +24,6 @@ const FinanceDashboard = () => {
 	const [drawer, setDrawer] = useState({ open: false });
 	const { showToast } = useToast();
 	const [viewType, setViewType] = useState("CASHFLOW"); 
-	//const totals = {};
-	
-	//const [showTable, setShowTable] = useState(false);
-// SUMMARY | RECEIVABLE | PAYABLE
 
 	const [tableData, setTableData] = useState([]);
 	const [loading, setLoading] = useState(false);
@@ -72,17 +68,29 @@ const FinanceDashboard = () => {
 	  setShowTxnModal(true);
 	};
 	
+	useEffect(() => {
+	  if (viewType !== "CASHFLOW") {
+		handleFilter({ type: viewType });
+	  }
+	}, [viewType, dateRange]);
+	
 	const loadSummary = async (range = dateRange) => {
 	  const res = await getFinanceSummary(range);
 	  setSummary(res.data.data);
 	};
 
 	const loadCashFlow = async (f = filters, range = dateRange) => {
-	  const res = await getCashFlow({
-		...f,
-		...range,
-	  });
-	  setRows(res.data.data);
+	  try {
+		const res = await getCashFlow({
+		  ...f,
+		  ...range,
+		});
+
+		setRows(res?.data?.data || []); // ✅ safe access
+	  } catch (err) {
+		console.error("Cashflow API failed", err);
+		setRows([]); // fallback
+	  }
 	};
 
 	
@@ -98,24 +106,23 @@ const FinanceDashboard = () => {
 			loadCashFlow();
 			return;
 		}
-
 		setDrawer({ open: true, row, action });
 	  } catch {
 		showToast("Failed to verify payment", "danger");
 		}
 		return;
-	  
 	};
 	
-	const handleFilter = async ({ type }) => {
-		//console.log("handleFilter called:", type);
+	const handleFilter = async ({ type, rangeOverride } = {}) => {
 	  setLoading(true);
-	  
-	  if (!dateRange?.from || !dateRange?.to) {
-		  console.error("Invalid dateRange:", dateRange);
-		  showToast("Invalid date range", "danger");
-		  return;
-		}
+
+	  const range = rangeOverride || dateRange; // ✅ fallback to state
+
+	  if (!range?.from || !range?.to) {
+		console.error("Invalid dateRange:", range);
+		showToast("Invalid date range", "danger");
+		return;
+	  }
 
 	  try {
 		let url;
@@ -142,11 +149,11 @@ const FinanceDashboard = () => {
 
 		const res = await API.get(url, {
 		  params: {
-			from: dateRange.from,
-			to: dateRange.to
+			from: range.from,
+			to: range.to
 		  }
 		});
-//console.log("API response:", res.data);
+
 		setTableData(res.data.data || []);
 		setViewType(type);
 
@@ -284,16 +291,6 @@ const FinanceDashboard = () => {
 	  if (!columns) {
 		return <div className="text-muted">No table configuration</div>;
 	  }
-	  
-	  columns?.forEach(col => {
-		  if (col.isAmount) {
-			totals[col.key] = data.reduce(
-			  (sum, row) => sum + Number(row[col.key] || 0),
-			  0
-			);
-		  }
-		});
-
 	  return (
 		<Table striped bordered hover size="sm">
 		  <thead>
@@ -447,7 +444,7 @@ const FinanceDashboard = () => {
 			  remarks: payload.remarks
 			};
 		  
-		  console.log("handlePaymentSubmit paidTo: "+jsonData);
+		  //console.log("handlePaymentSubmit paidTo: "+jsonData);
 		await API.post("/api/payments", jsonData);
 		showToast("Payment saved successfully");
 		setShowPaymentModal(false);	
@@ -496,13 +493,17 @@ const FinanceDashboard = () => {
 	});
 	
 	const refreshCurrentView = async (typeOverride) => {
-	  await loadSummary(dateRange);
-	  await loadCashFlow(filters, dateRange);
-	  
 	  const typeToUse = typeOverride || viewType;
 
-	  if (typeToUse && typeToUse !== "CASHFLOW") {
-		await handleFilter({ type: typeToUse });
+	  await loadSummary(dateRange);
+
+	  if (typeToUse === "CASHFLOW") {
+		await loadCashFlow(filters, dateRange);
+	  } else {
+		await handleFilter({
+		  type: typeToUse,
+		  rangeOverride: dateRange
+		});
 	  }
 	};
 	
@@ -644,7 +645,7 @@ const FinanceDashboard = () => {
 			{viewType === "PAYABLE" && (
 				<>
 					<SectionHeader
-						title={`Commission Payable Details (${formatDate(dateRange.from)} → ${formatDate(dateRange.to)})`}
+						title={`Payable Details (${formatDate(dateRange.from)} → ${formatDate(dateRange.to)})`}
 						onBack={() => setViewType("CASHFLOW")}
 					/>
 					
@@ -678,7 +679,7 @@ const FinanceDashboard = () => {
 				action={drawer.action}
 				onClose={() => setDrawer(d => ({ ...d, open: false }))}
 				onSuccess={async () => {
-				  await refreshCurrentView(); // ✅ FIX
+				  await refreshCurrentView(viewType); // ✅ FIX
 				  setDrawer({ open: false });
 				}}
 			/>

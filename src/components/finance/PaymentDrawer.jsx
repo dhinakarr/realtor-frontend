@@ -11,7 +11,7 @@ const PaymentDrawer = ({ open, onClose, row, action, onSuccess }) => {
 		action === "RECEIVE"
 			? "Receive Payment"
 			: action === "PAY_COMMISSION"
-			? "Pay Commission"
+			? "Payout"
 			: "Payment";
 
 	return (

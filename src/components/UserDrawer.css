@@ -21,15 +21,15 @@
 
 .drawer {
   position: fixed;
-  right: -500px;
+  right: -600px;
   top: 0;
-  width: 500px;
+  width: 600px;
   height: 100%;
   background: #fff;
   z-index: 999;
   transition: right 0.3s ease;
 
-  padding: 20px;              /* ✅ ADD THIS */
+  padding: 4px;              /* ✅ ADD THIS */
   overflow-y: auto;           /* ✅ scroll if content is long */
   box-shadow: -2px 0 10px rgba(0,0,0,0.1); /* optional nice UI */
 }
@@ -51,10 +51,10 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;   /* space below header */
+  margin-bottom: 6px;   /* space below header */
 }
 .drawer-body {
-  margin-top: 10px;
+  margin-top: 4px;
 }
 .close-icon svg {
   cursor: pointer;
