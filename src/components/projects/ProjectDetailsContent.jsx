@@ -103,7 +103,6 @@ export default function ProjectDetailsContent({
 
 		  </div>
       </div>
-
       {/* ================= PLOT GRID ================= */}
 		<div className="d-flex gap-3 mb-3 align-items-center">
   
@@ -131,6 +130,10 @@ export default function ProjectDetailsContent({
 			<option value="South">South</option>
 			<option value="East">East</option>
 			<option value="West">West</option>
+			<option value="South East">South East</option>
+			<option value="South West">South West</option>
+			<option value="North East">North East</option>
+			<option value="North West">North West</option>
 		  </select>
 		
 			<button

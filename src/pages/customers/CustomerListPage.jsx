@@ -34,29 +34,35 @@ export default function CustomerListPage() {
 	};
   
   useEffect(() => {
+	  let isActive = true;
+
 	  if (searchText.trim() === "") {
-		// Load all customers
 		fetchCustomers();
 		return;
 	  }
 
 	  const delayDebounce = setTimeout(() => {
 		API.get("/api/customers/search", {
-			  params: { searchText }
-			})
-			.then((res) => {
-				
-			  const pageResult = res.data;
+		  params: { searchText }
+		})
+		  .then((res) => {
+			if (!isActive) return;
 
-			  setCustomers(Array.isArray(pageResult?.data) ? pageResult.data : []);
-			  setPage(1);
-			})
+			const data = res.data?.data;
+			setCustomers(Array.isArray(data) ? data : []);
+			setPage(1);
+		  })
 		  .catch((err) => {
+			if (!isActive) return;
 			console.error(err);
 			setCustomers([]);
 		  });
-	  }, 400);   // debounce 400ms like Google search
-	  return () => clearTimeout(delayDebounce);
+	  }, 400);
+
+	  return () => {
+		isActive = false;
+		clearTimeout(delayDebounce);
+	  };
 	}, [searchText]);
   
   
@@ -65,7 +71,7 @@ export default function CustomerListPage() {
 		.then((response) => {
 		  const data = response.data?.data; // <-- get the actual payload from API
 		  if (Array.isArray(data)) {
-			setCustomers(data);
+			setCustomers(data ? data: []);
 		  } else if (data == null) {
 			setCustomers([]);  // API returned null
 		  } else {
@@ -103,7 +109,7 @@ export default function CustomerListPage() {
 
   return (
     <div className="container-fluid mt-1">
-      <div><h2>Customer Portal</h2></div>
+      <div><h4>Customer Portal</h4></div>
       {/* Top bar: search - title - create */}
       <div className="mb-3 align-items-center"
   style={{
@@ -127,7 +133,7 @@ export default function CustomerListPage() {
 
         {/* Center title */}
         <div className="flex-grow-1 text-center pe-5">
-		  <h3 className="m-0">Customer List</h3>
+		  <h5 className="m-0">Customer List</h5>
 		</div>
 
         {/* Right: Create button */}

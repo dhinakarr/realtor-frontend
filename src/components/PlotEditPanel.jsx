@@ -10,8 +10,6 @@ export default function PlotEditPanel({ plotId, onClose, onSaved }) {
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(false);
   
-  
-
   // load form + data
   useEffect(() => {
     if (!plotId) return;
@@ -183,6 +181,36 @@ export default function PlotEditPanel({ plotId, onClose, onSaved }) {
         </div>
       );
     }
+	
+	if (f.fieldType === "select") {
+	  return (
+		<>
+		  <label className="form-label" htmlFor={key}>
+			{f.displayLabel}
+		  </label>
+
+		  <select
+			id={key}
+			name={key}
+			className="form-control"
+			value={val || ""}
+			onChange={handleChange(key, f.fieldType)}
+		  >
+			<option value="">-- Select {f.displayLabel} --</option>
+
+			{(f.lookupData || []).map((opt, idx) => (
+			  <option key={idx} value={opt.value}>
+				{opt.key}
+			  </option>
+			))}
+		  </select>
+
+		  {errors[key] && (
+			<div className="text-danger small">{errors[key]}</div>
+		  )}
+		</>
+	  );
+	}
 
     if (f.fieldType === "number") {
 	  const isRateField = f.apiField === "ratePerSqft";

@@ -36,7 +36,15 @@ export default function UsersListPage() {
 //console.log("UserListPage feature: "+JSON.stringify(feature));
 
   const loadData = useCallback(() => {
-	  API.get(`/api/users/pages?page=${page}&size=${size}`)
+	  API.get(`/api/users/pages`, {
+		  params: {
+			page,
+			size,
+			search,
+			role: roleFilter,
+			manager: managerFilter
+		  }
+		})
 		.then((res) => {
 		  const result = res.data.data || {};
 		  setList(result.data || []);
@@ -45,27 +53,17 @@ export default function UsersListPage() {
 		.catch((err) => {
 		  console.error("Failed to load users page:", err);
 		});
-	}, [page, size]);
+	}, [page, size, search, roleFilter, managerFilter]);
 
   
   useEffect(() => {
-    if (search) {
-    searchUsers(search);	
-	  } else {
-		loadData();
-	  }
-  }, [page, search, loadData]);
+	loadData();
+  }, [page, search, roleFilter, managerFilter]);
   
   const roleOptions = [...new Set(list.map(u => u.roleName).filter(Boolean))];
   const managerOptions = [...new Set(list.map(u => u.managerName).filter(Boolean))];
   
-  const filteredList = list.filter(u => {
-	  return (
-		(!roleFilter || u.roleName === roleFilter) &&
-		(!managerFilter || u.managerName === managerFilter)
-	  );
-	});
-  
+  const filteredList = list;
   
   const handleDeleteClick = (userId) => {
 	  setSelectedUserId(userId);
@@ -88,14 +86,14 @@ export default function UsersListPage() {
 	const handleSearchChange = (e) => {
 	  const value = e.target.value;
 	  setSearch(value);
-	  setPage(1);	
+	  setPage(1);
+
 	  if (searchTimeout) {
 		clearTimeout(searchTimeout);
 	  }
 
-	  // Wait 500ms after user stops typing
 	  const timeout = setTimeout(() => {
-		searchUsers(value);
+		// just trigger state change → useEffect will call loadData
 	  }, 500);
 
 	  setSearchTimeout(timeout);
@@ -175,7 +173,7 @@ export default function UsersListPage() {
 				onChange={(e) => setRoleFilter(e.target.value)}
 			  >
 				<option value="">Role Name</option>
-				{roleOptions.map((role, i) => (
+				{(roleOptions || []).map((role, i) => (
 				  <option key={i} value={role}>{role}</option>
 				))}
 			  </select>
@@ -188,7 +186,7 @@ export default function UsersListPage() {
 					onChange={(e) => setManagerFilter(e.target.value)}
 				  >
 					<option value="">Reporting Manager</option>
-					{managerOptions.map((m, i) => (
+					{(managerOptions || []).map((m, i) => (
 					  <option key={i} value={m}>{m}</option>
 					))}
 				  </select>
