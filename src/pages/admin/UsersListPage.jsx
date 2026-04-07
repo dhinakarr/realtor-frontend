@@ -205,10 +205,10 @@ export default function UsersListPage() {
           ) : (
             filteredList.map((u) => (
               <tr key={u.userId} title={`Employee ID: ${u.employeeId}`}>
-                <td>{u.fullName}</td>
+                <td>{u.fullName } ({u.employeeId})</td>
                 <td>{u.roleName}</td>
                 <td>{u.email}</td>
-                <td>{u.managerName}</td>
+		  <td>{u.managerName} ({u.managerEmpId}) </td>
 				<td>{u.mobile}</td>
                 <td>
 				  <div className="d-flex align-items-center gap-1">
