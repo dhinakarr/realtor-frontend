@@ -210,6 +210,7 @@ const payables = commission.reduce(
           <tr>
             <th>Project</th>
 			<th>Plot Number</th>
+			<th>Member Name</th>
             <th>Plot Price</th>
             <th>Total Payout</th>
             <th>Paid</th>
@@ -220,6 +221,7 @@ const payables = commission.reduce(
             <tr key={c.commissionId}>
               <td>{c.projectName}</td>
 			  <td>{c.plotNumber}</td>
+			  <td>{c.agentName}</td>
               <td className="text-end">₹{formatINRComma(c.saleAmount)}</td>
               <td className="text-end">₹{formatINRComma(c.totalCommission)}</td>
               <td className="text-success text-end">{formatINRComma(c.commissionPaid)}</td>
@@ -229,7 +231,7 @@ const payables = commission.reduce(
 		
 		<tfoot>
 		  <tr>
-			<th colSpan="2" className="text-end">Total</th>
+			<th colSpan="3" className="text-end">Total</th>
 			<th className="text-end">₹{formatINRComma(payables.saleAmount)}</th>
 			<th className="text-end">₹{formatINRComma(payables.total)}</th>
 			<th className="text-end">₹{formatINRComma(payables.paid)}</th>

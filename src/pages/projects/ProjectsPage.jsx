@@ -8,6 +8,7 @@ import "./ProjectPage.css";
 import UploadDocumentOverlay from "./UploadDocumentOverlay";
 import { FaUpload } from "react-icons/fa";
 import ProjectCards from "../../components/projects/ProjectCards"
+import ProjectPricingPanel from "../../components/projects/ProjectPricingPanel";
 
 export default function ProjectPage() {
   const [projects, setProjects] = useState([]);
@@ -19,6 +20,9 @@ export default function ProjectPage() {
   const [showUploadOverlay, setShowUploadOverlay] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [activeVideo, setActiveVideo] = useState(null);
+  
+  const [showPricingPanel, setShowPricingPanel] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null);
   
   const feature = module?.features?.find(f => f.url  === featureUrl);
   //console.log("ProjectsPage feature.canCreate: "+JSON.stringify(feature.canCreate));
@@ -33,6 +37,11 @@ export default function ProjectPage() {
   const canEdit   = feature?.canUpdate;
   const canDelete = feature?.canDelete;
   //console.log("ProjectsPage canCreate: "+canCreate+ " canEdit: "+canEdit+" canDelete: "+canDelete);
+  
+  const handlePricing = (project) => {
+	  setSelectedProject(project);
+	  setShowPricingPanel(true);
+	};
   
   useEffect(() => {
     loadProjects();
@@ -174,6 +183,7 @@ export default function ProjectPage() {
 		  }}
 		  setActiveVideo={setActiveVideo}
 		  setShowVideoModal={setShowVideoModal}
+		  onPricing={handlePricing}
 		/>
 		
 		<UploadDocumentOverlay
@@ -184,6 +194,13 @@ export default function ProjectPage() {
 			setShowUploadOverlay(false);
 			loadProjects(); // ✅ THIS is what you're missing
 		  }}
+		/>
+		
+		<ProjectPricingPanel
+		  show={showPricingPanel}
+		  project={selectedProject}
+		  onClose={() => setShowPricingPanel(false)}
+		  onSuccess={loadProjects}
 		/>
 		
 	  {/* DELETE PROJECT CONFIRM MODAL */}

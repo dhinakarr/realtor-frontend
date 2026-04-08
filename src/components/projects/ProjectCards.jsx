@@ -1,6 +1,7 @@
 import React from "react";
-import { FaEdit, FaTrash, FaUpload } from "react-icons/fa";
+import { FaEdit, FaTrash, FaUpload, FaTags } from "react-icons/fa";
 import UploadDocumentOverlay from "../../pages/projects/UploadDocumentOverlay";
+
 
 export default function ProjectCards({
   projects,
@@ -13,6 +14,7 @@ export default function ProjectCards({
   onUpload,
   setActiveVideo,
   setShowVideoModal,
+  onPricing,
 }) {
 
   return (
@@ -39,8 +41,19 @@ export default function ProjectCards({
               onClick={() => onView?.(project.projectId)}
             >
               {/* ACTION ICONS */}
+			  
               {(canEdit || canDelete) && (
-                <div className="project-icon-overlay">
+				<div className="project-icon-overlay">
+				  {canEdit && (
+					  <FaTags
+						title="Update Pricing"
+						className="project-icon"
+						onClick={(e) => {
+						  e.stopPropagation();
+						  onPricing(project);
+						}}
+					  />
+					)}
                   {canEdit && (
                     <FaEdit
                       className="project-icon"
@@ -50,7 +63,6 @@ export default function ProjectCards({
                       }}
                     />
                   )}
-
                   {canEdit && (
                     <FaUpload
                       className="project-icon"

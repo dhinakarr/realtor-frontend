@@ -204,3 +204,51 @@
 .inv-card.sold .inv-label {
   color: #fff;   /* softer green */
 }
+
+.slideover-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  z-index: 1050;
+}
+
+.slideover-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 400px;
+  height: 100%;
+  background: #fff;
+  box-shadow: -2px 0 10px rgba(0,0,0,0.2);
+  animation: slideIn 0.3s ease;
+  display: block; /* ✅ change from flex */
+}
+
+@keyframes slideIn {
+  from { right: -400px; }
+  to { right: 0; }
+}
+
+.slideover-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.slideover-footer {
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.slideover-body {
+  flex: 1;
+  padding: 8px;
+  overflow-y: auto;
+}
