@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Table, Spinner, Form } from "react-bootstrap";
-import API from "../api/API";
+import API from "../api/api";
 import { formatINRComma } from "../utils/numberFormatter";
-import "./dashboard.css";
+import "./Dashboard.css";
 
 export default function CommissionDetailsModal({ open, onClose, from, to }) {
   const [list, setList] = useState([]);

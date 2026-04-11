@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Card, Row, Col, Spinner } from "react-bootstrap";
 import { Bar, Line, Doughnut } from "react-chartjs-2";
-import API from "../api/API";
+import API from "../api/api";
 import { useNavigate } from "react-router-dom";
-import "./dashboard.css";
+import "./Dashboard.css";
 import { formatINRComma, formatINR } from "../utils/numberFormatter";
 import ReceivableDetailsModal from "./ReceivableDetailsModal";
 import CommissionDetailsModal from "./CommissionDetailsModal";

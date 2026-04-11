@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Table, Button, Spinner, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { FaEye, FaEdit, FaMoneyBillWave, FaPlus } from "react-icons/fa";
-import API from "../../api/API";
+import API from "../../api/api";
 import SiteVisitFormDrawer from "./SiteVisitFormDrawer";
 import SiteVisitViewDrawer from "./SiteVisitViewDrawer";
 import SiteVisitEditDrawer from "./SiteVisitEditDrawer";

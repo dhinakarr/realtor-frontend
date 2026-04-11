@@ -27,10 +27,7 @@ const moduleRouteMap = {
 export default function Sidebar({user}) {
   const location = useLocation();
   const permissions = user?.permission || []; // fixed access
-  //console.log("Sidebar Data Received: "+JSON.stringify(storedUser));
-  //console.log("Sidebar permissions: "+JSON.stringify(permissions));
-  //const isActive = (route) => location.pathname.startsWith(route);
-  //console.log("Sidebar isActive: "+isActive);
+  const hiddenModules = ['Sales'];
   
   if (!permissions.length) {
     return null;
@@ -43,7 +40,8 @@ export default function Sidebar({user}) {
 		backgroundColor: '#001F3F', color: 'white', minHeight: '100vh', padding: '0.5rem',
 		display: 'flex', flexDirection: 'column', alignItems: 'center',}}
 	>
-	  {permissions.map((module) => (
+	  {permissions.filter(module => !hiddenModules.includes(module.moduleName))
+		.map((module) => (
 		<OverlayTrigger
 		  key={module.moduleId}
 		  placement="right"

@@ -33,11 +33,12 @@ export default function useNotifications(user) {
 
   useEffect(() => {
 	  if (!user) return;
-
+		if ("serviceWorker" in navigator) {
 	  listenForForegroundMessages((msg) => {
 		setNotifications((prev) => [msg, ...prev]);
 		setUnreadCount((c) => c + 1);
 	  });
+		}
    
   }, [user]);
 

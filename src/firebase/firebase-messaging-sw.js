@@ -3,11 +3,11 @@ importScripts("https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"
 importScripts("https://www.gstatic.com/firebasejs/10.7.0/firebase-messaging-compat.js");
 
 firebase.initializeApp({
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID
+  apiKey: "AIzaSyAx3qpmuyzMU80wASxeW_Xxvf0eG1ggDVk",
+  authDomain: "diamond-realty-8bf53.firebaseapp.com",
+  projectId: "diamond-realty-8bf53",
+  messagingSenderId: "94445078896",
+  appId: "1:94445078896:web:884253fd800978bd68e7b5"
 });
 
 const messaging = firebase.messaging();

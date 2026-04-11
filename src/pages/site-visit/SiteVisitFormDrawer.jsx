@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Offcanvas, Button, Spinner } from "react-bootstrap";
-import API from "../../api/API";
+import API from "../../api/api";
 import DynamicFormRenderer from "../../components/DynamicFormRenderer";
 
 

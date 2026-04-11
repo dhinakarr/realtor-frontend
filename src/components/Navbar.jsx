@@ -79,11 +79,14 @@ export default function Navbar({ user, setUser }) {
 
 
   /* ---------------- Firebase (optional) ---------------- */
+  
   useEffect(() => {
     if (!user) return;
+	if ("serviceWorker" in navigator) {
     listenForForegroundMessages(() => {
 	})
       .catch(() => setNotificationsEnabled(false));
+	}
   }, [user]);
 
   /* ---------------- Logout ---------------- */

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Table, Button, Form, Row, Col, Alert, Spinner } from "react-bootstrap";
-import API from "../../api/API";
+import API from "../../api/api";
 import { useToast } from "../../components/common/ToastProvider";
 import { formatINRComma, formatINR, formatDate } from "../../utils/numberFormatter";
 

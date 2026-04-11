@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Offcanvas, Spinner, Table } from "react-bootstrap";
-import API from "../../api/API";
+import API from "../../api/api";
 import { formatINRComma, formatINR, formatDate } from "../../utils/numberFormatter";
 
 export default function SiteVisitViewDrawer({ show, siteVisitId, onClose }) {

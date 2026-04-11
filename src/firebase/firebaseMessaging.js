@@ -1,8 +1,21 @@
-import { getMessaging, onMessage, isSupported } from "firebase/messaging";
+//import { getMessaging, onMessage, isSupported } from "firebase/messaging";
 import { firebaseApp } from "./firebase";
 
 export default async function listenForForegroundMessages(onReceive) {
   try {
+	  
+	  if (
+		  typeof window === "undefined" ||
+		  !("serviceWorker" in navigator) ||
+		  !("Notification" in window)
+		) {
+		  console.warn("Messaging not supported in this environment");
+		  return;
+		}
+
+		const { getMessaging, onMessage, isSupported } =
+		  await import("firebase/messaging");
+	  
     const supported = await isSupported();
     if (!supported) {
       console.warn("FCM not supported in this browser");

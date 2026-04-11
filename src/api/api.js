@@ -89,7 +89,10 @@ API.interceptors.response.use(
         }
       );
 
-	  const { accessToken } = response.data?.accessToken || response.data?.data?.accessToken;
+	  const accessToken = response.data?.accessToken || response.data?.data?.accessToken;
+	  if (!accessToken) {
+		  throw new Error("Access token not found in response");
+		}
       const isRemember = !!localStorage.getItem("refreshToken");
 
 		if (isRemember) {

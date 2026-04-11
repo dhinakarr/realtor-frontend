@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Form, Button, Row, Col, Spinner } from "react-bootstrap";
-import API from "../../api/API";
+import API from "../../api/api";
 import { useToast } from "../../components/common/ToastProvider";
 
 export default function SiteVisitForm({ siteVisitId, onClose }) {

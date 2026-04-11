@@ -101,7 +101,7 @@ export default function ProjectCards({
                   <p className="mb-1" />
 
                   <small className="text-muted">
-                    Plots: {project.noOfPlots} (Start: {project.plotStartNumber})
+                    Plots: {project.noOfPlots} 
                   </small>
 
                   <div className="mt-2 text-secondary">
