@@ -24,14 +24,14 @@ export default function SaleInitiationPanel({ plotId, projectId, onClose, onSucc
 
     Promise.all([
       API.get(`/api/plots/${plotId}`),
-      API.get(`/api/customers/hierarchy-visible`), // backend filters hierarchy
+      //API.get(`/api/customers/hierarchy-visible`), // backend filters hierarchy
 	  API.get(`/api/users/id-with-role?role=PH`)
     ])
-      .then(([plotRes, custRes, userRes]) => {
+      .then(([plotRes, userRes]) => {
         if (plotRes.data?.success) 
 			setPlot(plotRes.data.data.plotData);
-        if (custRes.data?.success) 
-			setCustomers(custRes.data.data);
+        //if (custRes.data?.success) 
+		//	setCustomers(custRes.data.data);
 		if (userRes.data?.success) 
 			setProjectHeads(userRes.data.data);
 		
@@ -40,6 +40,34 @@ export default function SaleInitiationPanel({ plotId, projectId, onClose, onSucc
 	  .catch(err => console.error("Sale initiation load error:", err))
       .finally(() => setLoading(false));
   }, [plotId]);
+  
+  const fetchCustomers = () => {
+	  if (!selectedHead) {
+		showToast("Select Project Head first", "danger");
+		return;
+	  }
+
+	  const params = new URLSearchParams();
+
+	  if (selectedAssociate) {
+		params.append("userId", selectedAssociate);
+	  } else if (selectedManager) {
+		params.append("userId", selectedManager);
+	  } else {
+		params.append("userId", selectedHead);
+	  }
+
+	  API.get(`/api/customers/hierarchy-visible?${params.toString()}`)
+		.then(res => {
+		  if (res.data?.success) {
+			setCustomers(res.data.data);
+		  }
+		})
+		.catch(err => {
+		  console.error("Customer fetch error:", err);
+		  showToast("Failed to load customers", "danger");
+		});
+	};
   
   const handleHeadChange = (headId) => {
 	  setSelectedHead(headId);
@@ -193,20 +221,33 @@ export default function SaleInitiationPanel({ plotId, projectId, onClose, onSucc
 				{/* Customer (Mandatory) */}
 				<div className="col-md-6">
 				  <label className="form-label">Customer *</label>
-				  <select
-					className="form-select"
-					value={selectedCustomer}
-					onChange={(e) => setSelectedCustomer(e.target.value)}
-				  >
-					<option value="">-- Select Customer --</option>
-					{customers.map(c => (
-					  <option key={c.customerId} value={c.customerId}>
-						{c.customerName} — {c.mobile}
-					  </option>
-					))}
-				  </select>
-				</div>
 
+				  <div className="input-group">
+					<select
+					  className="form-select"
+					  value={selectedCustomer}
+					  onChange={(e) => setSelectedCustomer(e.target.value)}
+					  disabled={customers.length === 0}
+					>
+					  <option value="">-- Select Customer --</option>
+					  {customers.map(c => (
+						<option key={c.customerId} value={c.customerId}>
+						  {c.customerName} — {c.mobile}
+						</option>
+					  ))}
+					</select>
+
+					<button
+					  className="btn btn-outline-primary"
+					  type="button"
+					  onClick={fetchCustomers}
+					  disabled={!selectedHead}
+					>
+					  Fetch
+					</button>
+				  </div>
+				</div>
+				
 			  </div>
 			</div>
 

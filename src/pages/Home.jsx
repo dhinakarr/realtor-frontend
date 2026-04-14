@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import API from "../api/api";
 import { getFullUrl } from "../utils/mapApiToRoute";
 import { useNavigate } from "react-router-dom";
@@ -12,16 +12,19 @@ export default function HomePage() {
   const [activeVideo, setActiveVideo] = useState(null);
   const navigate = useNavigate();
   const BASE_URL = API.defaults.baseURL;
-
+  const hasFetched = useRef(false);
+  
   useEffect(() => {
+console.log(API.defaults.baseURL);
     loadProjects();
   }, []);
   
   
 
   const loadProjects = async () => {
+	  
     try {
-      const res = await API.get("/public/projects");
+      const res = await API.get("/api/public/projects");
       if (res.data?.success) 
 		  setProjects(res.data.data || []);
     } catch (err) {
@@ -32,7 +35,7 @@ export default function HomePage() {
   };
 
   const openProject = (id) => navigate(`/public/projects/details/${id}`);
-
+console.log("Projects size: "+projects.length);
   return (
     <div className="container-fluid px-2">
       {loading && <p>Loading...</p>}

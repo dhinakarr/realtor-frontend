@@ -16,11 +16,11 @@ const moduleIcons = {
 };
 
 const moduleRouteMap = {
-  Dashboard: '/dashboard',
-	Admin: '/module/admin',
-	Projects: '/projects/list',
-	Finance: '/finance/list',
-	Customers: '/customers/list',
+  dashboard: '/dashboard',
+	admin: '/module/admin',
+	projects: '/projects/list',
+	finance: '/finance/list',
+	customers: '/customers/list',
 	sitevisits: '/site-visits/list'
 };
 
@@ -33,7 +33,7 @@ export default function Sidebar({user}) {
     return null;
   }
   
-  const normalizeModuleName = (name) => name.replace(/-/g, '');
+  const normalize = (name) => name?.toLowerCase().replace(/[^a-z0-9]/g, '');
   
   return (
     <div style={{width: '60px', minWidth: '60px', maxWidth: '60px', flex: '0 0 60px',
@@ -41,14 +41,16 @@ export default function Sidebar({user}) {
 		display: 'flex', flexDirection: 'column', alignItems: 'center',}}
 	>
 	  {permissions.filter(module => !hiddenModules.includes(module.moduleName))
-		.map((module) => (
+		.map((module) => {
+			const key = normalize(module.moduleName);
+			const route = moduleRouteMap[key];
+		return (
 		<OverlayTrigger
 		  key={module.moduleId}
 		  placement="right"
 		  overlay={<Tooltip id={`tooltip-${module.moduleName}`}>{module.moduleName}</Tooltip>}
 		>
-		  <Link
-			to={moduleRouteMap[module.moduleName] || `/${module.moduleName.toLowerCase()}/list`}
+		  <Link to={route || '#'}
 			className="sidebar-link d-flex flex-column align-items-center justify-content-center text-white text-decoration-none rounded mb-3"
 			style={{width: '100%', height: '50px', minWidth: '0', boxSizing: 'border-box',}}
 		  >
@@ -58,7 +60,8 @@ export default function Sidebar({user}) {
 			</span>
 		  </Link>
 		</OverlayTrigger>
-	  ))}
+	  );
+		})}
 	</div>
 
   );  

@@ -17,7 +17,7 @@ export default function PublicProjectDetailsPage() {
   const [showVideoModal, setShowVideoModal] = useState(false);
 
   useEffect(() => {
-    API.get(`/public/projects/details/${id}`)
+    API.get(`/api/public/projects/details/${id}`)
       .then((res) => {
         if (res.data.success) {
 			setProjectData(res.data.data);
@@ -27,7 +27,7 @@ export default function PublicProjectDetailsPage() {
   }, [id]);
 
   const openPlotOverlay = (plotId) => {
-    API.get(`/public/plots/${plotId}`)
+    API.get(`/api/public/plots/${plotId}`)
       .then((res) => {
         if (res.data.success) {
 			setSelectedPlot({
