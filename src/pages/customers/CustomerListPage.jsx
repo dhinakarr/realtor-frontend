@@ -23,6 +23,12 @@ export default function CustomerListPage() {
   const [showDocs, setShowDocs] = useState(false);
   const [showUploadOverlay, setShowUploadOverlay] = useState(false);
   const [showNotesOverlay, setShowNotesOverlay] = useState(false);
+  const [editValues, setEditValues] = useState({});
+  const [editingCell, setEditingCell] = useState(null);
+  const [filters, setFilters] = useState({
+		  project: "",
+		  commentStatus: ""
+		});
   
   const openDocuments = (id) => {
 	  setDocCustomerId(id);
@@ -72,6 +78,16 @@ export default function CustomerListPage() {
 		  const data = response.data?.data; // <-- get the actual payload from API
 		  if (Array.isArray(data)) {
 			setCustomers(data ? data: []);
+			
+			// 🔥 Initialize editable fields
+			  const initialEdit = {};
+			  data.forEach((c) => {
+				initialEdit[c.customerId] = {
+				  project: c.project || "",
+				  commentStatus: c.commentStatus || ""
+				};
+			  });
+			  setEditValues(initialEdit);
 		  } else if (data == null) {
 			setCustomers([]);  // API returned null
 		  } else {
@@ -88,6 +104,34 @@ export default function CustomerListPage() {
   useEffect(() => {
 	fetchCustomers();
   }, []);
+  
+  const handleFieldChange = (id, field, value) => {
+	  if (value.length > 20) return; // max length enforcement
+
+	  setEditValues((prev) => ({
+		...prev,
+		[id]: {
+		  ...prev[id],
+		  [field]: value
+		}
+	  }));
+	};
+
+  const handleFieldBlur = async (id) => {
+	  const original = customers.find(c => c.customerId === id);
+	  const updated = editValues[id];
+
+	  if (
+		original.project === updated.project &&
+		original.status === updated.status
+	  ) return;
+
+	  try {
+		await API.patch(`/api/customers/${id}/update-fields`, updated);
+	  } catch (err) {
+		console.error(err);
+	  }
+	};
 
   const handleEdit = (id) => {
 	  setSelectedCustomerId(id);
@@ -152,7 +196,9 @@ export default function CustomerListPage() {
               <th>Email</th>
               <th>Mobile</th>
 			  <th>Member Name</th>
-              <th style={{ width: "80px" }}>Action</th>
+			  <th>Project</th>
+			  <th>Status</th>
+              <th style={{ width: "60px" }}>Action</th>
             </tr>
           </thead>
 
@@ -164,6 +210,45 @@ export default function CustomerListPage() {
                   <td>{c.email}</td>
                   <td>{c.mobile}</td>
 				  <td>{c.agentName}</td>
+				  <td onClick={() => setEditingCell(`${c.customerId}-project`)}>
+					  {editingCell === `${c.customerId}-project` ? (
+						<input
+						  autoFocus
+						  className="form-control inline-input"
+						  value={editValues[c.customerId]?.project || ""}
+						  maxLength={20}
+						  onChange={(e) =>
+							handleFieldChange(c.customerId, "project", e.target.value)
+						  }
+						  onBlur={() => {
+							handleFieldBlur(c.customerId);
+							setEditingCell(null);
+						  }}
+						/>
+					  ) : (
+						<span>{editValues[c.customerId]?.project || "-"}</span>
+					  )}
+					</td>
+
+				<td onClick={() => setEditingCell(`${c.customerId}-status`)}>
+				  {editingCell === `${c.customerId}-status` ? (
+					<input
+					  autoFocus
+					  className="form-control inline-input"
+					  value={editValues[c.customerId]?.commentStatus || ""}
+					  maxLength={20}
+					  onChange={(e) =>
+						handleFieldChange(c.customerId, "commentStatus", e.target.value)
+					  }
+					  onBlur={() => {
+						handleFieldBlur(c.customerId);
+						setEditingCell(null);
+					  }}
+					/>
+				  ) : (
+					<span>{editValues[c.customerId]?.commentStatus || "-"}</span>
+				  )}
+				</td>
                   <td className="action-col">
 				   <div className="action-icons">
 					<FaEye 

@@ -1,12 +1,13 @@
 .action-icons {
   display: flex;
   align-items: center;   /* Perfect vertical alignment */
-  gap: 8px;              /* Space between icons */
+  gap: 1px;              /* Space between icons */
+  justify-content: center;
 }
 
 .action-icon {
   cursor: pointer;
-  font-size: 18px;       /* Normalize icon size */
+  font-size: 10px;       /* Normalize icon size */
   line-height: 1;        /* Prevent baseline shifting */
 }
 
@@ -14,3 +15,15 @@
 .action-icon.edit  { color: #007bff; }
 .action-icon.upload { color: #007bff; }
 .action-icon.note  { color: #007bff; }    /* gold */
+
+.inline-input {
+  height: 18px;
+  padding: 2px 6px;
+  font-size: 10px;
+  border: none;
+  background: transparent;
+}
+.inline-input:focus {
+  border: 1px solid #ccc;
+  background: #fff;
+}

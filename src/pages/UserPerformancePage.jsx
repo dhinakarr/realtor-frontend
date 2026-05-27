@@ -76,6 +76,15 @@ const totalExpense = visits.reduce(
   );
 }
 
+const mapSaleStatus = (status) => {
+  const map = {
+    IN_PROGRESS: "BOOKED",
+    COMPLETED: "SOLD"
+  };
+
+  return map[status] || status; // fallback to original
+};
+
 function SalesTable({ sales }) {
   if (!Array.isArray(sales) || sales.length === 0) return null;
 
@@ -95,6 +104,7 @@ function SalesTable({ sales }) {
             <th>Customer</th>
             <th>Plot Price</th>
             <th>Booked on</th>
+			<th>Status</th>
           </tr>
         </thead>
         <tbody>
@@ -105,6 +115,7 @@ function SalesTable({ sales }) {
               <td>{s.customerName}</td>
               <td className="text-end">₹{formatINRComma(s.saleAmount)}</td>
               <td>{formatDate(s.confirmedAt)}</td>
+			  <td>{mapSaleStatus(s.saleStatus)}</td>
             </tr>
           ))}
         </tbody>
@@ -113,6 +124,7 @@ function SalesTable({ sales }) {
 			  <tr>
 				<th colSpan="3" className="text-end">Total</th>
 				<th className="text-end">₹{formatINRComma(totalSales)}</th>
+				<th></th>
 				<th></th>
 			  </tr>
 			</tfoot>

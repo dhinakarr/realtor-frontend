@@ -138,11 +138,17 @@ export default function UserCreatePage({ onClose, onSuccess }) {
           <label className="form-label">{f.displayLabel}</label>
           <select {...commonProps} className="form-select">
             <option value="">Select {f.displayLabel}</option>
-            {f.lookupData?.map((opt) => (
-              <option key={opt.key} value={opt.key}>
-                {opt.value}
-              </option>
-            ))}
+            {f.lookupData?.filter(
+				(opt) =>
+				  !(
+					opt.value?.toLowerCase() === "customer"
+				  )
+			  )
+			  .map((opt) => (
+				<option key={opt.key} value={opt.key}>
+				  {opt.value}
+				</option>
+			))}
           </select>
           {extra.hint && <small className="text-muted">{extra.hint}</small>}
         </div>

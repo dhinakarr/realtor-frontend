@@ -91,7 +91,10 @@ function UserDrawer({ open, onClose }) {
 		  return (
 			<select {...commonProps}>
 			  <option value="">Select</option>
-			  {field.lookupData?.map(opt => (
+			  {field.lookupData?.filter(
+				(opt) => !(opt.value?.toLowerCase() === "customer")
+			  )
+			  .map(opt => (
 				<option key={opt.key} value={opt.key}>
 				  {opt.value}
 				</option>

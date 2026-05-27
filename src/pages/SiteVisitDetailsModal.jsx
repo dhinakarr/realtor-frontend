@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Modal, Table, Spinner } from "react-bootstrap";
 import { formatINRComma, formatINR, formatDate } from "../utils/numberFormatter";
-import "./dashboard.css";
+import "./Dashboard.css";
 
 export default function SiteVisitDetailsModal({
 		  open,

@@ -26,7 +26,7 @@ export default function UserEditOverlay({ show, onClose, userId, onSuccess }) {
         setForm(formInfo);
         setRecord(data);
         setInitialData(data);
-
+console.log("Data: "+JSON.stringify(data));
         const metaPairs = Object.entries(data.meta || {}).map(([key, value]) => ({ key, value }));
         setMetaList(metaPairs);
 
@@ -117,7 +117,10 @@ export default function UserEditOverlay({ show, onClose, userId, onSuccess }) {
   };
 
   const renderField = (f) => {
-    const value = record[f.apiField] != null ? String(record[f.apiField]) : "";
+    let value = record[f.apiField] != null ? String(record[f.apiField]) : "";
+	if (f.apiField === "fullName") {
+	  value = value.replace(/\s*\(.*?\)\s*/g, "");
+	}
     const extra = f.extraSettings || {};
     const hasError = !!errors[f.apiField];
     const colClass = f.fieldType === "textarea" ? "col-md-12" : "col-md-6";

@@ -480,7 +480,7 @@ export default function DashboardSummary() {
       {/* ================= ROW 2 ================= */}
 	  {hasAgents && (
 		
-		  <DashboardCard className="grid-item" title="Agent Performance">
+		  <DashboardCard className="grid-item" title="Memeber Performance">
 			<ChartBox>
 			  <Bar data={agentChart} options={chartOptions} />
 			</ChartBox>
