@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import API from "../../api/api";
 import "./CommissionRuleCreate.css";
 import { useToast } from "../../components/common/ToastProvider";
@@ -9,6 +9,8 @@ import useModule from "../../hooks/useModule";
 export default function CommissionRuleCreate() {
   const navigate = useNavigate();
   const { id: projectId } = useParams();
+  const location = useLocation();
+  const projectName = location.state?.projectName;
 
   const [roles, setRoles] = useState([]);
   const [users, setUsers] = useState([]);
@@ -22,12 +24,19 @@ export default function CommissionRuleCreate() {
   
   const commissionUrl = "/api/commission-rules";
   const commissionModule = useModule(commissionUrl);
-  console.log("commissionModule: "+JSON.stringify(commissionModule));
+  //console.log("commissionModule: "+JSON.stringify(commissionModule));
   const rulesFlag = commissionModule?.features?.find(r => r.url === commissionUrl);
 
   const rCreate = rulesFlag?.canCreate ?? false;
   const canEdit   = rulesFlag?.canUpdate ?? false;
   const canDelete = rulesFlag?.canDelete ?? false;
+  
+  const hierarchyOptions = [
+					  { value: null, label: "Select" },
+					  { value: 0, label: "Seller (Level 0)" },
+					  { value: 1, label: "Parent (Level 1)" },
+					  { value: 2, label: "Grand Parent (Level 2)" }
+					];
   
   useEffect(() => {
 	  if (!projectId) return;
@@ -44,6 +53,7 @@ export default function CommissionRuleCreate() {
     projectId,
     roleId: "",
     userId: "",
+	hierarchyDepth: null, // NEW
     commissionType: "PERCENTAGE", // PERCENTAGE | AMOUNT_PER_SQFT
     commissionValue: "",
     priority: 1,
@@ -83,10 +93,20 @@ export default function CommissionRuleCreate() {
   ========================= */
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+	
+	let finalValue;
+
+	  if (type === "checkbox") {
+		finalValue = checked;
+	  } else if (name === "hierarchyDepth") {
+		finalValue = value === "" ? null : Number(value);
+	  } else {
+		finalValue = value;
+	  }
 
     setForm(prev => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value
+	  [name]: finalValue
     }));
 
     setErrors(prev => ({ ...prev, [name]: undefined }));
@@ -135,6 +155,7 @@ export default function CommissionRuleCreate() {
 	  const payload = {
 		roleId: form.roleId,
 		userId: form.userId || null,
+		hierarchyDepth: form.hierarchyDepth === null || form.hierarchyDepth === "" ? null : Number(form.hierarchyDepth),
 		commissionType: form.commissionType,
 		commissionValue: Number(form.commissionValue),
 		priority: Number(form.priority),
@@ -170,6 +191,7 @@ export default function CommissionRuleCreate() {
 		  ...prev,
 		  roleId: "",
 		  userId: "",
+		  hierarchyDepth: "",
 		  commissionValue: "",
 		  priority: 1,
 		  effectiveFrom: "",
@@ -191,11 +213,13 @@ export default function CommissionRuleCreate() {
   
   const handleEditRule = (rule) => {
 	  setEditingRuleId(rule.ruleId);
+
 	  // Prefill form for editing
 	  setForm({
 		projectId,
 		roleId: rule.roleId,
 		userId: rule.userId || "",
+		hierarchyDepth: rule.distributionType === "DEPTH" ? rule.hierarchyDepth : "",
 		commissionType: rule.commissionType,
 		commissionValue: rule.commissionValue,
 		priority: rule.priority,
@@ -227,7 +251,7 @@ export default function CommissionRuleCreate() {
   return (
     <div className="commission-rule-create">
       <div className="page-header">
-		<h4>Create Payout Rule</h4>
+		<h4>Create Payout Rule ({projectName})</h4>
 		  <button
 			type="button"
 			className="btn-link"
@@ -250,9 +274,21 @@ export default function CommissionRuleCreate() {
 				  {r.roleName}
 				</option>
 			  ))}
+			  
 			</select>
 			{errors.roleId && <small className="error">{errors.roleId}</small>}
 		  </div>
+		  <div className="form-field">
+			  <label>Hierarchy Level</label>
+			  <select name="hierarchyDepth" value={form.hierarchyDepth ?? ""}
+					onChange={handleChange}>
+				  {hierarchyOptions.map(h => (
+					<option key={h.value} value={h.value}>
+					  {h.label}
+					</option>
+				  ))}
+				</select>
+			</div>
 
 		  {/* User (filtered by role) */}
 		  <div className="form-field">
@@ -283,7 +319,7 @@ export default function CommissionRuleCreate() {
 			  onChange={handleChange}
 			>
 			  <option value="PERCENTAGE">Percentage</option>
-			  <option value="AMOUNT_PER_SQFT">Amount / Sqft</option>
+			  <option value="PER_SQFT">Amount / Sqft</option>
 			  <option value="FLAT">Flat</option>
 			</select>
 		  </div>
@@ -375,6 +411,7 @@ export default function CommissionRuleCreate() {
 			  <tr>
 				<th>Role</th>
 				<th>User</th>
+				<th>Hierarchy</th>
 				<th>Type</th>
 				<th>Value</th>
 				<th>Effective From</th>
@@ -387,6 +424,11 @@ export default function CommissionRuleCreate() {
 				<tr key={rule.ruleId}>
 				  <td>{rule.roleName}</td>
 				  <td>{rule.userName}</td>
+				  <td>
+					  {rule.hierarchyDepth === 0 && "Seller"}
+					  {rule.hierarchyDepth === 1 && "Parent"}
+					  {rule.hierarchyDepth === 2 && "Grand Parent"}
+				  </td>
 				  <td>{rule.commissionType}</td>
 				  <td>
 					{rule.commissionType === "PERCENTAGE"

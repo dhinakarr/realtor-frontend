@@ -35,7 +35,7 @@ export default function SaleInitiationPanel({ plotId, projectId, onClose, onSucc
 		if (userRes.data?.success) 
 			setProjectHeads(userRes.data.data);
 		
-		//console.log("useEffect area: "+JSON.stringify(plot));
+		//console.log("useEffect area: "+JSON.stringify(userRes.data.data));
       })
 	  .catch(err => console.error("Sale initiation load error:", err))
       .finally(() => setLoading(false));
@@ -56,7 +56,7 @@ export default function SaleInitiationPanel({ plotId, projectId, onClose, onSucc
 	  } else {
 		params.append("userId", selectedHead);
 	  }
-
+	  showToast("Fetching Customer Data", "success");
 	  API.get(`/api/customers/hierarchy-visible?${params.toString()}`)
 		.then(res => {
 		  if (res.data?.success) {

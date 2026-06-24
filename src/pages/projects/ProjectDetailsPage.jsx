@@ -103,6 +103,8 @@ export default function ProjectDetailsPage() {
   
   const galleryImages = project.documents?.filter(d => d.documentType === "IMAGE") || [];
   const galleryVideos = project.documents?.filter(d => d.documentType === "VIDEO") || [];
+  const galleryDocuments =
+  project.documents?.filter(d => d.documentType === "PDF") || [];
 
   //console.log("documents", JSON.stringify(project.documents));
 
@@ -164,7 +166,7 @@ export default function ProjectDetailsPage() {
       {/* HEADER */}
  
 		<div className="project-header">
-		  <h4 style={{ margin: 0 }}>Project Details</h4>
+		  <h4 style={{ margin: 0 }}>Project Details ({project.projectName})</h4>
 
 		  <div className="project-header-actions">
 			<button
@@ -175,13 +177,19 @@ export default function ProjectDetailsPage() {
 			  Back
 			</button>
 			{rCreate && (
-			<button
-			  type="button"
-			  className="btn btn-primary"
-			  onClick={() => navigate(`/projects/${id}/commission-rules`)}
-			>
-			  Payout Rules
-			</button>
+			  <button
+				type="button"
+				className="btn btn-primary"
+				onClick={() =>
+				  navigate(`/projects/${id}/commission-rules`, {
+					state: {
+					  projectName: project.projectName
+					}
+				  })
+				}
+			  >
+				Payout Rules
+			  </button>
 			)}
 			{pCreate && (
 			<button
@@ -227,11 +235,17 @@ export default function ProjectDetailsPage() {
 				/>
 			  )
 			})}
-		  
+			
 		  onMediaClick={(doc, type) => {
 			setActiveMedia(doc);
 			if (type === "IMAGE") setShowImageModal(true);
 			if (type === "VIDEO") setShowVideoModal(true);
+			if (type === "PDF") {
+				window.open(
+				  `${BASE_URL}${doc.filePath}`,
+				  "_blank"
+				);
+			  }
 		  }}
 		/>
 

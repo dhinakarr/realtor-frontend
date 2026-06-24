@@ -46,6 +46,9 @@ export default function ProjectDetailsContent({
 
   const galleryVideos =
     project.documents?.filter(d => d.documentType === "VIDEO") || [];
+	
+  const galleryDocuments =
+  project.documents?.filter(d => d.documentType === "PDF") || [];
 
   return (
     <>
@@ -196,7 +199,8 @@ export default function ProjectDetailsContent({
 			</div>
 	  
       {/* ================= GALLERY ================= */}
-      {(galleryImages.length > 0 || galleryVideos.length > 0) && (
+      {(galleryImages.length > 0 || galleryVideos.length > 0 ||
+  galleryDocuments.length > 0) && (
         <section className="project-media-section">
           <h5>Project Media</h5>
 
@@ -231,6 +235,26 @@ export default function ProjectDetailsContent({
 				  <span className="play-icon">▶</span>
 				</div>
 			  ))}
+			  
+			  {/* ✅ PDF DOCUMENTS */}
+				{galleryDocuments.map(doc => (
+				  <div
+					key={doc.documentId}
+					className="pdf-thumb-wrapper"
+					onClick={() => {
+						console.log("PDF CLICKED");
+					onMediaClick?.(doc, "PDF")
+					}}
+				  >
+					<div className="pdf-thumb">
+					  📄
+					</div>
+
+					<div className="pdf-name">
+					  {doc.fileName || "Document"}
+					</div>
+				  </div>
+				))}
 
 			</div>
         </section>
