@@ -12,13 +12,74 @@
   width: 500px;
   background: white;
   height: 100%;
-  padding: 20px;
+  padding: 10px;
   overflow-y: auto;
   border-left: 1px solid #ddd;
   box-shadow: -6px 0 18px rgba(0,0,0,0.08);
   animation: slideIn 0.18s;
 }	
 
+.page-header{
+    display:flex;
+    align-items:center;
+    border-bottom:2px solid #ddd;
+    padding-bottom:10px;
+    margin-bottom:20px;
+}
+
+.page-left{
+    width:60px;
+}
+
+.page-center{
+    flex:1;
+    text-align:center;
+}
+
+.print-logo{
+    width:50px;
+    height:50px;
+}
+
+.print-date{
+    display:none;
+}
+
+.project-title {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.page-title {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.page-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 10px;
+}
+
+.page-brand {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.brand-logo {
+    width: 110px;
+    height: 50px;
+}
+
+.no-print {
+    display: flex;
+    gap: 8px;
+}
 @keyframes slideIn {
   from { transform: translateX(100%); }
   to { transform: translateX(0); }
@@ -56,25 +117,6 @@
   font-size: 0.95rem;
 }
 
-@media (max-width: 480px) {
-  .plot-view-panel {
-    width: 100%;
-  }
-}
-@media print {
-  body {
-    background: white !important;
-  }
-
-  .plot-view-overlay {
-    position: static !important;
-    background: none !important;
-  }
-
-  .btn {
-    display: none !important;
-  }
-}
 /* ============================= */
 /* PRINT STYLES */
 /* ============================= */
@@ -83,11 +125,42 @@
   margin: 20mm;
 }
 
+@media (max-width:480px){
+    .plot-view-panel{
+        width:100%;
+    }
+}
+
 @media print {
+
   body {
     background: #fff !important;
   }
 
+	.page-header{
+			border-bottom:2px solid #000;
+	}
+	
+	.no-print {
+        display: none !important;
+    }
+
+    .brand-logo {
+        display: block;
+		width: 110px;
+		height: 50px;
+    }
+
+	.print-logo {
+		display:block;
+		width: 50px;
+		height: 50px;
+	}
+
+    .print-date {
+        display: block;
+        margin-top: 2px;
+    }
   /* Hide overlay effect */
   .plot-view-overlay {
     position: static !important;
@@ -105,30 +178,9 @@
     color: #000;
   }
 
-  /* HEADER */
-  .print-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    border-bottom: 2px solid #333;
-    padding-bottom: 8px;
-    margin-bottom: 16px;
-	width: 100%;
-	position: relative;
-  }
-
   .print-logo {
     height: 50px;
     width: auto;
-  }
-
-  .print-header-text h5 {
-    margin: 0;
-    font-size: 16px;
-  }
-
-  .print-header-text small {
-    color: #555;
   }
 
   /* CONTENT */
@@ -162,23 +214,7 @@
     content: "Page " counter(page);
   }
 }
-/* ============================= */
-/* SCREEN (DEFAULT) */
-/* ============================= */
-.print-header,
-.print-footer {
-  display: none;
-}
 
-/* ============================= */
-/* PRINT ONLY */
-/* ============================= */
-@media print {
-  .print-header,
-  .print-footer {
-    display: flex;
-  }
-}
 /* Cancel booking modal backdrop */
 .cancel-modal-backdrop {
   position: fixed;
@@ -195,13 +231,6 @@
   display: flex;
   align-items: center;
   gap: 10px;
-}
-
-.print-center {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  text-align: center;
 }
 
 .company-name {

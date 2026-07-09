@@ -52,6 +52,7 @@ const ReceivePaymentForm = ({ row, onCancel, onSuccess }) => {
 	return (
 		<Form>
 			<p className="text-muted">
+			<strong>Project:</strong> {row.projectName}
 				<strong>Plot:</strong> {row.plotNo}
 			</p>
 

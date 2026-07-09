@@ -378,6 +378,7 @@ export default function ProjectDetailsPage() {
 	  
 	  
         <PlotViewPanel
+		  project={project}
           plotId={viewPlotId}
           onClose={() => setViewPlotId(null)}
 		  onBook={handleSaleInitiation}

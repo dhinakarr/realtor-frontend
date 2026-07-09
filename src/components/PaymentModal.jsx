@@ -3,7 +3,7 @@ import "./PaymentModal.css";
 import API from "../api/api";
 import { formatINRComma, formatDate } from "../utils/numberFormatter";
 
-export default function PaymentModal({ open, onClose, plotId, outstandingAmount, onSubmit }) {
+export default function PaymentModal({ open, row, onClose, plotId, outstandingAmount, onSubmit }) {
 	const [errors, setErrors] = useState({});
 	const [transactions, setTransactions] = useState([]);
 	const [loadingTxns, setLoadingTxns] = useState(false);
@@ -125,89 +125,111 @@ export default function PaymentModal({ open, onClose, plotId, outstandingAmount,
 
         {/* Body */}
         
-		<div className="payment-body grid-2">
+		<div className="payment-body">
 		
-		  <div className="text-muted mt-1">
-			  Total received: {formatINRComma(totalReceived)}
+		  <div className="payment-summary">
+			<div className="summary-item">
+				<label>Project Name</label>
+				<span>{row?.projectName}</span>
+			  </div>
+
+			  <div className="summary-item">
+				<label>Plot Number</label>
+				<span>{row?.plotNumber}</span>
+			  </div>
+
+			  <div className="summary-item">
+				<label>Total Received</label>
+				<span className="text-success fw-bold">
+				  {formatINRComma(totalReceived)}
+				</span>
+			  </div>
+
+			  <div className="summary-item">
+				<label>Outstanding</label>
+				<span className="text-danger fw-bold">
+				  {formatINRComma(outstandingAmount)}
+				</span>
+			  </div>
 		  </div>
-		  <div className="text-muted mt-1">
-			  OutStanding: {formatINRComma(outstandingAmount)}
-		  </div>
+		<hr />
+		   <div className="grid-2">
+			   <div>
+				<label>Payment Type</label>
+				<select
+				  name="paymentType"
+				  value={form.paymentType}
+				  onChange={handleChange}
+				  className={`form-control ${errors.paymentType ? "is-invalid" : ""}`}
+				>
+				  <option value="RECEIVED">Received</option>
+				  <option value="PAID">Paid</option>
+				</select>
+			  </div>
 
-          <div>
-            <label>Payment Type</label>
-            <select
-              name="paymentType"
-              value={form.paymentType}
-              onChange={handleChange}
-              className={`form-control ${errors.paymentType ? "is-invalid" : ""}`}
-            >
-              <option value="RECEIVED">Received</option>
-              <option value="PAID">Paid</option>
-            </select>
-          </div>
+			  <div>
+				<label>Payment Date</label>
+				<input
+				  type="date"
+				  name="paymentDate"
+				  value={form.paymentDate}
+				  onChange={handleChange}
+				  className={`form-control ${errors.paymentDate ? "is-invalid" : ""}`}
+				/>
+				{errors.paymentDate && <div className="invalid-feedback">{errors.paymentDate}</div>}
+			  </div>
 
-          <div>
-            <label>Payment Date</label>
-            <input
-              type="date"
-              name="paymentDate"
-              value={form.paymentDate}
-              onChange={handleChange}
-              className={`form-control ${errors.paymentDate ? "is-invalid" : ""}`}
-            />
-            {errors.paymentDate && <div className="invalid-feedback">{errors.paymentDate}</div>}
-          </div>
+			  <div>
+				<label>Amount</label>
+				<input
+				  type="number"
+				  name="amount"
+				  value={form.amount}
+				  onChange={handleChange}
+				  className={`form-control ${errors.amount ? "is-invalid" : ""}`}
+				/>
+				{errors.amount && <div className="invalid-feedback">{errors.amount}</div>}
+			  </div>
 
-          <div>
-            <label>Amount</label>
-            <input
-              type="number"
-              name="amount"
-              value={form.amount}
-              onChange={handleChange}
-              className={`form-control ${errors.amount ? "is-invalid" : ""}`}
-            />
-            {errors.amount && <div className="invalid-feedback">{errors.amount}</div>}
-          </div>
+			  <div>
+				<label>Payment Mode</label>
+				<select
+				  name="paymentMode"
+				  value={form.paymentMode}
+				  onChange={handleChange}
+				  className={`form-control ${errors.paymentMode ? "is-invalid" : ""}`}
+				>
+				  <option value="CASH">Cash</option>
+				  <option value="CHEQUE">Cheque</option>
+				  <option value="DD">DD</option>
+				  <option value="UPI">UPI</option>
+				  <option value="BANK_TRANSFER">Bank Transfer</option>
+				</select>
+				{errors.paymentMode && <div className="invalid-feedback">{errors.paymentMode}</div>}
+			  </div>
 
-          <div>
-            <label>Payment Mode</label>
-            <select
-              name="paymentMode"
-              value={form.paymentMode}
-              onChange={handleChange}
-              className={`form-control ${errors.paymentMode ? "is-invalid" : ""}`}
-            >
-              <option value="CASH">Cash</option>
-              <option value="CHEQUE">Cheque</option>
-              <option value="DD">DD</option>
-              <option value="UPI">UPI</option>
-              <option value="BANK_TRANSFER">Bank Transfer</option>
-            </select>
-            {errors.paymentMode && <div className="invalid-feedback">{errors.paymentMode}</div>}
-          </div>
+			  <div>
+				<label>Transaction Reference</label>
+				<input
+				  name="transactionRef"
+				  value={form.transactionRef}
+				  onChange={handleChange}
+				  className="form-control"
+				/>
+			  </div>
 
-          <div>
-            <label>Transaction Reference</label>
-            <input
-              name="transactionRef"
-              value={form.transactionRef}
-              onChange={handleChange}
-			  className="form-control"
-            />
-          </div>
+			  <div>
+				<label>Remarks</label>
+				<input
+				  name="remarks"
+				  value={form.remarks}
+				  onChange={handleChange}
+				  className="form-control"
+				/>
+			  </div>
+		    </div>
+		</div>
 
-          <div>
-            <label>Remarks</label>
-            <input
-              name="remarks"
-              value={form.remarks}
-              onChange={handleChange}
-			  className="form-control"
-            />
-          </div>
-        </div>
 		{/* Footer */}
         <div className="payment-footer">
           <button className="btn-outline" onClick={onClose}>Cancel</button>

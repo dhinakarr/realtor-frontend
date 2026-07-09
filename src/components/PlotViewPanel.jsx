@@ -8,7 +8,7 @@ import CancelBookingPanel from "./CancelBookingPanel"
 import { formatINRComma, formatINR, formatDate } from "../utils/numberFormatter";
 import useModule from "../hooks/useModule";
 
-export default function PlotViewPanel({ plotId, plotData, onClose, onBook, onCancel }) {
+export default function PlotViewPanel({ project, plotId, plotData, onClose, onBook, onCancel }) {
   const [plot, setPlot] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -24,7 +24,12 @@ export default function PlotViewPanel({ plotId, plotData, onClose, onBook, onCan
   const sCreate = sales?.canCreate ?? false;
   const sUpdate = sales?.canUpdate ?? false;
   const sDelete = sales?.canDelete ?? false;
-//console.log("@PlotViewPanel sCreate: "+sCreate);
+console.log("@PlotViewPanel project: "+plotData?.projectName);
+console.log("@PlotViewPanel props", {
+    project,
+    plotId,
+    plotData
+});
   
   useEffect(() => {
 	  
@@ -117,45 +122,37 @@ export default function PlotViewPanel({ plotId, plotData, onClose, onBook, onCan
   return (
     <div className="plot-view-overlay">
       <div className="plot-view-panel">
-        <div className="d-flex justify-content-between align-items-center mb-3">
-          <h4>Plot Details</h4>
-		  <div className="d-flex gap-3">
-			<button
-			  className="btn btn-sm btn-outline-primary"
-			  onClick={handlePrint}
-			  title="Print / Save as PDF"
-			  disabled={loading || !plot}
-			>
-			  <FaPrint />
-			</button>
-		  
-          <button className="btn btn-sm btn-outline-secondary" onClick={onClose}>✕</button>
-         </div>
-		</div>
-
         {loading && <p>Loading...</p>}
         {!loading && !plot && (
           <div className="alert alert-warning">No plot data found.</div>
         )}
 		<div ref={printRef} className="print-container">
-			{/* PRINT HEADER */}
-		  <div className="print-header">
-			  <div className="print-left">
-				<img
-				  src={logo}
-				  alt="Company Logo"
-				  width="50"
-				  height="50"
-				  className="print-logo"
-				/>
+			  {/* Screen + Print Header */}
+			  <div className="page-toolbar">
+				<div className="page-brand">
+					<img src={logo} className="brand-logo" />
+					<h4>{project?.projectName}</h4>
+				</div>
+				<div className="toolbar-actions no-print">
+					<button
+						className="btn btn-sm btn-outline-primary"
+						onClick={handlePrint}
+						title="Print / Save as PDF"
+						disabled={loading || !plot}
+					>
+						<FaPrint />
+					</button>
+					<button
+						className="btn btn-sm btn-outline-secondary"
+						onClick={onClose}
+					>
+						✕
+					</button>
+				</div>
 			  </div>
-
-			  <div className="print-center">
-				<h5>Plot Details</h5>
-				<small>Generated on: {formatDate(new Date())}</small>
-			  </div>
-			</div>
-
+				<small className="print-date">
+				  Generated on: {formatDate(new Date())}
+				</small>
   
         {!loading && plot && (
           <div className="plot-details-container">

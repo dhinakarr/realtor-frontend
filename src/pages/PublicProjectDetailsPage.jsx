@@ -161,6 +161,7 @@ export default function PublicProjectDetailsPage() {
 			
 			{viewPlotId && (
 				<PlotViewPanel
+				  project={project}
 				  plotId={viewPlotId}
 				  plotData={selectedPlot}
 				  onClose={() => setViewPlotId(null)}

@@ -22,6 +22,7 @@ const FinanceDashboard = () => {
 	const [rows, setRows] = useState([]);
 	const [filters, setFilters] = useState({});
 	const [drawer, setDrawer] = useState({ open: false });
+	const [selectedRow, setSelectedRow] = useState(null);
 	const { showToast } = useToast();
 	const [viewType, setViewType] = useState("CASHFLOW"); 
 
@@ -355,6 +356,7 @@ const FinanceDashboard = () => {
 	const handleTableAction = (action, row ) => {
 		//console.log("@FinanceDashbord row: "+JSON.stringify(row));
 		if (action === "PAYMENT") {
+			setSelectedRow(row);
 			setSelectedPlotId(row.plotId);
 			setSelectedOutstanding(Number(row.outstandingAmount || 0));
 			setShowPaymentModal(true);
@@ -686,6 +688,7 @@ const FinanceDashboard = () => {
 			
 			<PaymentModal
 			  open={showPaymentModal}
+			  row={selectedRow}
 			  plotId={selectedPlotId}
 			  outstandingAmount={selectedOutstanding}
 			  onClose={() => setShowPaymentModal(false)}

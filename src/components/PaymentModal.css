@@ -70,10 +70,6 @@
 .payment-body {
   flex: none;
   max-height: 400px;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  column-gap: 12px;
-  row-gap: 4px;
   padding: 8px 16px;
   overflow-y: auto;
 }
@@ -86,14 +82,14 @@
 
 /* =========================
    FIELD BLOCK
-========================= */
+========================= 
 
 .payment-body > div {
-  display: grid;
-  grid-template-rows: auto auto;
-  row-gap: 1px;
+    display: grid;
+    grid-template-rows: auto auto;
+    row-gap: 1px;
 }
-
+*/
 
 /* =========================
    LABEL
@@ -141,6 +137,19 @@
 .payment-body *::before,
 .payment-body *::after {
   box-sizing: border-box;
+}
+
+.grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: 16px;
+    row-gap: 8px;
+}
+
+.grid-2 > div {
+    display: grid;
+    grid-template-rows: auto auto;
+    row-gap: 2px;
 }
 
 .invalid-feedback {
@@ -228,11 +237,28 @@
   position: sticky;
   top: 0;
 }
+
 .payment-summary {
-  grid-column: span 2;
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  color: #6b7280;
-  padding-bottom: 4px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 30px;
+    margin-bottom: 12px;
 }
+
+.summary-item {
+    display: flex;
+    align-items: center;
+}
+
+.summary-item label {
+    min-width: 120px;
+    margin: 0;
+    font-weight: 600;
+    color: #666;
+}
+
+.summary-item span {
+    font-weight: 600;
+    color: #222;
+}
+

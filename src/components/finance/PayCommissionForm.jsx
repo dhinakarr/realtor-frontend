@@ -106,6 +106,14 @@ const PayCommissionForm = ({ row, onCancel, onSuccess }) => {
 		  <strong>Agent:</strong> {row.agentName}
 		  <div className="text-muted small mt-1 d-flex justify-content-between align-items-center text-nowrap">
 			  <span>
+				Project: <strong>{row.projectName}</strong>
+			  </span>
+			  <span>
+				Plot Number: <strong>{row.plotNumber}</strong>
+			  </span>
+			</div>
+		  <div className="text-muted small mt-1 d-flex justify-content-between align-items-center text-nowrap">
+			  <span>
 				Paid Amount: <strong>₹{totalPaid}</strong>
 			  </span>
 			  <span>
