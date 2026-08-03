@@ -30,12 +30,19 @@ function UserDrawer({ open, onClose }) {
 		  .sort((a, b) => a.sortOrder - b.sortOrder);
 
 		setFields(requiredFields);
+		
+		const roleField = requiredFields.find(f => f.apiField === "roleId");
+		const projectAssociate = roleField?.lookupData?.find(
+			  opt => opt.value?.toLowerCase() === "project associate"
+			);
 
 		setFormData(prev => ({
 		  ...prev,
-		  managerId: userId
+		  managerId: userId,
+			roleId: projectAssociate?.key || ""
 		}));
 	  });
+	  
 	}, [open]);
 
   

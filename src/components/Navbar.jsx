@@ -33,7 +33,7 @@ export default function Navbar({ user, setUser }) {
   const [open, setOpen] = useState(false);
   
   const userType = user?.token?.userType;
-  const allowedRoles = ["HR", "PM", "MD", "PH"];
+  const allowedRoles = ["HR", "PM", "MD", "PH", "PA"];
   const [showChangePassword, setShowChangePassword] = useState(false);
   
    /* ---------------- Reset on Auth Change ---------------- */
@@ -93,7 +93,7 @@ export default function Navbar({ user, setUser }) {
   const handleLogout = async () => {
 	  try {
 		// Call backend to invalidate session/token
-		await API.post("/logout", {}, {
+		await API.post("/api/auth/logout", {}, {
 		  headers: { Authorization: `Bearer ${user?.token?.accessToken}` }
 		});
 	  } catch (e) {

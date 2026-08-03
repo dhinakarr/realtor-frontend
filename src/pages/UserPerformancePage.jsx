@@ -202,8 +202,10 @@ function ReceivableTable({ receivable }) {
   );
 }
 
-function CommissionTable({ commission }) {
+function CommissionTable({ commission, view }) {
   if (!commission?.length) return null;
+  
+  
 
 const payables = commission.reduce(
   (acc, c) => {
@@ -223,6 +225,7 @@ const payables = commission.reduce(
             <th>Project</th>
 			<th>Plot Number</th>
 			<th>Member Name</th>
+			<th>Sold By</th>
             <th>Plot Price</th>
             <th>Total Payout</th>
             <th>Paid</th>
@@ -233,7 +236,8 @@ const payables = commission.reduce(
             <tr key={c.commissionId}>
               <td>{c.projectName}</td>
 			  <td>{c.plotNumber}</td>
-			  <td>{c.agentName}</td>
+			  <td>{c.agentName} </td>
+			  <td>{c.sellerName} </td>
               <td className="text-end">₹{formatINRComma(c.saleAmount)}</td>
               <td className="text-end">₹{formatINRComma(c.totalCommission)}</td>
               <td className="text-success text-end">{formatINRComma(c.commissionPaid)}</td>
@@ -243,7 +247,7 @@ const payables = commission.reduce(
 		
 		<tfoot>
 		  <tr>
-			<th colSpan="3" className="text-end">Total</th>
+			<th colSpan="4" className="text-end">Total</th>
 			<th className="text-end">₹{formatINRComma(payables.saleAmount)}</th>
 			<th className="text-end">₹{formatINRComma(payables.total)}</th>
 			<th className="text-end">₹{formatINRComma(payables.paid)}</th>
@@ -278,6 +282,8 @@ export default function UserPerformancePage() {
       }
     });
   }, []);
+  
+  
 
   return (
     <div className="container-fluid vh-100">
@@ -410,7 +416,7 @@ function UserPerformancePanel({ user, filters, onFilterChange }) {
 				  fromDate: filters.fromDate,
 				  toDate: filters.toDate
 				});
-
+  const commissionView = user ? "seller" : "member";
 
   useEffect(() => {
     setLoading(true);
@@ -476,7 +482,7 @@ function UserPerformancePanel({ user, filters, onFilterChange }) {
 			<SiteVisitsTable visits={data.siteVisits} />
 			<SalesTable sales={data.sales} />
 			<ReceivableTable receivable={data.receivable} />
-			<CommissionTable commission={data.commission} />
+			<CommissionTable commission={data.commission} view={commissionView} />
 		  </>
 		)
 
